@@ -17,19 +17,36 @@
     Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
     Dim NbVal As Integer = 0
 
-    Dim cpk(8, 8) As Integer ' Candidats par case
-    Dim cpl(8, 8) As Integer ' Candidats par ligne
-    Dim cpli(8, 8) As Integer
-    Dim cplj(8, 8) As Integer
-    Dim cplk(8, 8) As Integer
-    Dim cpc(8, 8) As Integer ' Candidats par colonne
-    Dim cpci(8, 8) As Integer
-    Dim cpcj(8, 8) As Integer
-    Dim cpck(8, 8) As Integer
-    Dim cpr(8, 8) As Integer ' Candidats par région
-    Dim cpri(8, 8) As Integer
-    Dim cprj(8, 8) As Integer
-    Dim cprk(8, 8) As Integer
+    Structure InfoSegment
+        Dim o As Integer ' occurence par segment
+        Dim i As Integer
+        Dim j As Integer
+        Dim k As Integer
+        Dim vp As String ' valeur paire
+        Dim ip As Integer
+        Dim jp As Integer
+        Dim vt As String ' valeur triplet
+        Dim it As Integer
+        Dim jt As Integer
+    End Structure
+
+    Public ILig(8, 8) As Sudoku.InfoSegment
+    Public ICol(8, 8) As Sudoku.InfoSegment
+    Public IReg(8, 8) As Sudoku.InfoSegment
+
+    Dim opk(8, 8) As Integer ' Candidats par case
+    Dim opl(8, 8) As Integer ' Candidats par ligne
+    Dim opli(8, 8) As Integer
+    Dim oplj(8, 8) As Integer
+    Dim oplk(8, 8) As Integer
+    Dim opc(8, 8) As Integer ' Candidats par colonne
+    Dim opci(8, 8) As Integer
+    Dim opcj(8, 8) As Integer
+    Dim opck(8, 8) As Integer
+    Dim opr(8, 8) As Integer ' Candidats par région
+    Dim opri(8, 8) As Integer
+    Dim oprj(8, 8) As Integer
+    Dim oprk(8, 8) As Integer
     Dim Erreur As Boolean
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
@@ -84,12 +101,12 @@
             Case "Test"
                 TextSudoku = sudo_Modèle
                 InitTest()
-                initialisations(Grille, Candidats, cpk, cpl, cpc, cpr)
+                initialisations(Grille, Candidats, opk, opl, opc, opr)
                 Contrôle_Saisie()
             Case "Géné"
                 TextSudoku = Générateur.Générateur(typeGrille)
                 InitTest()
-                initialisations(Grille, Candidats, cpk, cpl, cpc, cpr)
+                initialisations(Grille, Candidats, opk, opl, opc, opr)
                 Contrôle_Saisie()
         End Select
 
@@ -350,7 +367,7 @@
 
     Private Sub Resoudre()
 
-        Calcul_Candidats(Grille, Candidats, cpk, cpl, cpli, cplj, cplk, cpc, cpci, cpcj, cpck, cpr, cpri, cprj, cprk, TabSolution, NbSol)
+        Calcul_Candidats(Grille, Candidats, opk, opl, opli, oplj, oplk, opc, opci, opcj, opck, opr, opri, oprj, oprk, TabSolution, NbSol)
 
         '
         ' Affiche les candidats dans la grille

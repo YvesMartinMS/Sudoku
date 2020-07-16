@@ -30,19 +30,19 @@ Module Générateur
         Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
 
 
-        Dim cpk(8, 8) As Integer ' Candidats par case
-        Dim cpl(8, 8) As Integer ' Candidats par ligne
-        Dim cpli(8, 8) As Integer
-        Dim cplj(8, 8) As Integer
-        Dim cplk(8, 8) As Integer
-        Dim cpc(8, 8) As Integer ' Candidats par colonne
-        Dim cpci(8, 8) As Integer
-        Dim cpcj(8, 8) As Integer
-        Dim cpck(8, 8) As Integer
-        Dim cpr(8, 8) As Integer ' Candidats par région
-        Dim cpri(8, 8) As Integer
-        Dim cprj(8, 8) As Integer
-        Dim cprk(8, 8) As Integer
+        Dim opk(8, 8) As Integer ' Candidats par case
+        Dim opl(8, 8) As Integer ' Candidats par ligne
+        Dim opli(8, 8) As Integer
+        Dim oplj(8, 8) As Integer
+        Dim oplk(8, 8) As Integer
+        Dim opc(8, 8) As Integer ' Candidats par colonne
+        Dim opci(8, 8) As Integer
+        Dim opcj(8, 8) As Integer
+        Dim opck(8, 8) As Integer
+        Dim opr(8, 8) As Integer ' Candidats par région
+        Dim opri(8, 8) As Integer
+        Dim oprj(8, 8) As Integer
+        Dim oprk(8, 8) As Integer
 
         Dim Erreur As Boolean
         Dim ErreurGrille(8, 8) As String
@@ -84,7 +84,7 @@ Module Générateur
             Next
         Next
 
-        initialisations(Grille, Candidats, cpk, cpl, cpc, cpr)
+        initialisations(Grille, Candidats, opk, opl, opc, opr)
 
         'While NbVal < 80 And Not Erreur
         While NbVal < 80 And Not Erreur
@@ -103,7 +103,7 @@ Module Générateur
                 Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient 
                 ControleGénération(Erreur, ErreurGrille, Grille, Candidats)
 
-                If  Erreur Then
+                If Erreur Then
                     Contexte.NbVal = NbVal
                     Contexte.i = i
                     Contexte.j = j
@@ -138,7 +138,7 @@ Module Générateur
 
                 GNbSol = 0
 
-                Calcul_Candidats(Grille, Candidats, cpk, cpl, cpli, cplj, cplk, cpc, cpci, cpcj, cpck, cpr, cpri, cprj, cprk, GTabSolution, GNbSol)
+                Calcul_Candidats(Grille, Candidats, opk, opl, opli, oplj, oplk, opc, opci, opcj, opck, opr, opri, oprj, oprk, GTabSolution, GNbSol)
 
                 If GNbSol > 0 Then
 

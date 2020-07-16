@@ -1,6 +1,6 @@
 ﻿Module Solveur
 
-    Sub initialisations(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String, ByRef _cpk(,) As Integer, ByRef _cpl(,) As Integer, ByRef _cpc(,) As Integer, ByRef _cpr(,) As Integer)
+    Sub initialisations(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String, ByRef _opk(,) As Integer, ByRef _opl(,) As Integer, ByRef _opc(,) As Integer, ByRef _opr(,) As Integer)
 
         Dim _k As Integer
 
@@ -21,10 +21,10 @@
         'initialise les compteurs
         For _i = 0 To 8
             For _j = 0 To 8
-                _cpk(_i, _j) = 0
-                _cpl(_i, _j) = 0
-                _cpc(_i, _j) = 0
-                _cpr(_i, _j) = 0
+                _opk(_i, _j) = 0
+                _opl(_i, _j) = 0
+                _opc(_i, _j) = 0
+                _opr(_i, _j) = 0
             Next
         Next
     End Sub
@@ -216,10 +216,10 @@
     '
 
     Sub Calcul_Candidats(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String,
-                         ByRef _cpk(,) As Integer,
-                         ByRef _cpl(,) As Integer, ByRef _cpli(,) As Integer, _cplj(,) As Integer, ByRef _cplk(,) As Integer,
-                         ByRef _cpc(,) As Integer, ByRef _cpci(,) As Integer, _cpcj(,) As Integer, ByRef _cpck(,) As Integer,
-                         ByRef _cpr(,) As Integer, ByRef _cpri(,) As Integer, _cprj(,) As Integer, ByRef _cprk(,) As Integer,
+                         ByRef _opk(,) As Integer,
+                         ByRef _opl(,) As Integer, ByRef _opli(,) As Integer, _oplj(,) As Integer, ByRef _oplk(,) As Integer,
+                         ByRef _opc(,) As Integer, ByRef _opci(,) As Integer, _opcj(,) As Integer, ByRef _opck(,) As Integer,
+                         ByRef _opr(,) As Integer, ByRef _opri(,) As Integer, _oprj(,) As Integer, ByRef _oprk(,) As Integer,
                          ByRef _TabSolution() As Sudoku.Solution, ByRef _NbSol As Integer)
         '
         ' Elimine les candidats dans les lignes colonnes et régions
@@ -240,23 +240,23 @@
             GommeRégion(_Grille, _Candidats, _r)
         Next
 
-        'Mise à jour le tableau des possibilités par case
-        génère_cpk(_Candidats, _cpk)
+        'Mise à jour le tableau des occurrences par case
+        génère_opk(_Candidats, _opk)
 
-        'Mise à jour le tableau des possibilités par ligne
-        génère_cpl(_Candidats, _cpl, _cpli, _cplj, _cplk)
+        'Mise à jour le tableau des occurrences par ligne
+        génère_opl(_Candidats, _opl, _opli, _oplj, _oplk)
 
-        'Mise à jour le tableau des possibilités par colonne
-        génère_cpc(_Candidats, _cpc, _cpci, _cpcj, _cpck)
+        'Mise à jour le tableau des occurrences par colonne
+        génère_opc(_Candidats, _opc, _opci, _opcj, _opck)
 
-        'Mise à jour le tableau des possibilités par région
-        génère_cpr(_Candidats, _cpr, _cpri, _cprj, _cprk)
+        'Mise à jour le tableau des occurrences par région
+        génère_opr(_Candidats, _opr, _opri, _oprj, _oprk)
 
         _NbSol = 0
-        SeulDansUneCase(_NbSol,_Candidats, _cpk, _TabSolution)
-        SeulDansUneLigne(_NbSol,_cpl, _cpli, _cplj, _cplk, _TabSolution)
-        SeulDansUneColonne(_NbSol,_cpc, _cpci, _cpcj, _cpck, _TabSolution) 
-        SeulDansUneRégion(_NbSol, _cpr, _cpri, _cprj, _cprk, _TabSolution)
+        SeulDansUneCase(_NbSol, _Candidats, _opk, _TabSolution)
+        SeulDansUneLigne(_NbSol, _opl, _opli, _oplj, _oplk, _TabSolution)
+        SeulDansUneColonne(_NbSol, _opc, _opci, _opcj, _opck, _TabSolution)
+        SeulDansUneRégion(_NbSol, _opr, _opri, _oprj, _oprk, _TabSolution)
 
     End Sub
 
@@ -377,18 +377,18 @@
     ' Détermine s'il n'y a plus qu'un candidat dans la case 
     '============================================================================================================================================================
 
-    Sub génère_cpk(ByRef _Candidats(,,) As String, ByRef _cpk(,) As Integer)
-        ' détermine les possibilités par case
+    Sub génère_opk(ByRef _Candidats(,,) As String, ByRef _opk(,) As Integer)
+        ' détermine le nombre de valeurs possibles par case
         Dim _i As Integer
         Dim _j As Integer
         Dim _k As Integer
 
         For _i = 0 To 8
             For _j = 0 To 8
-                _cpk(_i, _j) = 0
+                _opk(_i, _j) = 0
                 For _k = 0 To 8
                     If _Candidats(_i, _j, _k) <> " " Then
-                        _cpk(_i, _j) += 1
+                        _opk(_i, _j) += 1
                     End If
                 Next
             Next
@@ -402,7 +402,7 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub génère_cpl(ByRef _Candidats(,,) As String, ByRef _cpl(,) As Integer, ByRef _cpli(,) As Integer, ByRef _cplj(,) As Integer, ByRef _cplk(,) As Integer)
+    Sub génère_opl(ByRef _Candidats(,,) As String, ByRef _opl(,) As Integer, ByRef _opli(,) As Integer, ByRef _oplj(,) As Integer, ByRef _oplk(,) As Integer)
         ' - Détermine le nombre d'occurrences par ligne
         ' - Détermine la position d'une occurrence seule sur une ligne
         ' - recense les doublons et la position du dernier de chaque doublon sur une ligne
@@ -415,25 +415,25 @@
         ' - Initialise le nombre d'occurrences de k par ligne
         For _i = 0 To 8
             For _k = 0 To 8
-                _cpl(_i, _k) = 0
+                _opl(_i, _k) = 0
             Next
         Next
 
         ' - Détermine le nombre d'occurrences de k par ligne
         For _i = 0 To 8
             For _k = 0 To 8
-                _cpl(_i, _k) = 0
+                _opl(_i, _k) = 0
                 For _j = 0 To 8
                     If _Candidats(_i, _j, _k) <> " " Then
-                        _cpl(_i, _k) += 1
-                        _cpli(_i, _k) = _i
-                        _cplj(_i, _k) = _j
-                        _cplk(_i, _k) = _k
+                        _opl(_i, _k) += 1
+                        _opli(_i, _k) = _i
+                        _oplj(_i, _k) = _j
+                        _oplk(_i, _k) = _k
                     End If
                 Next
             Next
         Next
-
+        ' - identifie et recense les paires par ligne 
         ' - recense les doublons et la position du dernier de chaque doublon sur une ligne
         ' - recense les triplets et la position du dernier de chaque triplet sur une ligne
     End Sub
@@ -444,7 +444,7 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub génère_cpc(ByRef _Candidats(,,) As String, _cpc(,) As Integer, ByRef _cpci(,) As Integer, ByRef _cpcj(,) As Integer, ByRef _cpck(,) As Integer)
+    Sub génère_opc(ByRef _Candidats(,,) As String, _opc(,) As Integer, ByRef _opci(,) As Integer, ByRef _opcj(,) As Integer, ByRef _opck(,) As Integer)
         ' - Détermine le nombre d'occurrences par colonne
         ' - Détermine la position d'une occurrence seule sur une colonne
         ' - recense les doublons et la position du dernier de chaque doublon sur une colonne
@@ -457,20 +457,20 @@
         ' - Initialise le nombre d'occurrences de k par colonne
         For _j = 0 To 8
             For _k = 0 To 8
-                _cpc(_j, _k) = 0
+                _opc(_j, _k) = 0
             Next
         Next
 
         ' - Détermine le nombre d'occurrences de k par colonne
         For _j = 0 To 8
             For _k = 0 To 8
-                _cpc(_j, _k) = 0
+                _opc(_j, _k) = 0
                 For _i = 0 To 8
                     If _Candidats(_i, _j, _k) <> " " Then
-                        _cpc(_j, _k) += 1
-                        _cpci(_j, _k) = _i
-                        _cpcj(_j, _k) = _j
-                        _cpck(_j, _k) = _k
+                        _opc(_j, _k) += 1
+                        _opci(_j, _k) = _i
+                        _opcj(_j, _k) = _j
+                        _opck(_j, _k) = _k
                     End If
                 Next
             Next
@@ -487,7 +487,7 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub génère_cpr(ByRef _Candidats(,,) As String, ByRef _cpr(,) As Integer, ByRef _cpri(,) As Integer, ByRef _cprj(,) As Integer, ByRef _cprk(,) As Integer)
+    Sub génère_opr(ByRef _Candidats(,,) As String, ByRef _opr(,) As Integer, ByRef _opri(,) As Integer, ByRef _oprj(,) As Integer, ByRef _oprk(,) As Integer)
 
         ' - Détermine le nombre d'occurrences par région
         ' - Détermine la position d'une occurrence seule sur une région
@@ -504,7 +504,7 @@
         ' - Initialise le nombre d'occurrences de k par région
         For _r = 0 To 8
             For _k = 0 To 8
-                _cpr(_r, _k) = 0
+                _opr(_r, _k) = 0
             Next
         Next
 
@@ -516,10 +516,10 @@
                 For _j = _jr To _jr + 2
                     For _k = 0 To 8
                         If _Candidats(_i, _j, _k) <> " " Then
-                            _cpr(_r, _k) += 1
-                            _cpri(_r, _k) = _i
-                            _cprj(_r, _k) = _j
-                            _cprk(_r, _k) = _k
+                            _opr(_r, _k) += 1
+                            _opri(_r, _k) = _i
+                            _oprj(_r, _k) = _j
+                            _oprk(_r, _k) = _k
                         End If
                     Next
                 Next
@@ -533,10 +533,10 @@
 
     '============================================================================================================================================================
     ' Recherche de solution 
-    ' Balaye la table cpk - candidats par case - pour alimenter la table des solutions à proposer
+    ' Balaye la table opk - candidats par case - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneCase(ByRef _NbSol As Integer, _Candidats(,,) As String, _cpk(,) As Integer, _TabSolution() As Sudoku.Solution)
+    Sub SeulDansUneCase(ByRef _NbSol As Integer, _Candidats(,,) As String, _opk(,) As Integer, _TabSolution() As Sudoku.Solution)
 
         Dim _i As Integer
         Dim _j As Integer
@@ -545,7 +545,7 @@
 
         For _i = 0 To 8
             For _j = 0 To 8
-                If _cpk(_i, _j) = 1 Then
+                If _opk(_i, _j) = 1 Then
                     For _k = 0 To 8
                         If _Candidats(_i, _j, _k) <> " " Then
                             _New_Solution.i = _i
@@ -563,10 +563,10 @@
 
     '============================================================================================================================================================
     ' Recherche de solution 
-    ' Balaye la table cpl - possibilités par ligne - pour alimenter la table des solutions à proposer
+    ' Balaye la table opl - possibilités par ligne - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneLigne(byref _NbSol  As Integer,_cpl(,) As Integer, _cpli(,) As Integer, _cplj(,) As Integer, _cplk(,) As Integer, _TabSolution() As Sudoku.Solution)
+    Sub SeulDansUneLigne(ByRef _NbSol As Integer, _opl(,) As Integer, _opli(,) As Integer, _oplj(,) As Integer, _oplk(,) As Integer, _TabSolution() As Sudoku.Solution)
 
         Dim _i As Integer
         Dim _k As Integer
@@ -576,12 +576,12 @@
 
         For _i = 0 To 8
             For _k = 0 To 8
-                If _cpl(_i, _k) = 1 Then
-                    _New_Solution.i = _cpli(_i, _k)
-                    _New_Solution.j = _cplj(_i, _k)
-                    _New_Solution.k = Sudoku.Val(_cplk(_i, _k))
+                If _opl(_i, _k) = 1 Then
+                    _New_Solution.i = _opli(_i, _k)
+                    _New_Solution.j = _oplj(_i, _k)
+                    _New_Solution.k = Sudoku.Val(_oplk(_i, _k))
                     _New_Solution.m = "Seule présence dans cette ligne"
-                    Add_Solution(_NbSol, _TabSolution, _New_Solution )
+                    Add_Solution(_NbSol, _TabSolution, _New_Solution)
                 End If
             Next
         Next
@@ -593,10 +593,10 @@
 
     '============================================================================================================================================================
     ' Recherche de solution 
-    ' Balaye la table cpc - possibilités par colonne - pour alimenter la table des solutions à proposer
+    ' Balaye la table opc - possibilités par colonne - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneColonne(ByRef _NbSol As Integer, _cpc(,) As Integer, _cpci(,) As Integer, _cpcj(,) As Integer, _cpck(,) As Integer, _TabSolution() As Sudoku.Solution)
+    Sub SeulDansUneColonne(ByRef _NbSol As Integer, _opc(,) As Integer, _opci(,) As Integer, _opcj(,) As Integer, _opck(,) As Integer, _TabSolution() As Sudoku.Solution)
 
         Dim _j As Integer
         Dim _k As Integer
@@ -606,10 +606,10 @@
 
         For _j = 0 To 8
             For _k = 0 To 8
-                If _cpc(_j, _k) = 1 Then
-                    _New_Solution.i = _cpci(_j, _k)
-                    _New_Solution.j = _cpcj(_j, _k)
-                    _New_Solution.k = Sudoku.Val(_cpck(_j, _k))
+                If _opc(_j, _k) = 1 Then
+                    _New_Solution.i = _opci(_j, _k)
+                    _New_Solution.j = _opcj(_j, _k)
+                    _New_Solution.k = Sudoku.Val(_opck(_j, _k))
                     _New_Solution.m = "Seule présence dans cette colonne"
                     Add_Solution(_NbSol, _TabSolution, _New_Solution)
                 End If
@@ -620,10 +620,10 @@
 
     '============================================================================================================================================================
     ' Recherche de solution 
-    ' Balaye la table cpr - possibilités par région - pour alimenter la table des solutions à proposer
+    ' Balaye la table opr - possibilités par région - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneRégion(ByRef _NbSol As Integer, _cpr(,) As Integer, _cpri(,) As Integer, _cprj(,) As Integer, _cprk(,) As Integer, _TabSolution() As Sudoku.Solution)
+    Sub SeulDansUneRégion(ByRef _NbSol As Integer, _opr(,) As Integer, _opri(,) As Integer, _oprj(,) As Integer, _oprk(,) As Integer, _TabSolution() As Sudoku.Solution)
 
         Dim _r As Integer
         Dim _k As Integer
@@ -633,10 +633,10 @@
 
         For _r = 0 To 8
             For _k = 0 To 8
-                If _cpr(_r, _k) = 1 Then
-                    _New_Solution.i = _cpri(_r, _k)
-                    _New_Solution.j = _cprj(_r, _k)
-                    _New_Solution.k = Sudoku.Val(_cprk(_r, _k))
+                If _opr(_r, _k) = 1 Then
+                    _New_Solution.i = _opri(_r, _k)
+                    _New_Solution.j = _oprj(_r, _k)
+                    _New_Solution.k = Sudoku.Val(_oprk(_r, _k))
                     _New_Solution.m = "Seule présence dans cette région"
                     Add_Solution(_NbSol, _TabSolution, _New_Solution)
                 End If
