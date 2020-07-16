@@ -1,7 +1,5 @@
 ﻿Module Solveur
 
-
-
     Sub initialisations(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String, ByRef _cpk(,) As Integer, ByRef _cpl(,) As Integer, ByRef _cpc(,) As Integer, ByRef _cpr(,) As Integer)
 
         Dim _k As Integer
@@ -31,81 +29,6 @@
         Next
     End Sub
 
-    Sub ExtraitLig(ByRef _Segment() As String, ByRef _SegmentCandidats(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _i As Integer)
-
-        ' extrait un segment et un segment candidats d'une ligne
-        Dim _j As Integer
-        Dim _k As Integer
-
-        For _j = 0 To 8
-            _Segment(_j) = _Grille(_i, _j)
-            For _k = 0 To 8
-                _SegmentCandidats(_j, _k) = _Candidats(_i, _j, _k)
-            Next
-        Next
-
-    End Sub
-
-    Sub ExtraitCol(ByRef _Segment() As String, ByRef _SegmentCandidats(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _j As Integer)
-
-        ' extrait un segment et un segment candidats d'une colonne
-        Dim _i As Integer
-        Dim _k As Integer
-
-        For _i = 0 To 8
-            _Segment(_i) = _Grille(_i, _j)
-            For _k = 0 To 8
-                _SegmentCandidats(_i, _k) = _Candidats(_i, _j, _k)
-            Next
-        Next
-
-    End Sub
-
-    Sub ExtraitReg(ByRef _Segment() As String, ByRef _SegmentCandidats(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _r As Integer)
-
-        ' extrait un segment et un segment candidats d'une région
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _k As Integer
-        Dim _ir As Integer
-        Dim _jr As Integer
-        Dim _g As Integer = 0
-
-        _ir = (_r \ 3) * 3
-        _jr = (_r - _ir) * 3
-        For _i = _ir To _ir + 2
-            For _j = _jr To _jr + 2
-                _Segment(_g) = _Grille(_i, _j)
-                For _k = 0 To 8
-                    _SegmentCandidats(_g, _k) = _Candidats(_ir, _jr, _k)
-                Next
-                _g += 1
-            Next
-        Next
-
-    End Sub
-
-
-
-    Sub ControleSegment(ByRef _Erreur As Boolean, ByRef _ErreurSegment() As String, ByVal _Segment() As String, indice As Integer)
-
-        Dim _i As Integer
-        Dim _j As Integer
-        For _i = 0 To 8
-            _ErreurSegment(_i) = " "
-        Next
-        For _i = 0 To 7
-            For _j = _i + 1 To 8
-                If _Segment(_i) = _Segment(_j) And _Segment(_i) <> "0" Then
-                    _ErreurSegment(_i) = "X"
-                    _ErreurSegment(_j) = "X"
-                    _Erreur = True
-                End If
-            Next
-        Next
-
-    End Sub
-
     Sub ControleLigne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _i As Integer)
 
         ' Contrôle les doublons d'une ligne
@@ -113,12 +36,15 @@
         Dim _jbis As Integer
         Dim _ierr As Integer
         Dim _jerr As Integer
+
+        ' Initialise _ErreurGrille
         For _ierr = 0 To 8
             For _jerr = 0 To 8
                 _ErreurGrille(_ierr, _jerr) = " "
             Next
         Next
-            For _j = 0 To 7
+
+        For _j = 0 To 7
             For _jbis = _j + 1 To 8
                 If _Grille(_i, _j) = _Grille(_i, _jbis) And _Grille(_i, _j) <> "0" Then
                     _ErreurGrille(_i, _j) = "X"
@@ -178,30 +104,9 @@
 
     End Sub
 
-    Sub ControleCandidat(ByRef _Erreur As Boolean, ByRef _ErreurCandidat() As String, ByVal _Segment() As String, ByVal _SegmentCandidats(,) As String, TypeSegment As String, indice As Integer, ByVal _Candidats(,,) As String)
-
-        Dim _s As Integer
-        Dim _k As Integer
-        For _s = 0 To 8
-            _ErreurCandidat(_s) = " "
-        Next
-        For _s = 0 To 8
-            If _Segment(_s) = "0" Then
-                _ErreurCandidat(_s) = "X"
-                For _k = 0 To 8
-                    If _SegmentCandidats(_s, _k) <> " " Then
-                        _ErreurCandidat(_s) = " "
-                    End If
-                Next
-                If _ErreurCandidat(_s) = "X" Then
-                    _Erreur = True
-                End If
-            End If
-        Next
-
-    End Sub
-
     Sub ControleCandidatLigne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _i As Integer)
+
+        ' vérifie que pour une case non occupée il existe au moins un candidat
 
         Dim _j As Integer
         Dim _k As Integer
@@ -225,6 +130,8 @@
 
     Sub ControleCandidatColonne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _j As Integer)
 
+        ' vérifie que pour une case non occupée il existe au moins un candidat
+
         Dim _i As Integer
         Dim _k As Integer
         Dim _ErreurCandidat(8, 8)
@@ -244,7 +151,6 @@
             End If
         Next
     End Sub
-
 
     Sub ControleCandidatRégion(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _r As Integer)
 
@@ -275,32 +181,31 @@
 
     End Sub
 
-    ' Sub ControleGénération(ByRef _Segment() As String, ByRef _SegmentCandidats(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, ByRef _ErreurSegment() As String, ByRef _ErreurCandidat() As String, ByRef _Erreur As Boolean)
     Sub ControleGénération(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String)
         ' Recherche d'erreurs sur les lignes
         Dim _i As Integer
         Dim _j As Integer
         Dim _r As Integer
-        Dim TypeSegment As String
+
         _Erreur = False
-        TypeSegment = "ligne"
         ' Recherche d'erreurs sur les lignes
         For _i = 0 To 8
             ControleLigne(_Erreur, _ErreurGrille, _Grille, _i)
             ControleCandidatLigne(_Erreur, _ErreurGrille, _Grille, _Candidats, _i)
         Next
-        TypeSegment = "colonne"
+
         ' Recherche d'erreurs sur les colonnes
         For _j = 0 To 8
             ControleColonne(_Erreur, _ErreurGrille, _Grille, _j)
             ControleCandidatColonne(_Erreur, _ErreurGrille, _Grille, _Candidats, _j)
         Next
-        TypeSegment = "région"
+
         ' Recherche d'erreurs sur les régions
         For _r = 0 To 8
-            ControleRégion(_Erreur, _ErreurGrille, _Grille, _j)
-            ControleCandidatColonne(_Erreur, _ErreurGrille, _Grille, _Candidats, _r)
+            ControleRégion(_Erreur, _ErreurGrille, _Grille, _r)
+            ControleCandidatRégion(_Erreur, _ErreurGrille, _Grille, _Candidats, _r)
         Next
+
     End Sub
     '
     ' ============================================================================================================================================
@@ -310,8 +215,8 @@
     '============================================================================================================================================
     '
 
-    Sub Calcul_Candidats(ByRef _Grille(,) As String, ByRef _Segment() As String, ByRef _Candidats(,,) As String,
-                         ByRef _SegmentCandidats(,) As String, ByRef _cpk(,) As Integer,
+    Sub Calcul_Candidats(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String,
+                         ByRef _cpk(,) As Integer,
                          ByRef _cpl(,) As Integer, ByRef _cpli(,) As Integer, _cplj(,) As Integer, ByRef _cplk(,) As Integer,
                          ByRef _cpc(,) As Integer, ByRef _cpci(,) As Integer, _cpcj(,) As Integer, ByRef _cpck(,) As Integer,
                          ByRef _cpr(,) As Integer, ByRef _cpri(,) As Integer, _cprj(,) As Integer, ByRef _cprk(,) As Integer,
@@ -348,10 +253,10 @@
         génère_cpr(_Candidats, _cpr, _cpri, _cprj, _cprk)
 
         _NbSol = 0
-        _NbSol = SeulDansUneCase(_Candidats, _cpk, _TabSolution, _NbSol)
-        _NbSol = SeulDansUneLigne(_cpl, _cpli, _cplj, _cplk, _TabSolution, _NbSol)
-        _NbSol = SeulDansUneColonne(_cpc, _cpci, _cpcj, _cpck, _TabSolution, _NbSol)
-        _NbSol = SeulDansUneRégion(_cpr, _cpri, _cprj, _cprk, _TabSolution, _NbSol)
+        SeulDansUneCase(_NbSol,_Candidats, _cpk, _TabSolution)
+        SeulDansUneLigne(_NbSol,_cpl, _cpli, _cplj, _cplk, _TabSolution)
+        SeulDansUneColonne(_NbSol,_cpc, _cpci, _cpcj, _cpck, _TabSolution) 
+        SeulDansUneRégion(_NbSol, _cpr, _cpri, _cprj, _cprk, _TabSolution)
 
     End Sub
 
@@ -365,8 +270,6 @@
         Dim _jbis As Integer
         Dim _k As Integer
         Dim _s As Integer
-        Dim Valeur As String
-
 
         For _j = 0 To 8
             If Grille(_i, _j) <> "0" Then
@@ -446,11 +349,9 @@
     '============================================================================================================================================================
 
     Sub Recalcul_Candidats(ByRef _i As Integer, ByRef _j As Integer, ByRef _Grille(,) As String, ByRef _Candidats(,,) As String)
-        Dim _k As Integer
 
+        Dim _k As Integer
         Dim _r As Integer
-        Dim _Segment(8) As String
-        Dim _SegmentCandidats(8, 8) As String
 
         For _k = 0 To 8
             _Candidats(_i, _j, _k) = " "  ' on enlève les candidats de la case qui vient d'être garnie
@@ -466,7 +367,7 @@
 
         ' Efface le candidat dans la région 
         _r = ((_i \ 3) * 3) + (_j \ 3)  ' calcule la région d'après i et j
-        GommeColonne(_Grille, _Candidats, _r)
+        GommeRégion(_Grille, _Candidats, _r)
 
 
     End Sub
@@ -635,7 +536,7 @@
     ' Balaye la table cpk - candidats par case - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Function SeulDansUneCase(_Candidats(,,) As String, _cpk(,) As Integer, _TabSolution() As Sudoku.Solution, _NbSol As Integer)
+    Sub SeulDansUneCase(ByRef _NbSol As Integer, _Candidats(,,) As String, _cpk(,) As Integer, _TabSolution() As Sudoku.Solution)
 
         Dim _i As Integer
         Dim _j As Integer
@@ -651,88 +552,23 @@
                             _New_Solution.j = _j
                             _New_Solution.k = Sudoku.Val(_k)
                             _New_Solution.m = "Seul candidat dans cette case"
-                            _NbSol = Add_Solution(_TabSolution, _New_Solution, _NbSol)
+                            Add_Solution(_NbSol, _TabSolution, _New_Solution)
                         End If
                     Next
                 End If
             Next
         Next
-        Return _NbSol
-    End Function
 
-    ''============================================================================================================================================================
-    '' Recherche de solution 
-    '' Balaye la table cpl - possiblilités par ligne - pour alimenter la table des solutions à proposer
-    ''============================================================================================================================================================
-
-    'Function SeulDansUneLigne(_cpl(,) As Integer, _cpli(,) As Integer, _cplj(,) As Integer, _cplk(,) As Integer, _TabSolution() As Sudoku.Solution, _NbSol As Integer)
-
-    '    Dim _i As Integer
-    '    Dim _j As Integer
-    '    Dim _k As Integer
-    '    Dim _New_Solution As Sudoku.Solution
-
-    '    ' - Détermine la position d'une occurrence seule sur une ligne
-
-    '    For _i = 0 To 8
-    '        For _k = 0 To 8
-    '            If _cpl(_i, _k) = 1 Then
-    '                _New_Solution.i = _cpli(_i, _k)
-    '                _New_Solution.j = _cplj(_j, _k)
-    '                _New_Solution.k = Sudoku.Val(_cplk(_i, _k))
-    '                _New_Solution.m = "Seule présence dans cette ligne"
-    '                _NbSol = Add_Solution(_TabSolution, _New_Solution, _NbSol)
-    '            End If
-    '        Next
-    '    Next
-
-    '    ' - recense les doublons et la position du dernier de chaque doublon sur une ligne
-    '    ' - recense les triplets et la position du dernier de chaque triplet sur une ligne
-
-    '    Return _NbSol
-
-    'End Function
-
-    ''============================================================================================================================================================
-    '' Recherche de solution 
-    '' Balaye la table cpc - possiblilités par colonne - pour alimenter la table des solutions à proposer
-    ''============================================================================================================================================================
-
-    'Function SeulDansUneColonne(_cpc(,) As Integer, _cpci(,) As Integer, _cpcj(,) As Integer, _cpck(,) As Integer, _TabSolution() As Sudoku.Solution, _NbSol As Integer)
-
-    '    Dim _i As Integer
-    '    Dim _j As Integer
-    '    Dim _k As Integer
-    '    Dim _New_Solution As Sudoku.Solution
-
-    '    ' - Détermine la position d'une occurrence seule sur une colonne
-
-    '    For _j = 0 To 8
-    '        For _k = 0 To 8
-    '            If _cpc(_j, _k) = 1 Then
-    '                _New_Solution.i = _cpci(_i, _k)
-    '                _New_Solution.j = _cpcj(_j, _k)
-    '                _New_Solution.k = Sudoku.Val(_cpck(_j, _k))
-    '                _New_Solution.m = "Seule présence dans cette colonne"
-    '                _NbSol = Add_Solution(_TabSolution, _New_Solution, _NbSol)
-    '            End If
-    '        Next
-    '    Next
-
-    '    Return _NbSol
-
-    'End Function
-
+    End Sub
 
     '============================================================================================================================================================
     ' Recherche de solution 
-    ' Balaye la table cpl - possiblilités par ligne - pour alimenter la table des solutions à proposer
+    ' Balaye la table cpl - possibilités par ligne - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Function SeulDansUneLigne(_cpl(,) As Integer, _cpli(,) As Integer, _cplj(,) As Integer, _cplk(,) As Integer, _TabSolution() As Sudoku.Solution, _NbSol As Integer)
+    Sub SeulDansUneLigne(byref _NbSol  As Integer,_cpl(,) As Integer, _cpli(,) As Integer, _cplj(,) As Integer, _cplk(,) As Integer, _TabSolution() As Sudoku.Solution)
 
         Dim _i As Integer
-
         Dim _k As Integer
         Dim _New_Solution As Sudoku.Solution
 
@@ -745,7 +581,7 @@
                     _New_Solution.j = _cplj(_i, _k)
                     _New_Solution.k = Sudoku.Val(_cplk(_i, _k))
                     _New_Solution.m = "Seule présence dans cette ligne"
-                    _NbSol = Add_Solution(_TabSolution, _New_Solution, _NbSol)
+                    Add_Solution(_NbSol, _TabSolution, _New_Solution )
                 End If
             Next
         Next
@@ -753,17 +589,14 @@
         ' - recense les doublons et la position du dernier de chaque doublon sur une ligne
         ' - recense les triplets et la position du dernier de chaque triplet sur une ligne
 
-        Return _NbSol
-
-    End Function
+    End Sub
 
     '============================================================================================================================================================
     ' Recherche de solution 
-    ' Balaye la table cpc - possiblilités par colonne - pour alimenter la table des solutions à proposer
+    ' Balaye la table cpc - possibilités par colonne - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Function SeulDansUneColonne(_cpc(,) As Integer, _cpci(,) As Integer, _cpcj(,) As Integer, _cpck(,) As Integer, _TabSolution() As Sudoku.Solution, _NbSol As Integer)
-
+    Sub SeulDansUneColonne(ByRef _NbSol As Integer, _cpc(,) As Integer, _cpci(,) As Integer, _cpcj(,) As Integer, _cpck(,) As Integer, _TabSolution() As Sudoku.Solution)
 
         Dim _j As Integer
         Dim _k As Integer
@@ -778,21 +611,19 @@
                     _New_Solution.j = _cpcj(_j, _k)
                     _New_Solution.k = Sudoku.Val(_cpck(_j, _k))
                     _New_Solution.m = "Seule présence dans cette colonne"
-                    _NbSol = Add_Solution(_TabSolution, _New_Solution, _NbSol)
+                    Add_Solution(_NbSol, _TabSolution, _New_Solution)
                 End If
             Next
         Next
 
-        Return _NbSol
-
-    End Function
+    End Sub
 
     '============================================================================================================================================================
     ' Recherche de solution 
-    ' Balaye la table cpr - possiblilités par région - pour alimenter la table des solutions à proposer
+    ' Balaye la table cpr - possibilités par région - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Function SeulDansUneRégion(_cpr(,) As Integer, _cpri(,) As Integer, _cprj(,) As Integer, _cprk(,) As Integer, _TabSolution() As Sudoku.Solution, _NbSol As Integer)
+    Sub SeulDansUneRégion(ByRef _NbSol As Integer, _cpr(,) As Integer, _cpri(,) As Integer, _cprj(,) As Integer, _cprk(,) As Integer, _TabSolution() As Sudoku.Solution)
 
         Dim _r As Integer
         Dim _k As Integer
@@ -807,20 +638,18 @@
                     _New_Solution.j = _cprj(_r, _k)
                     _New_Solution.k = Sudoku.Val(_cprk(_r, _k))
                     _New_Solution.m = "Seule présence dans cette région"
-                    _NbSol = Add_Solution(_TabSolution, _New_Solution, _NbSol)
+                    Add_Solution(_NbSol, _TabSolution, _New_Solution)
                 End If
             Next
         Next
 
-        Return _NbSol
-
-    End Function
+    End Sub
 
     '============================================================================================================================================================
     ' Ajoute un poste dans la table des solutions 
     '============================================================================================================================================================
 
-    Function Add_Solution(_TabSolution() As Sudoku.Solution, New_Solution As Sudoku.Solution, _NbSol As Integer)
+    Sub Add_Solution(ByRef _NbSol As Integer, _TabSolution() As Sudoku.Solution, New_Solution As Sudoku.Solution)
 
         Dim _ExisteDeja As Boolean = False
         If _NbSol > 0 Then
@@ -837,8 +666,8 @@
             _TabSolution(_NbSol).m = New_Solution.m
             _NbSol += 1
         End If
-        Return _NbSol
-    End Function
+
+    End sub
 
     '============================================================================================================================================================
     ' Fait une rotation des postes de la table des solutions

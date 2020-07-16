@@ -30,10 +30,7 @@
     Dim cpri(8, 8) As Integer
     Dim cprj(8, 8) As Integer
     Dim cprk(8, 8) As Integer
-    Dim Segment(8) As String
     Dim Erreur As Boolean
-
-    Dim ErreurSegment(8) As String
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
 
@@ -82,7 +79,7 @@
                 TBini(i, j) = TB(i, j)
             Next
         Next
-        Mode = "Test"
+        Mode = "Géné"
         Select Case Mode
             Case "Test"
                 TextSudoku = sudo_Modèle
@@ -96,7 +93,7 @@
                 Contrôle_Saisie()
         End Select
 
-        i = 0
+        '     i = 0
 
     End Sub
 #Region "Initialisations"
@@ -239,23 +236,22 @@
 #End Region
 #Region "Controles préalables"
     Sub Contrôle_Saisie()
+
         ' Recherche de doublons sur les lignes
         For i = 0 To 8
             ControleLigne(Erreur, ErreurGrille, Grille, i)
-            AfficheErreurLigne()
-
         Next
         ' Recherche de doublons sur les colonnes
         For j = 0 To 8
             ControleColonne(Erreur, ErreurGrille, Grille, j)
-            AfficheErreurColonne()
-
         Next
         ' Recherche de doublons sur les régions
         For r = 0 To 8
             ControleRégion(Erreur, ErreurGrille, Grille, r)
-            AfficheErreurRegion()
         Next
+
+        AfficheErreur()
+
 #End Region
     End Sub
 
@@ -265,46 +261,16 @@
     '                                                             A F F I C H A G E S 
     '============================================================================================================================================================
 
-    Sub AfficheErreurLigne()
-        For j = 0 To 8
-            If ErreurSegment(j) = "X" Or ErreurSegment(j) = "Y" Then
-                TB(i, j).BackColor = Color.Red
-            Else
-                TB(i, j).ForeColor = TBini(i, j).ForeColor
-            End If
-        Next
-    End Sub
-
-    Sub AfficheErreurColonne()
+    Sub AfficheErreur()
         For i = 0 To 8
-            If ErreurSegment(j) = "X" Or ErreurSegment(j) = "Y" Then
-                TB(i, j).BackColor = Color.Red
-            Else
-                TB(i, j).ForeColor = TBini(i, j).ForeColor
-            End If
-        Next
-    End Sub
-
-    Sub AfficheErreurRegion()
-        Dim ir As Integer
-        Dim jr As Integer
-
-        ir = (r \ 3) * 3
-        jr = (r - ir) * 3
-        g = 0
-
-        For i = ir To ir + 2
-            For j = jr To jr + 2
-                If ErreurSegment(g) = "X" Or ErreurSegment(j) = "Y" Then
+            For j = 0 To 8
+                If ErreurGrille(i, j) = "X" Or ErreurGrille(i, j) = "Y" Then
                     TB(i, j).BackColor = Color.Red
                 Else
-                    TB(i, j).BackColor = TBini(ir, jr).BackColor
+                    TB(i, j).ForeColor = TBini(i, j).ForeColor
                 End If
-                g += 1
             Next
         Next
-
-
     End Sub
 
     Sub raffraichi_ligne(_i As Integer)
@@ -384,7 +350,7 @@
 
     Private Sub Resoudre()
 
-        Calcul_Candidats(Grille, Segment, Candidats, SegmentCandidats, cpk, cpl, cpli, cplj, cplk, cpc, cpci, cpcj, cpck, cpr, cpri, cprj, cprk, TabSolution, NbSol)
+        Calcul_Candidats(Grille, Candidats, cpk, cpl, cpli, cplj, cplk, cpc, cpci, cpcj, cpck, cpr, cpri, cprj, cprk, TabSolution, NbSol)
 
         '
         ' Affiche les candidats dans la grille

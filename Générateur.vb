@@ -1,8 +1,21 @@
 ﻿Imports System.IO
 Module Générateur
 
+    Structure Contexte
+        Dim NbVal As Integer
+        Dim i As Integer
+        Dim j As Integer
+        Dim v As Integer
+        Dim Grille(,) As String ' La grille de Sudoku
+        Dim Candidats(,,) As String ' La grille des candidats ( Valeurs au crayon)
+    End Structure
+
     Function Générateur(ByVal typeGrille As String)
         Const PATHFICHIER As String = "Sudoku.txt"
+
+        Dim Contexte As New Contexte
+        Dim Pile As Stack = New Stack()
+
         Dim i As Integer = 0
         Dim j As Integer = 0
         Dim k As Integer = 0
@@ -12,9 +25,10 @@ Module Générateur
         Dim s As Integer = 0
         Dim z As String = 0
 
+        Dim NbVal As Integer = 0
         Dim Grille(8, 8) As String ' La grille de Sudoku
         Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
-        Dim NbVal As Integer = 0
+
 
         Dim cpk(8, 8) As Integer ' Candidats par case
         Dim cpl(8, 8) As Integer ' Candidats par ligne
@@ -30,13 +44,8 @@ Module Générateur
         Dim cprj(8, 8) As Integer
         Dim cprk(8, 8) As Integer
 
-        Dim Segment(8) As String
-        Dim _ErreurSegment(8) As String
-        Dim SegmentCandidats(8, 8) As String
-
         Dim Erreur As Boolean
         Dim ErreurGrille(8, 8) As String
-
 
         Dim GTabSolution(80) As Sudoku.Solution
         Dim GNbSol As Integer = 0 'Nombre solutions en réserve
@@ -93,6 +102,17 @@ Module Générateur
                 généCase(Grille, Candidats, i, j, NbVal, TextSudoku, pili, pilj, pilv, pilr, ModeDebug)
                 Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient 
                 ControleGénération(Erreur, ErreurGrille, Grille, Candidats)
+
+                If  Erreur Then
+                    Contexte.NbVal = NbVal
+                    Contexte.i = i
+                    Contexte.j = j
+                    Contexte.v = Grille(i, j)
+                    Contexte.Grille = Grille
+                    Contexte.Candidats = Candidats
+                    Pile.Push(Contexte)
+                End If
+
                 If typeGrille = "Sym" Then
                     If i <> 4 Or j <> 4 Then
                         i = 8 - i
@@ -100,6 +120,15 @@ Module Générateur
                         généCase(Grille, Candidats, i, j, NbVal, TextSudoku, pili, pilj, pilv, pilr, ModeDebug)
                         Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient 
                         ControleGénération(Erreur, ErreurGrille, Grille, Candidats)
+                        If Not Erreur Then
+                            Contexte.NbVal = NbVal
+                            Contexte.i = i
+                            Contexte.j = j
+                            Contexte.v = Grille(i, j)
+                            Contexte.Grille = Grille
+                            Contexte.Candidats = Candidats
+                            Pile.Push(Contexte)
+                        End If
                     End If
                 End If
 
@@ -109,7 +138,7 @@ Module Générateur
 
                 GNbSol = 0
 
-                Calcul_Candidats(Grille, Segment, Candidats, SegmentCandidats, cpk, cpl, cpli, cplj, cplk, cpc, cpci, cpcj, cpck, cpr, cpri, cprj, cprk, GTabSolution, GNbSol)
+                Calcul_Candidats(Grille, Candidats, cpk, cpl, cpli, cplj, cplk, cpc, cpci, cpcj, cpck, cpr, cpri, cprj, cprk, GTabSolution, GNbSol)
 
                 If GNbSol > 0 Then
 
@@ -149,6 +178,7 @@ Module Générateur
     End Function
 
     Sub ChoisitCase(ByVal Grille(,) As String, ByVal NbVal As Integer, ByRef i As Integer, ByRef j As Integer)
+
         Dim g As Integer
         Dim h As Integer
         g = GetRandom(0, 81 - NbVal)
@@ -181,7 +211,6 @@ Module Générateur
         Dim TS As String
 
         Dim attribué As Boolean
-
 
         NombreCandidats = 0
         For k = 0 To 8
