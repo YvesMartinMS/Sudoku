@@ -1,4 +1,5 @@
 ﻿Public Class Sudoku
+
 #Region " Déclarations"
 
     '============================================================================================================================================================
@@ -11,55 +12,57 @@
     Dim j As Integer = 0
     Dim k As Integer = 0
     Dim g As Integer = 0
-    Dim r As Integer = 0
+    'Dim r As Integer = 0
 
     Dim Grille(8, 8) As String ' La grille de Sudoku
     Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
     Dim NbVal As Integer = 0
 
-    Structure InfoSegment
-        Dim o As Integer ' occurence par segment
+    Structure StrAnalyse
+        Dim n As Integer ' occurrences par case
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-        Dim vp As String ' valeur paire
-        Dim ip As Integer
-        Dim jp As Integer
-        Dim vt As String ' valeur triplet
-        Dim it As Integer
-        Dim jt As Integer
+        Dim v As String
     End Structure
 
-    Public ILig(8, 8) As Sudoku.InfoSegment
-    Public ICol(8, 8) As Sudoku.InfoSegment
-    Public IReg(8, 8) As Sudoku.InfoSegment
+    Structure StrSolution
+        Dim i As Integer
+        Dim j As Integer
+        Dim v As String 'Valeur
+        Dim m As String 'Motif
+    End Structure
 
-    Dim opk(8, 8) As Integer ' Candidats par case
-    Dim opl(8, 8) As Integer ' Candidats par ligne
-    Dim opli(8, 8) As Integer
-    Dim oplj(8, 8) As Integer
-    Dim oplk(8, 8) As Integer
-    Dim opc(8, 8) As Integer ' Candidats par colonne
-    Dim opci(8, 8) As Integer
-    Dim opcj(8, 8) As Integer
-    Dim opck(8, 8) As Integer
-    Dim opr(8, 8) As Integer ' Candidats par région
-    Dim opri(8, 8) As Integer
-    Dim oprj(8, 8) As Integer
-    Dim oprk(8, 8) As Integer
+    Structure StrSimplification
+        Dim n As Integer
+        Dim i() As Integer
+        Dim j() As Integer
+        Dim v() As String 'Valeur
+        Dim m As String 'Motif
+        Dim act As Boolean
+    End Structure
+
+    Structure Contexte
+        Dim NbVal As Integer
+        Dim i As Integer
+        Dim j As Integer
+        Dim v As Integer
+        Dim Grille(,) As String ' La grille de Sudoku
+        Dim Candidats(,,) As String ' La grille des candidats ( Valeurs au crayon)
+    End Structure
+
+    Dim Analyse(8, 8) As Sudoku.StrAnalyse
+    Dim opk(8, 8) As Integer ' Occurrences de k par case
+    Dim nuplet(8, 8) As String 'Candidats agrégés
+
     Dim Erreur As Boolean
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
 
-    Structure Solution
-        Dim i As Integer
-        Dim j As Integer
-        Dim k As String 'Valeur
-        Dim m As String 'Motif
-    End Structure
-
-    Public TabSolution(80) As Sudoku.Solution
+    Public TabSolution(80) As Sudoku.StrSolution
     Public NbSol As Integer = 0 'Nombre solutions en réserve
+
+    Public Simplification As Sudoku.StrSimplification
 
     Public Val As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
 
@@ -75,7 +78,9 @@
     Dim sudoTestCol As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  8 427    1     9   4"
     Dim sudoTestReg As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  81427    1     9   4"
     Dim sudoDifficile As String = " 9 8 2     79  1 36   7 5   7    9 2         9 3    6   6 1   42 8  43     2 6 7 "
-    Dim TextSudoku As String
+    Dim Sudopairlig As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 "
+    Dim jaugeeeeeee As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
+    Dim TextSudoku As String = "                                                                                 "
 
 
 #End Region
@@ -96,17 +101,18 @@
                 TBini(i, j) = TB(i, j)
             Next
         Next
-        Mode = "Géné"
+        Mode = "Test"
         Select Case Mode
             Case "Test"
                 TextSudoku = sudo_Modèle
+                TextSudoku = Sudopairlig
                 InitTest()
-                initialisations(Grille, Candidats, opk, opl, opc, opr)
+                Initialisations(Grille, Candidats)
                 Contrôle_Saisie()
             Case "Géné"
-                TextSudoku = Générateur.Générateur(typeGrille)
+                Générateur.Générateur(typeGrille, TextSudoku)
                 InitTest()
-                initialisations(Grille, Candidats, opk, opl, opc, opr)
+                Initialisations(Grille, Candidats)
                 Contrôle_Saisie()
         End Select
 
@@ -205,7 +211,6 @@
     Sub InitTest()
         ' Remplace le module de saisie
 
-        '    Grille = sudoDifficile
         g = 0
         For i = 0 To 8
             For j = 0 To 8
@@ -290,7 +295,7 @@
         Next
     End Sub
 
-    Sub raffraichi_ligne(_i As Integer)
+    Sub RaffraichiLigne(_i As Integer)
         ' pour afficherles candidats de la ligne
         Dim _j As Integer
         For _j = 0 To 8
@@ -301,7 +306,7 @@
 
     End Sub
 
-    Sub raffraichi_colonne(_j As Integer)
+    Sub RaffraichiColonne(_j As Integer)
         ' pour afficherles candidats de la colonne
         Dim _i As Integer
         For _i = 0 To 8
@@ -312,7 +317,7 @@
 
     End Sub
 
-    Sub raffraichi_région(_i As Integer, _j As Integer)
+    Sub RaffraichiRégion(_i As Integer, _j As Integer)
         ' pour afficherles candidats de la région
         Dim _r As Integer
         Dim _ir As Integer
@@ -367,7 +372,7 @@
 
     Private Sub Resoudre()
 
-        Calcul_Candidats(Grille, Candidats, opk, opl, opli, oplj, oplk, opc, opci, opcj, opck, opr, opri, oprj, oprk, TabSolution, NbSol)
+        Calcul_Candidats(Grille, Candidats, opk, nuplet, TabSolution, NbSol, Simplification)
 
         '
         ' Affiche les candidats dans la grille
@@ -391,7 +396,7 @@
 
         If NbSol > 0 Then
             LBL_Conseil.Text = "Ligne " & TabSolution(0).i + 1 & " colonne " & TabSolution(0).j + 1 & " " & TabSolution(0).m & " : " _
-                             & TabSolution(0).k & " / " & NbSol & " / "
+                             & TabSolution(0).v & " / " & NbSol & " / "
             ProchaineSolution(TabSolution, NbSol)
         Else
             MsgBox("On passe à la suite")
@@ -409,7 +414,7 @@
 
             i = TabSolution(NbSol - 1).i
             j = TabSolution(NbSol - 1).j
-            TB(i, j).Text = TabSolution(NbSol - 1).k
+            TB(i, j).Text = TabSolution(NbSol - 1).v
             Grille(i, j) = TB(i, j).Text
 
             TB(i, j).Font = TB_grand_modele.Font
@@ -418,13 +423,13 @@
 
             Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient  
 
-            raffraichi_ligne(i)
-            raffraichi_colonne(j)
-            raffraichi_région(i, j)
+            RaffraichiLigne(i)
+            RaffraichiColonne(j)
+            RaffraichiRégion(i, j)
 
             TabSolution(NbSol - 1).i = "0"
             TabSolution(NbSol - 1).j = "0"
-            TabSolution(NbSol - 1).k = ""
+            TabSolution(NbSol - 1).v = ""
             TabSolution(NbSol - 1).m = ""
             NbSol -= 1
 

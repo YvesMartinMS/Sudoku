@@ -6,7 +6,7 @@
             Dim Element As New ListViewItem
             Element.Text = Sudoku.TabSolution(i).i
             Element.SubItems.Add(Sudoku.TabSolution(i).j)
-            Element.SubItems.Add(Sudoku.TabSolution(i).k)
+            Element.SubItems.Add(Sudoku.TabSolution(i).v)
             Element.SubItems.Add(Sudoku.TabSolution(i).m)
             ListSolution.Items.Add(Element)
         Next
@@ -16,4 +16,7 @@
         Me.Close()
     End Sub
 
+    Private Sub ListSolution_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListSolution.SelectedIndexChanged
+
+    End Sub
 End Class

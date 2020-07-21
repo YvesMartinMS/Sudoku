@@ -1,6 +1,6 @@
 ﻿Module Solveur
 
-    Sub initialisations(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String, ByRef _opk(,) As Integer, ByRef _opl(,) As Integer, ByRef _opc(,) As Integer, ByRef _opr(,) As Integer)
+    Sub Initialisations(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String)
 
         Dim _k As Integer
 
@@ -18,15 +18,7 @@
                 End If
             Next
         Next
-        'initialise les compteurs
-        For _i = 0 To 8
-            For _j = 0 To 8
-                _opk(_i, _j) = 0
-                _opl(_i, _j) = 0
-                _opc(_i, _j) = 0
-                _opr(_i, _j) = 0
-            Next
-        Next
+
     End Sub
 
     Sub ControleLigne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _i As Integer)
@@ -183,6 +175,7 @@
 
     Sub ControleGénération(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String)
         ' Recherche d'erreurs sur les lignes
+        ' case sans candidat ou deux fois la même valeur sur un segment
         Dim _i As Integer
         Dim _j As Integer
         Dim _r As Integer
@@ -216,17 +209,17 @@
     '
 
     Sub Calcul_Candidats(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String,
-                         ByRef _opk(,) As Integer,
-                         ByRef _opl(,) As Integer, ByRef _opli(,) As Integer, _oplj(,) As Integer, ByRef _oplk(,) As Integer,
-                         ByRef _opc(,) As Integer, ByRef _opci(,) As Integer, _opcj(,) As Integer, ByRef _opck(,) As Integer,
-                         ByRef _opr(,) As Integer, ByRef _opri(,) As Integer, _oprj(,) As Integer, ByRef _oprk(,) As Integer,
-                         ByRef _TabSolution() As Sudoku.Solution, ByRef _NbSol As Integer)
+                         ByRef _opk(,) As Integer, ByRef _nuplet(,) As String,
+                         ByRef _TabSolution() As Sudoku.StrSolution, ByRef _NbSol As Integer,
+                         _Simplification As Sudoku.StrSimplification)
         '
         ' Elimine les candidats dans les lignes colonnes et régions
         '
         Dim _i As Integer
         Dim _j As Integer
         Dim _r As Integer
+        Dim _Analyse(8, 8) As Sudoku.StrAnalyse
+
         ' Efface les candidats dans les lignes
         For _i = 0 To 8
             GommeLigne(_Grille, _Candidats, _i)
@@ -240,27 +233,40 @@
             GommeRégion(_Grille, _Candidats, _r)
         Next
 
+        'initialise les compteurs
+        For _i = 0 To 8
+            For _j = 0 To 8
+                _opk(_i, _j) = 0
+            Next
+        Next
+
         'Mise à jour le tableau des occurrences par case
-        génère_opk(_Candidats, _opk)
+        AnalyseCase(_Candidats, _opk, _nuplet)
 
         'Mise à jour le tableau des occurrences par ligne
-        génère_opl(_Candidats, _opl, _opli, _oplj, _oplk)
+        AnalyseLigne(_Candidats, _Analyse)
 
         'Mise à jour le tableau des occurrences par colonne
-        génère_opc(_Candidats, _opc, _opci, _opcj, _opck)
+        AnalyseColonne(_Candidats, _Analyse)
 
         'Mise à jour le tableau des occurrences par région
-        génère_opr(_Candidats, _opr, _opri, _oprj, _oprk)
+        AnalyseRégion(_Candidats, _Analyse)
 
         _NbSol = 0
         SeulDansUneCase(_NbSol, _Candidats, _opk, _TabSolution)
-        SeulDansUneLigne(_NbSol, _opl, _opli, _oplj, _oplk, _TabSolution)
-        SeulDansUneColonne(_NbSol, _opc, _opci, _opcj, _opck, _TabSolution)
-        SeulDansUneRégion(_NbSol, _opr, _opri, _oprj, _oprk, _TabSolution)
+        SeulDansUneLigne(_NbSol, _Analyse, _TabSolution)
+        SeulDansUneColonne(_NbSol, _Analyse, _TabSolution)
+        SeulDansUneRégion(_NbSol, _Analyse, _TabSolution)
+
+        'If _NbSol = 0 Then
+        '    PaireNueLig(_Candidats, _Simplification, _opk, _nuplet)
+        'End If
+
+        If _NbSol = 0 Then
+            PaireNueCol(_Candidats, _Simplification, _opk, _nuplet)
+        End If
 
     End Sub
-
-
 
     Sub GommeLigne(ByVal Grille(,) As String, ByRef Candidats(,,) As String, _i As Integer)
 
@@ -309,7 +315,6 @@
         Next
 
     End Sub
-
 
     Sub GommeRégion(ByVal Grille(,) As String, ByRef Candidats(,,) As String, _r As Integer)
 
@@ -369,7 +374,6 @@
         _r = ((_i \ 3) * 3) + (_j \ 3)  ' calcule la région d'après i et j
         GommeRégion(_Grille, _Candidats, _r)
 
-
     End Sub
 
     '============================================================================================================================================================
@@ -377,7 +381,7 @@
     ' Détermine s'il n'y a plus qu'un candidat dans la case 
     '============================================================================================================================================================
 
-    Sub génère_opk(ByRef _Candidats(,,) As String, ByRef _opk(,) As Integer)
+    Sub AnalyseCase(ByRef _Candidats(,,) As String, ByRef _opk(,) As Integer, ByRef _nuplet(,) As String)
         ' détermine le nombre de valeurs possibles par case
         Dim _i As Integer
         Dim _j As Integer
@@ -386,9 +390,11 @@
         For _i = 0 To 8
             For _j = 0 To 8
                 _opk(_i, _j) = 0
+                _nuplet(_i, _j) = ""
                 For _k = 0 To 8
                     If _Candidats(_i, _j, _k) <> " " Then
                         _opk(_i, _j) += 1
+                        _nuplet(_i, _j) = _nuplet(_i, _j) & _Candidats(_i, _j, _k)
                     End If
                 Next
             Next
@@ -402,40 +408,29 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub génère_opl(ByRef _Candidats(,,) As String, ByRef _opl(,) As Integer, ByRef _opli(,) As Integer, ByRef _oplj(,) As Integer, ByRef _oplk(,) As Integer)
-        ' - Détermine le nombre d'occurrences par ligne
-        ' - Détermine la position d'une occurrence seule sur une ligne
-        ' - recense les doublons et la position du dernier de chaque doublon sur une ligne
-        ' - recense les triplets et la position du dernier de chaque triplet sur une ligne
+    Sub AnalyseLigne(ByRef _Candidats(,,) As String, ByRef _AnlLig(,) As Sudoku.StrAnalyse)
+        ' - Détermine le nombre d'occurrences de chaque candidat par ligne
+        ' - Détermine la position d'un candidat seul sur une ligne
 
         Dim _i As Integer
         Dim _j As Integer
         Dim _k As Integer
 
-        ' - Initialise le nombre d'occurrences de k par ligne
-        For _i = 0 To 8
-            For _k = 0 To 8
-                _opl(_i, _k) = 0
-            Next
-        Next
-
         ' - Détermine le nombre d'occurrences de k par ligne
         For _i = 0 To 8
             For _k = 0 To 8
-                _opl(_i, _k) = 0
+                _AnlLig(_i, _k).n = 0
                 For _j = 0 To 8
                     If _Candidats(_i, _j, _k) <> " " Then
-                        _opl(_i, _k) += 1
-                        _opli(_i, _k) = _i
-                        _oplj(_i, _k) = _j
-                        _oplk(_i, _k) = _k
+                        _AnlLig(_i, _k).n += 1
+                        _AnlLig(_i, _k).i = _i
+                        _AnlLig(_i, _k).j = _j
+                        _AnlLig(_i, _k).k = _k
                     End If
                 Next
             Next
         Next
-        ' - identifie et recense les paires par ligne 
-        ' - recense les doublons et la position du dernier de chaque doublon sur une ligne
-        ' - recense les triplets et la position du dernier de chaque triplet sur une ligne
+
     End Sub
 
     '============================================================================================================================================================
@@ -444,40 +439,28 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub génère_opc(ByRef _Candidats(,,) As String, _opc(,) As Integer, ByRef _opci(,) As Integer, ByRef _opcj(,) As Integer, ByRef _opck(,) As Integer)
-        ' - Détermine le nombre d'occurrences par colonne
-        ' - Détermine la position d'une occurrence seule sur une colonne
-        ' - recense les doublons et la position du dernier de chaque doublon sur une colonne
-        ' - recense les triplets et la position du dernier de chaque triplet sur une colonne
+    Sub AnalyseColonne(ByRef _Candidats(,,) As String, ByRef _AnlCol(,) As Sudoku.StrAnalyse)
+        ' - Détermine le nombre d'occurrences de chaque candidat par colonne
+        ' - Détermine la position d'un candidat seul sur une colonne
 
         Dim _i As Integer
         Dim _j As Integer
         Dim _k As Integer
 
-        ' - Initialise le nombre d'occurrences de k par colonne
-        For _j = 0 To 8
-            For _k = 0 To 8
-                _opc(_j, _k) = 0
-            Next
-        Next
-
         ' - Détermine le nombre d'occurrences de k par colonne
         For _j = 0 To 8
             For _k = 0 To 8
-                _opc(_j, _k) = 0
+                _AnlCol(_j, _k).n = 0
                 For _i = 0 To 8
                     If _Candidats(_i, _j, _k) <> " " Then
-                        _opc(_j, _k) += 1
-                        _opci(_j, _k) = _i
-                        _opcj(_j, _k) = _j
-                        _opck(_j, _k) = _k
+                        _AnlCol(_j, _k).n += 1
+                        _AnlCol(_j, _k).i = _i
+                        _AnlCol(_j, _k).j = _j
+                        _AnlCol(_j, _k).k = _k
                     End If
                 Next
             Next
         Next
-
-        ' - recense les doublons et la position du dernier de chaque doublon sur une colonne
-        ' - recense les triplets et la position du dernier de chaque triplet sur une colonne
 
     End Sub
 
@@ -487,12 +470,10 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub génère_opr(ByRef _Candidats(,,) As String, ByRef _opr(,) As Integer, ByRef _opri(,) As Integer, ByRef _oprj(,) As Integer, ByRef _oprk(,) As Integer)
+    Sub AnalyseRégion(ByRef _Candidats(,,) As String, ByRef _AnlReg(,) As Sudoku.StrAnalyse)
 
-        ' - Détermine le nombre d'occurrences par région
-        ' - Détermine la position d'une occurrence seule sur une région
-        ' - recense les doublons et la position du dernier de chaque doublon sur une région
-        ' - recense les triplets et la position du dernier de chaque triplet sur une région
+        ' - Détermine le nombre d'occurrences de chaque candidat par région
+        ' - Détermine la position d'un candidat seul sur une région
 
         Dim _i As Integer
         Dim _j As Integer
@@ -504,7 +485,7 @@
         ' - Initialise le nombre d'occurrences de k par région
         For _r = 0 To 8
             For _k = 0 To 8
-                _opr(_r, _k) = 0
+                _AnlReg(_r, _k).n = 0
             Next
         Next
 
@@ -516,32 +497,143 @@
                 For _j = _jr To _jr + 2
                     For _k = 0 To 8
                         If _Candidats(_i, _j, _k) <> " " Then
-                            _opr(_r, _k) += 1
-                            _opri(_r, _k) = _i
-                            _oprj(_r, _k) = _j
-                            _oprk(_r, _k) = _k
+                            _AnlReg(_r, _k).n += 1
+                            _AnlReg(_r, _k).i = _i
+                            _AnlReg(_r, _k).j = _j
+                            _AnlReg(_r, _k).k = _k
                         End If
                     Next
                 Next
             Next
         Next
 
-        ' - recense les doublons et la position du dernier de chaque doublon sur une région
-        ' - recense les triplets et la position du dernier de chaque triplet sur une région
+    End Sub
+
+    '============================================================================================================================================================
+    ' Simplification des candidats 
+    ' recense les paires et la position de la dernière paire une ligne
+    '============================================================================================================================================================
+
+    Sub PaireNueLig(ByRef _Candidats(,,) As String, ByRef _Simplification As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
+        ' - recense les paires et la position de la dernière paire une ligne
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _jbis As Integer
+        Dim _k As Integer
+
+        For _i = 0 To 8
+            ' appariement
+            For _j = 0 To 7
+                If _opk(_i, _j) = 2 Then
+                    For _jbis = _j + 1 To 8
+                        If _opk(_i, _jbis) = 2 Then
+                            If _nuplet(_i, _j) = _nuplet(_i, _jbis) Then
+                                _Simplification.n = 1
+                                _Simplification.i(0) = _i
+                                _Simplification.j(0) = _j
+                                _Simplification.v(0) = Mid(_nuplet(_i, _j), 1, 1)
+                                _Simplification.i(1) = _i
+                                _Simplification.j(1) = _jbis
+                                _Simplification.v(1) = Mid(_nuplet(_i, _j), 2, 1)
+                                _Simplification.m = "Paire nue"
+                            End If
+                        End If
+                    Next
+                End If
+            Next
+            'Recherche si les paires sont actives (s'il y a des candidats à effacer)
+            _Simplification.act = False
+            For _j = 0 To 8
+                If _j <> _Simplification.j(0) And _j <> _Simplification.j(0) Then
+                    For _k = 0 To 8
+                        If _Candidats(_i, _j, _k) = _Simplification.v(0) Or _Candidats(_i, _jbis, _k) = _Simplification.v(1) Then
+                            _Simplification.act = True
+                            Exit For
+                        End If
+                        If _Simplification.act Then
+                            Exit For
+                        End If
+                    Next
+                End If
+                If _Simplification.act Then
+                    Exit For
+                End If
+            Next
+        Next
 
     End Sub
 
+    '============================================================================================================================================================
+    ' Simplification des candidats 
+    ' recense les paires et la position de la dernière paire une ligne
+    '============================================================================================================================================================
+
+    Sub PaireNueCol(ByRef _Candidats(,,) As String, ByRef _Simplification As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
+        ' - recense les paires et la position de la dernière paire une ligne
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _ibis As Integer
+        Dim _k As Integer
+        ReDim _Simplification.i(80)
+        ReDim _Simplification.j(80)
+        ReDim _Simplification.v(80)
+        _Simplification.n = 0
+        _Simplification.i(80) = 0
+        _Simplification.j(80) = 0
+        _Simplification.v(80) = " "
+        _Simplification.m = " "
+        _Simplification.act = False
+
+        For _j = 0 To 8
+            ' appariement
+            For _i = 0 To 8
+                If _opk(_i, _j) = 2 Then
+                    For _ibis = 1 To 8
+                        If _opk(_ibis, _j) = 2 Then
+                            If _nuplet(_i, _j) = _nuplet(_ibis, _j) Then
+                                _Simplification.n = 1
+                                _Simplification.i(0) = _i
+                                _Simplification.j(0) = _j
+                                _Simplification.v(0) = Mid(_nuplet(_i, _j), 1, 1)
+                                _Simplification.i(1) = _ibis
+                                _Simplification.j(1) = _j
+                                _Simplification.v(1) = Mid(_nuplet(_i, _j), 2, 1)
+                                _Simplification.m = "Paire nue"
+                            End If
+                            'Recherche si les paires sont actives (s'il y a des candidats à effacer)
+                            For _k = 0 To 8
+                                If _Candidats(_i, _j, _k) = _Simplification.v(0) Or _Candidats(_i, _j, _k) = _Simplification.v(1) Then
+                                    _Simplification.act = True
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        If _Simplification.act Then
+                            Exit For
+                        End If
+                    Next
+                End If
+                If _Simplification.act Then
+                    Exit For
+                End If
+            Next
+
+        Next
+
+    End Sub
     '============================================================================================================================================================
     ' Recherche de solution 
     ' Balaye la table opk - candidats par case - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneCase(ByRef _NbSol As Integer, _Candidats(,,) As String, _opk(,) As Integer, _TabSolution() As Sudoku.Solution)
+    Sub SeulDansUneCase(ByRef _NbSol As Integer, _Candidats(,,) As String, _opk(,) As Integer, _TabSolution() As Sudoku.StrSolution)
 
         Dim _i As Integer
         Dim _j As Integer
         Dim _k As Integer
-        Dim _New_Solution As Sudoku.Solution
+        Dim _New_Solution As Sudoku.StrSolution
 
         For _i = 0 To 8
             For _j = 0 To 8
@@ -550,9 +642,9 @@
                         If _Candidats(_i, _j, _k) <> " " Then
                             _New_Solution.i = _i
                             _New_Solution.j = _j
-                            _New_Solution.k = Sudoku.Val(_k)
+                            _New_Solution.v = Sudoku.Val(_k)
                             _New_Solution.m = "Seul candidat dans cette case"
-                            Add_Solution(_NbSol, _TabSolution, _New_Solution)
+                            AddSolution(_NbSol, _TabSolution, _New_Solution)
                         End If
                     Next
                 End If
@@ -566,22 +658,22 @@
     ' Balaye la table opl - possibilités par ligne - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneLigne(ByRef _NbSol As Integer, _opl(,) As Integer, _opli(,) As Integer, _oplj(,) As Integer, _oplk(,) As Integer, _TabSolution() As Sudoku.Solution)
+    Sub SeulDansUneLigne(ByRef _NbSol As Integer, ByRef _AnlLig(,) As Sudoku.StrAnalyse, _TabSolution() As Sudoku.StrSolution)
 
         Dim _i As Integer
         Dim _k As Integer
-        Dim _New_Solution As Sudoku.Solution
+        Dim _New_Solution As Sudoku.StrSolution
 
         ' - Détermine la position d'une occurrence seule sur une ligne
 
         For _i = 0 To 8
             For _k = 0 To 8
-                If _opl(_i, _k) = 1 Then
-                    _New_Solution.i = _opli(_i, _k)
-                    _New_Solution.j = _oplj(_i, _k)
-                    _New_Solution.k = Sudoku.Val(_oplk(_i, _k))
+                If _AnlLig(_i, _k).n = 1 Then
+                    _New_Solution.i = _AnlLig(_i, _k).i
+                    _New_Solution.j = _AnlLig(_i, _k).j
+                    _New_Solution.v = Sudoku.Val(_AnlLig(_i, _k).k)
                     _New_Solution.m = "Seule présence dans cette ligne"
-                    Add_Solution(_NbSol, _TabSolution, _New_Solution)
+                    AddSolution(_NbSol, _TabSolution, _New_Solution)
                 End If
             Next
         Next
@@ -596,22 +688,22 @@
     ' Balaye la table opc - possibilités par colonne - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneColonne(ByRef _NbSol As Integer, _opc(,) As Integer, _opci(,) As Integer, _opcj(,) As Integer, _opck(,) As Integer, _TabSolution() As Sudoku.Solution)
+    Sub SeulDansUneColonne(ByRef _NbSol As Integer, ByRef _AnlCol(,) As Sudoku.StrAnalyse, _TabSolution() As Sudoku.StrSolution)
 
         Dim _j As Integer
         Dim _k As Integer
-        Dim _New_Solution As Sudoku.Solution
+        Dim _New_Solution As Sudoku.StrSolution
 
         ' - Détermine la position d'une occurrence seule sur une colonne
 
         For _j = 0 To 8
             For _k = 0 To 8
-                If _opc(_j, _k) = 1 Then
-                    _New_Solution.i = _opci(_j, _k)
-                    _New_Solution.j = _opcj(_j, _k)
-                    _New_Solution.k = Sudoku.Val(_opck(_j, _k))
+                If _AnlCol(_j, _k).n = 1 Then
+                    _New_Solution.i = _AnlCol(_j, _k).i
+                    _New_Solution.j = _AnlCol(_j, _k).j
+                    _New_Solution.v = Sudoku.Val(_AnlCol(_j, _k).k)
                     _New_Solution.m = "Seule présence dans cette colonne"
-                    Add_Solution(_NbSol, _TabSolution, _New_Solution)
+                    AddSolution(_NbSol, _TabSolution, _New_Solution)
                 End If
             Next
         Next
@@ -623,22 +715,22 @@
     ' Balaye la table opr - possibilités par région - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneRégion(ByRef _NbSol As Integer, _opr(,) As Integer, _opri(,) As Integer, _oprj(,) As Integer, _oprk(,) As Integer, _TabSolution() As Sudoku.Solution)
+    Sub SeulDansUneRégion(ByRef _NbSol As Integer, ByRef _AnlReg(,) As Sudoku.StrAnalyse, _TabSolution() As Sudoku.StrSolution)
 
         Dim _r As Integer
         Dim _k As Integer
-        Dim _New_Solution As Sudoku.Solution
+        Dim _New_Solution As Sudoku.StrSolution
 
         ' - Détermine la position d'une occurrence seule sur une région
 
         For _r = 0 To 8
             For _k = 0 To 8
-                If _opr(_r, _k) = 1 Then
-                    _New_Solution.i = _opri(_r, _k)
-                    _New_Solution.j = _oprj(_r, _k)
-                    _New_Solution.k = Sudoku.Val(_oprk(_r, _k))
+                If _AnlReg(_r, _k).n = 1 Then
+                    _New_Solution.i = _AnlReg(_r, _k).i
+                    _New_Solution.j = _AnlReg(_r, _k).j
+                    _New_Solution.v = Sudoku.Val(_AnlReg(_r, _k).k)
                     _New_Solution.m = "Seule présence dans cette région"
-                    Add_Solution(_NbSol, _TabSolution, _New_Solution)
+                    AddSolution(_NbSol, _TabSolution, _New_Solution)
                 End If
             Next
         Next
@@ -649,7 +741,7 @@
     ' Ajoute un poste dans la table des solutions 
     '============================================================================================================================================================
 
-    Sub Add_Solution(ByRef _NbSol As Integer, _TabSolution() As Sudoku.Solution, New_Solution As Sudoku.Solution)
+    Sub AddSolution(ByRef _NbSol As Integer, _TabSolution() As Sudoku.StrSolution, New_Solution As Sudoku.StrSolution)
 
         Dim _ExisteDeja As Boolean = False
         If _NbSol > 0 Then
@@ -662,20 +754,20 @@
         If Not _ExisteDeja Then
             _TabSolution(_NbSol).i = New_Solution.i
             _TabSolution(_NbSol).j = New_Solution.j
-            _TabSolution(_NbSol).k = New_Solution.k
+            _TabSolution(_NbSol).v = New_Solution.v
             _TabSolution(_NbSol).m = New_Solution.m
             _NbSol += 1
         End If
 
-    End sub
+    End Sub
 
     '============================================================================================================================================================
     ' Fait une rotation des postes de la table des solutions
     '============================================================================================================================================================
 
-    Sub ProchaineSolution(ByRef _TabSolution() As Sudoku.Solution, ByRef _NbSol As Integer)
+    Sub ProchaineSolution(ByRef _TabSolution() As Sudoku.StrSolution, ByRef _NbSol As Integer)
 
-        Dim _Temp_Solution As Sudoku.Solution
+        Dim _Temp_Solution As Sudoku.StrSolution
         Dim _s As Integer
         _Temp_Solution = _TabSolution(0)
         For _s = 0 To _NbSol - 2
@@ -685,14 +777,14 @@
 
     End Sub
 
-    Sub SupprSolution(ByRef _TabSolution() As Sudoku.Solution, ByRef _NbSol As Integer)
+    Sub SupprSolution(ByRef _TabSolution() As Sudoku.StrSolution, ByRef _NbSol As Integer)
 
         Dim _s As Integer
 
         For _s = 0 To _NbSol - 1
             _TabSolution(_s).i = "0"
             _TabSolution(_s).j = "0"
-            _TabSolution(_s).k = ""
+            _TabSolution(_s).v = ""
             _TabSolution(_s).m = ""
         Next
 

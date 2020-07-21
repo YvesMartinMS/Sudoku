@@ -1,19 +1,10 @@
 ﻿Imports System.IO
 Module Générateur
 
-    Structure Contexte
-        Dim NbVal As Integer
-        Dim i As Integer
-        Dim j As Integer
-        Dim v As Integer
-        Dim Grille(,) As String ' La grille de Sudoku
-        Dim Candidats(,,) As String ' La grille des candidats ( Valeurs au crayon)
-    End Structure
-
-    Function Générateur(ByVal typeGrille As String)
+    Sub Générateur(ByVal typeGrille As String, ByRef TextSudoku As String)
         Const PATHFICHIER As String = "Sudoku.txt"
 
-        Dim Contexte As New Contexte
+        Dim Contexte As New Sudoku.Contexte
         Dim Pile As Stack = New Stack()
 
         Dim i As Integer = 0
@@ -29,32 +20,28 @@ Module Générateur
         Dim Grille(8, 8) As String ' La grille de Sudoku
         Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
 
-
         Dim opk(8, 8) As Integer ' Candidats par case
-        Dim opl(8, 8) As Integer ' Candidats par ligne
-        Dim opli(8, 8) As Integer
-        Dim oplj(8, 8) As Integer
-        Dim oplk(8, 8) As Integer
-        Dim opc(8, 8) As Integer ' Candidats par colonne
-        Dim opci(8, 8) As Integer
-        Dim opcj(8, 8) As Integer
-        Dim opck(8, 8) As Integer
-        Dim opr(8, 8) As Integer ' Candidats par région
-        Dim opri(8, 8) As Integer
-        Dim oprj(8, 8) As Integer
-        Dim oprk(8, 8) As Integer
+        Dim nuplet(8, 8) As String ' Candidats agrégés
 
         Dim Erreur As Boolean
         Dim ErreurGrille(8, 8) As String
 
-        Dim GTabSolution(80) As Sudoku.Solution
+        Dim GTabSolution(80) As Sudoku.StrSolution
         Dim GNbSol As Integer = 0 'Nombre solutions en réserve
-        Dim TextSudoku As String = "                                                                                 "
-        ' Dim TextSudoku As String = "123456789012345678901234567890123456789012345678901234567890123456789012345678901"
+
+        Dim GSimplification As Sudoku.StrSimplification
+        ReDim GSimplification.i(80)
+        ReDim GSimplification.j(80)
+        ReDim GSimplification.v(80)
+        GSimplification.n = 0
+        GSimplification.i(80) = 0
+        GSimplification.j(80) = 0
+        GSimplification.v(80) = " "
+        GSimplification.m = " "
 
         Dim ModeDebug As Boolean = False
-
         Dim f As Integer = 0
+
         Dim it As String
         Dim jt As String
         Dim pil(3) As String
@@ -84,7 +71,7 @@ Module Générateur
             Next
         Next
 
-        initialisations(Grille, Candidats, opk, opl, opc, opr)
+        Initialisations(Grille, Candidats)
 
         'While NbVal < 80 And Not Erreur
         While NbVal < 80 And Not Erreur
@@ -99,7 +86,7 @@ Module Générateur
                     jt = pilj(NbVal)
                     j = CInt(jt)
                 End If
-                généCase(Grille, Candidats, i, j, NbVal, TextSudoku, pili, pilj, pilv, pilr, ModeDebug)
+                GénéCase(Grille, Candidats, i, j, NbVal, TextSudoku, pili, pilj, pilv, pilr, ModeDebug)
                 Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient 
                 ControleGénération(Erreur, ErreurGrille, Grille, Candidats)
 
@@ -117,7 +104,7 @@ Module Générateur
                     If i <> 4 Or j <> 4 Then
                         i = 8 - i
                         j = 8 - j
-                        généCase(Grille, Candidats, i, j, NbVal, TextSudoku, pili, pilj, pilv, pilr, ModeDebug)
+                        GénéCase(Grille, Candidats, i, j, NbVal, TextSudoku, pili, pilj, pilv, pilr, ModeDebug)
                         Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient 
                         ControleGénération(Erreur, ErreurGrille, Grille, Candidats)
                         If Not Erreur Then
@@ -138,14 +125,14 @@ Module Générateur
 
                 GNbSol = 0
 
-                Calcul_Candidats(Grille, Candidats, opk, opl, opli, oplj, oplk, opc, opci, opcj, opck, opr, opri, oprj, oprk, GTabSolution, GNbSol)
+                Calcul_Candidats(Grille, Candidats, opk, nuplet, GTabSolution, GNbSol, GSimplification)
 
                 If GNbSol > 0 Then
 
                     i = GTabSolution(0).i
                     j = GTabSolution(0).j
-                    Grille(i, j) = GTabSolution(0).k
-                    z = GTabSolution(0).k
+                    Grille(i, j) = GTabSolution(0).v
+                    z = GTabSolution(0).v
                     g = (i * 9) + j
                     Select Case g
                         Case 0
@@ -173,9 +160,8 @@ Module Générateur
             File.AppendAllText(PATHFICHIER, pilv & Chr(13))
             File.AppendAllText(PATHFICHIER, pilr & Chr(13))
         End If
-        Return TextSudoku
 
-    End Function
+    End Sub
 
     Sub ChoisitCase(ByVal Grille(,) As String, ByVal NbVal As Integer, ByRef i As Integer, ByRef j As Integer)
 
@@ -196,8 +182,7 @@ Module Générateur
         Next
     End Sub
 
-    ' Sub généCase(ByRef Grille(,) As String, ByRef Candidats(,,) As String, i As Integer, j As Integer, ByRef NbVal As Integer, ByRef TextSudoku As String)
-    Sub généCase(ByRef Grille(,) As String, ByRef Candidats(,,) As String, i As Integer, j As Integer, ByRef NbVal As Integer, ByRef TextSudoku As String, ByRef pili As String, ByRef pilj As String, ByRef pilv As String, ByRef pilr As String, ByVal ModeDebug As Boolean)
+    Sub GénéCase(ByRef Grille(,) As String, ByRef Candidats(,,) As String, i As Integer, j As Integer, ByRef NbVal As Integer, ByRef TextSudoku As String, ByRef pili As String, ByRef pilj As String, ByRef pilv As String, ByRef pilr As String, ByVal ModeDebug As Boolean)
 
         Dim k As Integer = 0
         Dim g As Integer = 0
