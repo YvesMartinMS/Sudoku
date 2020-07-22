@@ -37,6 +37,7 @@
         Dim n As Integer
         Dim i() As Integer
         Dim j() As Integer
+        Dim k() As Integer
         Dim v() As String 'Valeur
         Dim m As String 'Motif
         Dim act As Boolean
@@ -51,7 +52,7 @@
         Dim Candidats(,,) As String ' La grille des candidats ( Valeurs au crayon)
     End Structure
 
-    Dim Analyse(8, 8) As Sudoku.StrAnalyse
+    'Dim Analyse(8, 8) As Sudoku.StrAnalyse
     Dim opk(8, 8) As Integer ' Occurrences de k par case
     Dim nuplet(8, 8) As String 'Candidats agrégés
 
@@ -62,7 +63,8 @@
     Public TabSolution(80) As Sudoku.StrSolution
     Public NbSol As Integer = 0 'Nombre solutions en réserve
 
-    Public Simplification As Sudoku.StrSimplification
+    Public Simplification(20) As Sudoku.StrSimplification
+    Public NbSmp As Integer = 0 'Nombre de simplifications en réserve
 
     Public Val As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
 
@@ -78,7 +80,8 @@
     Dim sudoTestCol As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  8 427    1     9   4"
     Dim sudoTestReg As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  81427    1     9   4"
     Dim sudoDifficile As String = " 9 8 2     79  1 36   7 5   7    9 2         9 3    6   6 1   42 8  43     2 6 7 "
-    Dim Sudopairlig As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 "
+    Dim SudopairLig As String = "   3    1 13 8 97  6 17    7 9    1     4     8    4 2    93 2  91 2 78 2    5   "
+    Dim SudopairCol As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 "
     Dim jaugeeeeeee As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
 
@@ -372,7 +375,7 @@
 
     Private Sub Resoudre()
 
-        Calcul_Candidats(Grille, Candidats, opk, nuplet, TabSolution, NbSol, Simplification)
+        Calcul_Candidats(Grille, Candidats, TabSolution, NbSol, Simplification, NbSmp)
 
         '
         ' Affiche les candidats dans la grille
@@ -389,22 +392,30 @@
             Next
         Next
 
-
-    End Sub
-
-    Private Sub BT_Suivant_Click(sender As Object, e As EventArgs) Handles BT_Suivant.Click
-
         If NbSol > 0 Then
             LBL_Conseil.Text = "Ligne " & TabSolution(0).i + 1 & " colonne " & TabSolution(0).j + 1 & " " & TabSolution(0).m & " : " _
                              & TabSolution(0).v & " / " & NbSol & " / "
-            ProchaineSolution(TabSolution, NbSol)
+            '    ProchaineSolution(TabSolution, NbSol)
         Else
             MsgBox("On passe à la suite")
         End If
 
+
     End Sub
 
-    Private Sub BT_Saisie_Click(sender As Object, e As EventArgs) Handles BT_Saisie.Click
+    'Private Sub BT_Suivant_Click(sender As Object, e As EventArgs) Handles BT_Suivant.Click
+
+    '    If NbSol > 0 Then
+    '        LBL_Conseil.Text = "Ligne " & TabSolution(0).i + 1 & " colonne " & TabSolution(0).j + 1 & " " & TabSolution(0).m & " : " _
+    '                         & TabSolution(0).v & " / " & NbSol & " / "
+    '        ProchaineSolution(TabSolution, NbSol)
+    '    Else
+    '        MsgBox("On passe à la suite")
+    '    End If
+
+    'End Sub
+
+    Private Sub BT_Suivant_Click(sender As Object, e As EventArgs) Handles BT_Suivant.Click
 
         ' La dernière valeur proposée est à la fin du tableau des solutions
 
@@ -432,9 +443,23 @@
             TabSolution(NbSol - 1).v = ""
             TabSolution(NbSol - 1).m = ""
             NbSol -= 1
+        Else
+            If NbSmp > 0 Then
+                SuppressionCandidats(NbSmp, Candidats, Simplification, opk, nuplet)
+            End If
+        End If
 
+        Resoudre()
+
+        If NbSol > 0 Then
+            LBL_Conseil.Text = "Ligne " & TabSolution(0).i + 1 & " colonne " & TabSolution(0).j + 1 & " " & TabSolution(0).m & " : " _
+                             & TabSolution(0).v & " / " & NbSol & " / "
+            '   ProchaineSolution(TabSolution, NbSol)
+        Else
+            MsgBox("On passe à la suite")
         End If
     End Sub
+
 
     Private Sub BT_Solutions_Click(sender As Object, e As EventArgs) Handles BT_Solutions.Click
 

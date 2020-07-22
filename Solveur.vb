@@ -209,16 +209,20 @@
     '
 
     Sub Calcul_Candidats(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String,
-                         ByRef _opk(,) As Integer, ByRef _nuplet(,) As String,
                          ByRef _TabSolution() As Sudoku.StrSolution, ByRef _NbSol As Integer,
-                         _Simplification As Sudoku.StrSimplification)
+                         _Simplification() As Sudoku.StrSimplification, ByRef _NbSmp As Integer)
         '
         ' Elimine les candidats dans les lignes colonnes et régions
         '
         Dim _i As Integer
         Dim _j As Integer
         Dim _r As Integer
-        Dim _Analyse(8, 8) As Sudoku.StrAnalyse
+
+        Dim _opk(8, 8) As Integer ' Candidats par case
+        Dim _nuplet(8, 8) As String ' Candidats agrégés
+        Dim _AnlLig(8, 8) As Sudoku.StrAnalyse
+        Dim _AnlCol(8, 8) As Sudoku.StrAnalyse
+        Dim _AnlReg(8, 8) As Sudoku.StrAnalyse
 
         ' Efface les candidats dans les lignes
         For _i = 0 To 8
@@ -244,26 +248,41 @@
         AnalyseCase(_Candidats, _opk, _nuplet)
 
         'Mise à jour le tableau des occurrences par ligne
-        AnalyseLigne(_Candidats, _Analyse)
+        AnalyseLigne(_Candidats, _AnlLig)
 
         'Mise à jour le tableau des occurrences par colonne
-        AnalyseColonne(_Candidats, _Analyse)
+        AnalyseColonne(_Candidats, _AnlCol)
 
         'Mise à jour le tableau des occurrences par région
-        AnalyseRégion(_Candidats, _Analyse)
+        AnalyseRégion(_Candidats, _AnlReg)
 
         _NbSol = 0
         SeulDansUneCase(_NbSol, _Candidats, _opk, _TabSolution)
-        SeulDansUneLigne(_NbSol, _Analyse, _TabSolution)
-        SeulDansUneColonne(_NbSol, _Analyse, _TabSolution)
-        SeulDansUneRégion(_NbSol, _Analyse, _TabSolution)
+        SeulDansUneLigne(_NbSol, _AnlLig, _TabSolution)
+        SeulDansUneColonne(_NbSol, _AnlCol, _TabSolution)
+        SeulDansUneRégion(_NbSol, _AnlReg, _TabSolution)
 
-        'If _NbSol = 0 Then
-        '    PaireNueLig(_Candidats, _Simplification, _opk, _nuplet)
-        'End If
+        'Dimentionnement du tableau dans la structure _ Initialisation de valeurs nulles
 
+        For i = 0 To 20
+            ReDim _Simplification(i).i(20)
+            ReDim _Simplification(i).j(20)
+            ReDim _Simplification(i).k(20)
+            ReDim _Simplification(i).v(20)
+            _Simplification(i).n = 0
+            For j = 0 To 20
+                _Simplification(i).i(j) = 0
+                _Simplification(i).j(j) = 0
+                _Simplification(i).k(j) = 0
+                _Simplification(i).v(j) = " "
+                _Simplification(i).m = " "
+                _Simplification(i).act = False
+            Next
+        Next
         If _NbSol = 0 Then
-            PaireNueCol(_Candidats, _Simplification, _opk, _nuplet)
+            PaireNueLig(_Candidats, _Simplification, _NbSmp, _opk, _nuplet)
+            PaireNueCol(_Candidats, _Simplification, _NbSmp, _opk, _nuplet)
+            PaireNueReg(_Candidats, _Simplification, _NbSmp, _opk, _nuplet)
         End If
 
     End Sub
@@ -511,16 +530,19 @@
 
     '============================================================================================================================================================
     ' Simplification des candidats 
-    ' recense les paires et la position de la dernière paire une ligne
+    ' recense les paires nues d'une ligne
     '============================================================================================================================================================
 
-    Sub PaireNueLig(ByRef _Candidats(,,) As String, ByRef _Simplification As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
+    Sub PaireNueLig(ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByRef _NbSmp As Integer, ByVal _opk(,) As Integer, _nuplet(,) As String)
         ' - recense les paires et la position de la dernière paire une ligne
 
         Dim _i As Integer
         Dim _j As Integer
         Dim _jbis As Integer
         Dim _k As Integer
+        Dim _s As New Sudoku.StrSimplification
+
+        _s = _Simplification(_NbSmp)
 
         For _i = 0 To 8
             ' appariement
@@ -529,35 +551,37 @@
                     For _jbis = _j + 1 To 8
                         If _opk(_i, _jbis) = 2 Then
                             If _nuplet(_i, _j) = _nuplet(_i, _jbis) Then
-                                _Simplification.n = 1
-                                _Simplification.i(0) = _i
-                                _Simplification.j(0) = _j
-                                _Simplification.v(0) = Mid(_nuplet(_i, _j), 1, 1)
-                                _Simplification.i(1) = _i
-                                _Simplification.j(1) = _jbis
-                                _Simplification.v(1) = Mid(_nuplet(_i, _j), 2, 1)
-                                _Simplification.m = "Paire nue"
+                                'Recherche si les paires sont actives (s'il y a des candidats à effacer)
+                                For _jter = 0 To 8
+                                    If _jter <> _j And _jter <> _jbis Then
+                                        For _k = 0 To 8
+                                            If _Candidats(_i, _jter, _k) = Mid(_nuplet(_i, _j), 1, 1) Then
+                                                _s.act = True
+                                                _s.k(0) = _k
+                                            End If
+                                            If _Candidats(_i, _jter, _k) = Mid(_nuplet(_i, _j), 2, 1) Then
+                                                _s.act = True
+                                                _s.k(1) = _k
+                                            End If
+                                        Next
+                                    End If
+                                Next
+                                If _s.act = True Then
+                                    _s.n = 1
+                                    _s.i(0) = _i
+                                    _s.j(0) = _j
+                                    _s.v(0) = Mid(_nuplet(_i, _j), 1, 1)
+                                    _s.i(1) = _i
+                                    _s.j(1) = _jbis
+                                    _s.v(1) = Mid(_nuplet(_i, _j), 2, 1)
+                                    _s.m = "Paire nue ligne"
+                                    _Simplification(_NbSmp) = _s
+                                    _NbSmp += 1
+                                    Exit For
+                                End If
                             End If
                         End If
                     Next
-                End If
-            Next
-            'Recherche si les paires sont actives (s'il y a des candidats à effacer)
-            _Simplification.act = False
-            For _j = 0 To 8
-                If _j <> _Simplification.j(0) And _j <> _Simplification.j(0) Then
-                    For _k = 0 To 8
-                        If _Candidats(_i, _j, _k) = _Simplification.v(0) Or _Candidats(_i, _jbis, _k) = _Simplification.v(1) Then
-                            _Simplification.act = True
-                            Exit For
-                        End If
-                        If _Simplification.act Then
-                            Exit For
-                        End If
-                    Next
-                End If
-                If _Simplification.act Then
-                    Exit For
                 End If
             Next
         Next
@@ -566,60 +590,139 @@
 
     '============================================================================================================================================================
     ' Simplification des candidats 
-    ' recense les paires et la position de la dernière paire une ligne
+    ' recense les paires nues d'une colonne
     '============================================================================================================================================================
 
-    Sub PaireNueCol(ByRef _Candidats(,,) As String, ByRef _Simplification As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
+    Sub PaireNueCol(ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByRef _NbSmp As Integer, ByVal _opk(,) As Integer, _nuplet(,) As String)
         ' - recense les paires et la position de la dernière paire une ligne
 
         Dim _i As Integer
         Dim _j As Integer
         Dim _ibis As Integer
+        Dim _iter As Integer
         Dim _k As Integer
-        ReDim _Simplification.i(80)
-        ReDim _Simplification.j(80)
-        ReDim _Simplification.v(80)
-        _Simplification.n = 0
-        _Simplification.i(80) = 0
-        _Simplification.j(80) = 0
-        _Simplification.v(80) = " "
-        _Simplification.m = " "
-        _Simplification.act = False
+        Dim _s As New Sudoku.StrSimplification
+
+        _s = _Simplification(_NbSmp)
 
         For _j = 0 To 8
             ' appariement
             For _i = 0 To 8
                 If _opk(_i, _j) = 2 Then
-                    For _ibis = 1 To 8
+                    For _ibis = _i + 1 To 8
                         If _opk(_ibis, _j) = 2 Then
                             If _nuplet(_i, _j) = _nuplet(_ibis, _j) Then
-                                _Simplification.n = 1
-                                _Simplification.i(0) = _i
-                                _Simplification.j(0) = _j
-                                _Simplification.v(0) = Mid(_nuplet(_i, _j), 1, 1)
-                                _Simplification.i(1) = _ibis
-                                _Simplification.j(1) = _j
-                                _Simplification.v(1) = Mid(_nuplet(_i, _j), 2, 1)
-                                _Simplification.m = "Paire nue"
-                            End If
-                            'Recherche si les paires sont actives (s'il y a des candidats à effacer)
-                            For _k = 0 To 8
-                                If _Candidats(_i, _j, _k) = _Simplification.v(0) Or _Candidats(_i, _j, _k) = _Simplification.v(1) Then
-                                    _Simplification.act = True
+                                'Recherche si les paires sont actives (s'il y a des candidats à effacer)
+                                For _iter = 0 To 8
+                                    If _iter <> _i And _iter <> _ibis Then
+                                        For _k = 0 To 8
+                                            If _Candidats(_iter, _j, _k) = Mid(_nuplet(_i, _j), 1, 1) Then
+                                                _s.act = True
+                                                _s.k(0) = _k
+                                            End If
+                                            If _Candidats(_iter, _j, _k) = Mid(_nuplet(_i, _j), 2, 1) Then
+                                                _s.act = True
+                                                _s.k(1) = _k
+                                            End If
+                                        Next
+                                    End If
+                                Next
+                                If _s.act = True Then
+                                    _s.n = 1
+                                    _s.i(0) = _i
+                                    _s.j(0) = _j
+                                    _s.v(0) = Mid(_nuplet(_i, _j), 1, 1)
+                                    _s.i(1) = _ibis
+                                    _s.j(1) = _j
+                                    _s.v(1) = Mid(_nuplet(_i, _j), 2, 1)
+                                    _s.m = "Paire nue colonne"
+                                    _Simplification(_NbSmp) = _s
+                                    _NbSmp += 1
                                     Exit For
                                 End If
-                            Next
-                        End If
-                        If _Simplification.act Then
-                            Exit For
+                            End If
                         End If
                     Next
                 End If
-                If _Simplification.act Then
-                    Exit For
-                End If
             Next
+        Next
 
+    End Sub
+
+    '============================================================================================================================================================
+    ' Simplification des candidats 
+    ' recense les paires nues d'une région
+    '============================================================================================================================================================
+
+    Sub PaireNueReg(ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByRef _NbSmp As Integer, ByVal _opk(,) As Integer, _nuplet(,) As String)
+        ' - recense les paires et la position de la dernière paire une ligne
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _ibis As Integer
+        Dim _jbis As Integer
+        Dim _iter As Integer
+        Dim _jter As Integer
+        Dim _k As Integer
+        Dim _ir As Integer
+        Dim _jr As Integer
+        Dim _r As Integer
+        Dim _g As Integer
+        Dim _gbis As Integer
+        Dim _s As New Sudoku.StrSimplification
+
+        _s = _Simplification(_NbSmp)
+
+        For _r = 0 To 8
+            _ir = (_r \ 3) * 3 'calcul coin supérieur gauche d'une région
+            _jr = (_r - _ir) * 3 'calcul coin supérieur gauche d'une région
+            For _i = _ir To _ir + 2 'parcour de l'élément 1
+                For _j = _jr To _jr + 2 'parcours de l'élément 1
+                    ' appariement
+                    If _opk(_i, _j) = 2 Then 'si l'élément 1 est une paire
+                        For _ibis = _ir To _ir + 2 'parcours de l'élément 2
+                            For _jbis = _jr To _jr + 2 'parcours de l'élément 2
+                                _g = (_i * 9) + _j
+                                _gbis = (_ibis * 9) + _jbis
+                                If _g < _gbis Then ' on ne compare que dans un sens (élément 2 tjrs > élément 1) 
+                                    If _opk(_ibis, _jbis) = 2 Then 'si l'élément 2 est une paire
+                                        If _nuplet(_i, _j) = _nuplet(_ibis, _jbis) Then 'on compare les 2 paires
+                                            'Recherche si les paires sont actives (s'il y a des candidats à effacer)
+                                            For _iter = _ir To _ir + 2
+                                                For _jter = _jr To _jr + 2
+                                                    If Not (_iter = _i And _iter = _j) And Not (_jter = _jbis And _jter = _jbis) Then
+                                                        If _Candidats(_iter, _jter, _k) = Mid(_nuplet(_i, _j), 1, 1) Then
+                                                            _s.act = True
+                                                            _s.k(0) = _k
+                                                        End If
+                                                        If _Candidats(_iter, _jter, _k) = Mid(_nuplet(_i, _j), 2, 1) Then
+                                                            _s.act = True
+                                                            _s.k(1) = _k
+                                                        End If
+                                                    End If
+                                                Next
+                                            Next
+                                        End If
+                                    End If
+                                End If
+                            Next
+                        Next
+                        If _s.act = True Then
+                            _s.n = 1
+                            _s.i(0) = _i
+                            _s.j(0) = _j
+                            _s.v(0) = Mid(_nuplet(_i, _j), 1, 1)
+                            _s.i(1) = _ibis
+                            _s.j(1) = _j
+                            _s.v(1) = Mid(_nuplet(_i, _j), 2, 1)
+                            _s.m = "Paire nue région"
+                            _Simplification(_NbSmp) = _s
+                            _NbSmp += 1
+                            Exit For
+                        End If
+                    End If
+                Next
+            Next
         Next
 
     End Sub
@@ -776,6 +879,9 @@
         _TabSolution(_NbSol - 1) = _Temp_Solution
 
     End Sub
+    '============================================================================================================================================================
+    ' retire une occurrence de la table des solutions
+    '============================================================================================================================================================
 
     Sub SupprSolution(ByRef _TabSolution() As Sudoku.StrSolution, ByRef _NbSol As Integer)
 
@@ -789,5 +895,109 @@
         Next
 
     End Sub
+    '============================================================================================================================================================
+    ' Suppression de candidats dans la grille
+    '============================================================================================================================================================
 
+    Sub SuppressionCandidats(ByRef _NbSmp As String, ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
+        Select Case _Simplification(0).m
+            Case "Paire nue ligne"
+                SupPNL(_NbSmp, _Candidats, _Simplification, _opk, _nuplet)
+            Case "Paire nue colonne"
+                SupPNC(_NbSmp, _Candidats, _Simplification, _opk, _nuplet)
+            Case "Paire nue région"
+                SupPNC(_NbSmp, _Candidats, _Simplification, _opk, _nuplet)
+        End Select
+    End Sub
+
+    '============================================================================================================================================================
+    ' Suppression de candidats d'une ligne par une paire nue 
+    '============================================================================================================================================================
+
+    Sub SupPNL(ByRef NbSmp As String, ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _k0 As Integer
+        Dim _k1 As Integer
+        Dim _s As Sudoku.StrSimplification
+
+        _s = _Simplification(0)
+        _i = _s.i(0)
+
+        For _j = 0 To 8
+            If _j <> _s.j(0) And _j <> _s.j(1) Then
+                _k0 = _s.k(0)
+                _k1 = _s.k(1)
+                If _Candidats(_i, _j, _k0) = _s.v(0) Then
+                    _Candidats(_i, _j, _k0) = " "
+                End If
+                If _Candidats(_i, _j, _k1) = _s.v(1) Then
+                    _Candidats(_i, _j, _k1) = " "
+                End If
+            End If
+        Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' Suppression de candidats d'une colonne par une paire nue 
+    '============================================================================================================================================================
+
+
+    Sub SupPNC(ByRef NbSmp As String, ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _k0 As Integer
+        Dim _k1 As Integer
+        Dim _s As Sudoku.StrSimplification
+
+        _s = _Simplification(0)
+        _j = _s.j(0)
+
+        For _i = 0 To 8
+            If _i <> _s.i(0) And _i <> _s.i(1) Then
+                _k0 = _s.k(0)
+                _k1 = _s.k(1)
+                If _Candidats(_i, _j, _k0) = _s.v(0) Then
+                    _Candidats(_i, _j, _k0) = " "
+                End If
+                If _Candidats(_i, _j, _k1) = _s.v(1) Then
+                    _Candidats(_i, _j, _k1) = " "
+                End If
+            End If
+        Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' Suppression de candidats d'une région par une paire nue 
+    '============================================================================================================================================================
+
+    Sub SupPNR(ByRef NbSmp As String, ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _k0 As Integer
+        Dim _k1 As Integer
+        Dim _s As Sudoku.StrSimplification
+
+        _s = _Simplification(0)
+        _i = _s.i(0)
+
+        For _j = 0 To 8
+            If _j <> _s.j(0) And _j <> _s.j(1) Then
+                _k0 = _s.k(0)
+                _k1 = _s.k(1)
+                If _Candidats(_i, _j, _k0) = _s.v(0) Then
+                    _Candidats(_i, _j, _k0) = " "
+                End If
+                If _Candidats(_i, _j, _k1) = _s.v(1) Then
+                    _Candidats(_i, _j, _k1) = " "
+                End If
+            End If
+        Next
+
+    End Sub
 End Module

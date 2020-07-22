@@ -110,9 +110,8 @@ Partial Class Sudoku
         Me.TB_74 = New System.Windows.Forms.TextBox()
         Me.TB_73 = New System.Windows.Forms.TextBox()
         Me.BT_Resoudre = New System.Windows.Forms.Button()
-        Me.BT_Suivant = New System.Windows.Forms.Button()
         Me.LBL_Conseil = New System.Windows.Forms.Label()
-        Me.BT_Saisie = New System.Windows.Forms.Button()
+        Me.BT_Suivant = New System.Windows.Forms.Button()
         Me.BT_Solutions = New System.Windows.Forms.Button()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -1154,15 +1153,6 @@ Partial Class Sudoku
         Me.BT_Resoudre.Text = "Résoudre"
         Me.BT_Resoudre.UseVisualStyleBackColor = True
         '
-        'BT_Suivant
-        '
-        Me.BT_Suivant.Location = New System.Drawing.Point(32, 211)
-        Me.BT_Suivant.Name = "BT_Suivant"
-        Me.BT_Suivant.Size = New System.Drawing.Size(75, 23)
-        Me.BT_Suivant.TabIndex = 1001
-        Me.BT_Suivant.Text = "Suivant"
-        Me.BT_Suivant.UseVisualStyleBackColor = True
-        '
         'LBL_Conseil
         '
         Me.LBL_Conseil.AutoSize = True
@@ -1172,14 +1162,14 @@ Partial Class Sudoku
         Me.LBL_Conseil.Size = New System.Drawing.Size(0, 20)
         Me.LBL_Conseil.TabIndex = 1002
         '
-        'BT_Saisie
+        'BT_Suivant
         '
-        Me.BT_Saisie.Location = New System.Drawing.Point(32, 259)
-        Me.BT_Saisie.Name = "BT_Saisie"
-        Me.BT_Saisie.Size = New System.Drawing.Size(75, 23)
-        Me.BT_Saisie.TabIndex = 1003
-        Me.BT_Saisie.Text = "Accepter"
-        Me.BT_Saisie.UseVisualStyleBackColor = True
+        Me.BT_Suivant.Location = New System.Drawing.Point(32, 259)
+        Me.BT_Suivant.Name = "BT_Suivant"
+        Me.BT_Suivant.Size = New System.Drawing.Size(75, 23)
+        Me.BT_Suivant.TabIndex = 1003
+        Me.BT_Suivant.Text = "Suivant"
+        Me.BT_Suivant.UseVisualStyleBackColor = True
         '
         'BT_Solutions
         '
@@ -1197,9 +1187,8 @@ Partial Class Sudoku
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(764, 661)
         Me.Controls.Add(Me.BT_Solutions)
-        Me.Controls.Add(Me.BT_Saisie)
-        Me.Controls.Add(Me.LBL_Conseil)
         Me.Controls.Add(Me.BT_Suivant)
+        Me.Controls.Add(Me.LBL_Conseil)
         Me.Controls.Add(Me.BT_Resoudre)
         Me.Controls.Add(Me.TB_81)
         Me.Controls.Add(Me.TB_80)
@@ -1385,8 +1374,7 @@ Partial Class Sudoku
     Friend WithEvents RésoudreToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents QuitterToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BT_Resoudre As Button
-    Friend WithEvents BT_Suivant As Button
     Friend WithEvents LBL_Conseil As Label
-    Friend WithEvents BT_Saisie As Button
+    Friend WithEvents BT_Suivant As Button
     Friend WithEvents BT_Solutions As Button
 End Class

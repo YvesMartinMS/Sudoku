@@ -20,24 +20,30 @@ Module Générateur
         Dim Grille(8, 8) As String ' La grille de Sudoku
         Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
 
-        Dim opk(8, 8) As Integer ' Candidats par case
-        Dim nuplet(8, 8) As String ' Candidats agrégés
-
         Dim Erreur As Boolean
         Dim ErreurGrille(8, 8) As String
 
         Dim GTabSolution(80) As Sudoku.StrSolution
-        Dim GNbSol As Integer = 0 'Nombre solutions en réserve
+        Dim GNbSol As Integer = 0 'Nombre de solutions en réserve
 
-        Dim GSimplification As Sudoku.StrSimplification
-        ReDim GSimplification.i(80)
-        ReDim GSimplification.j(80)
-        ReDim GSimplification.v(80)
-        GSimplification.n = 0
-        GSimplification.i(80) = 0
-        GSimplification.j(80) = 0
-        GSimplification.v(80) = " "
-        GSimplification.m = " "
+        Dim GSimplification(20) As Sudoku.StrSimplification
+        Dim GNbSmp As Integer = 0 'Nombre de simplifications en réserve
+        ''Dimentionnement du tableau dans la structure _ Initialisation de valeurs nulles
+        For i = 0 To 20
+            GSimplification(i).n = 0
+            ReDim GSimplification(i).i(20)
+            ReDim GSimplification(i).j(20)
+            ReDim GSimplification(i).k(20)
+            ReDim GSimplification(i).v(20)
+            For j = 0 To 20
+                GSimplification(i).i(j) = 0
+                GSimplification(i).j(j) = 0
+                GSimplification(i).k(j) = 0
+                GSimplification(i).v(j) = " "
+                GSimplification(i).m = " "
+                GSimplification(i).act = False
+            Next
+        Next
 
         Dim ModeDebug As Boolean = False
         Dim f As Integer = 0
@@ -125,7 +131,7 @@ Module Générateur
 
                 GNbSol = 0
 
-                Calcul_Candidats(Grille, Candidats, opk, nuplet, GTabSolution, GNbSol, GSimplification)
+                Calcul_Candidats(Grille, Candidats, GTabSolution, GNbSol, GSimplification, GNbSmp)
 
                 If GNbSol > 0 Then
 
