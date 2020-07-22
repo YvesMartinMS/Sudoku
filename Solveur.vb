@@ -944,7 +944,6 @@
     ' Suppression de candidats d'une colonne par une paire nue 
     '============================================================================================================================================================
 
-
     Sub SupPNC(ByRef NbSmp As String, ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
 
         Dim _i As Integer
@@ -978,25 +977,31 @@
     Sub SupPNR(ByRef NbSmp As String, ByRef _Candidats(,,) As String, ByRef _Simplification() As Sudoku.StrSimplification, ByVal _opk(,) As Integer, _nuplet(,) As String)
 
         Dim _i As Integer
+        Dim _ir As Integer
         Dim _j As Integer
+        Dim _jr As Integer
+
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _s As Sudoku.StrSimplification
 
         _s = _Simplification(0)
-        _i = _s.i(0)
+        _ir = (_s.i(0) \ 3) * 3
+        _jr = (_s.j(0) \ 3) * 3
 
-        For _j = 0 To 8
-            If _j <> _s.j(0) And _j <> _s.j(1) Then
-                _k0 = _s.k(0)
-                _k1 = _s.k(1)
-                If _Candidats(_i, _j, _k0) = _s.v(0) Then
-                    _Candidats(_i, _j, _k0) = " "
+        For _i = _ir To _ir + 2
+            For _j = _jr To _jr + 2
+                If Not (_i = _s.i(0) And _j = _s.j(0)) And Not (_i = _s.i(1) And _j = _s.j(1)) Then
+                    _k0 = _s.k(0)
+                    _k1 = _s.k(1)
+                    If _Candidats(_i, _j, _k0) = _s.v(0) Then
+                        _Candidats(_i, _j, _k0) = " "
+                    End If
+                    If _Candidats(_i, _j, _k1) = _s.v(1) Then
+                        _Candidats(_i, _j, _k1) = " "
+                    End If
                 End If
-                If _Candidats(_i, _j, _k1) = _s.v(1) Then
-                    _Candidats(_i, _j, _k1) = " "
-                End If
-            End If
+            Next
         Next
 
     End Sub
