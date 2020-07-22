@@ -12,9 +12,11 @@
     Dim j As Integer = 0
     Dim k As Integer = 0
     Dim g As Integer = 0
-    'Dim r As Integer = 0
 
     Dim Grille(8, 8) As String ' La grille de Sudoku
+    Dim opk(8, 8) As Integer ' Occurrences de k par case
+    Dim nuplet(8, 8) As String 'Candidats agrégés
+
     Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
     Dim NbVal As Integer = 0
 
@@ -52,10 +54,6 @@
         Dim Candidats(,,) As String ' La grille des candidats ( Valeurs au crayon)
     End Structure
 
-    'Dim Analyse(8, 8) As Sudoku.StrAnalyse
-    Dim opk(8, 8) As Integer ' Occurrences de k par case
-    Dim nuplet(8, 8) As String 'Candidats agrégés
-
     Dim Erreur As Boolean
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
@@ -82,7 +80,8 @@
     Dim sudoDifficile As String = " 9 8 2     79  1 36   7 5   7    9 2         9 3    6   6 1   42 8  43     2 6 7 "
     Dim SudopairLig As String = "   3    1 13 8 97  6 17    7 9    1     4     8    4 2    93 2  91 2 78 2    5   "
     Dim SudopairCol As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 "
-    Dim jaugeeeeeee As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
+    Dim SodiCVL1___ As String = "    1  8 1 4   2    97 4    78 9 3  3       2  2 6 84    1 86    5   1 3 1  7    "
+    Dim jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
 
 
