@@ -22,26 +22,47 @@ Module Générateur
 
         Dim Erreur As Boolean
         Dim ErreurGrille(8, 8) As String
+        Dim GQSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
+        Dim GQSmp As Queue(Of Sudoku.StrSmp) = New Queue(Of Sudoku.StrSmp)
+        Dim GSolution As Sudoku.StrSolution
+        GSolution.i = 0
+        GSolution.j = 0
+        GSolution.v = 0
+        GSolution.m = " "
+        GQSol.Enqueue(GSolution)
+        GSolution = GQSol.Dequeue()
 
-        Dim GTabSolution(80) As Sudoku.StrSolution
         Dim GNbSol As Integer = 0 'Nombre de solutions en réserve
 
-        Dim GSimplification(20) As Sudoku.StrSimplification
+        Dim GTabSmp(20) As Sudoku.StrSmp
         Dim GNbSmp As Integer = 0 'Nombre de simplifications en réserve
         ''Dimentionnement du tableau dans la structure _ Initialisation de valeurs nulles
-        For i = 0 To 20
-            GSimplification(i).n = 0
-            ReDim GSimplification(i).i(20)
-            ReDim GSimplification(i).j(20)
-            ReDim GSimplification(i).k(20)
-            ReDim GSimplification(i).v(20)
+        For i = 1 To 20
+
+            GTabSmp(i).m = " "
+            GTabSmp(i).act = False
+            ReDim GTabSmp(i).cri(2)
+            ReDim GTabSmp(i).crj(2)
+            ReDim GTabSmp(i).crk(2)
+            ReDim GTabSmp(i).crv(2)
+            ReDim GTabSmp(i).cei(20)
+            ReDim GTabSmp(i).cej(20)
+            ReDim GTabSmp(i).cek(20)
+            ReDim GTabSmp(i).cev(20)
+            GTabSmp(i).ne = 0
+            For j = 0 To 3
+                GTabSmp(i).cri(j) = 0
+                GTabSmp(i).crj(j) = 0
+                GTabSmp(i).crk(j) = 0
+                GTabSmp(i).crv(j) = " "
+            Next
+            GTabSmp(i).nr = 0
             For j = 0 To 20
-                GSimplification(i).i(j) = 0
-                GSimplification(i).j(j) = 0
-                GSimplification(i).k(j) = 0
-                GSimplification(i).v(j) = " "
-                GSimplification(i).m = " "
-                GSimplification(i).act = False
+                GTabSmp(i).cei(j) = 0
+                GTabSmp(i).cej(j) = 0
+                GTabSmp(i).cek(j) = 0
+                GTabSmp(i).cev(j) = 0
+
             Next
         Next
 
@@ -131,14 +152,14 @@ Module Générateur
 
                 GNbSol = 0
 
-                Calcul_Candidats(Grille, Candidats, GTabSolution, GNbSol, GSimplification, GNbSmp)
+                Calcul_Candidats(Grille, Candidats, GQSol, GQSmp)
 
-                If GNbSol > 0 Then
-
-                    i = GTabSolution(0).i
-                    j = GTabSolution(0).j
-                    Grille(i, j) = GTabSolution(0).v
-                    z = GTabSolution(0).v
+                If GQSol.Count > 0 Then
+                    GSolution = GQSol.Dequeue()
+                    i = GSolution.i
+                    j = GSolution.j
+                    Grille(i, j) = GSolution.v
+                    z = GSolution.v
                     g = (i * 9) + j
                     Select Case g
                         Case 0
@@ -151,7 +172,6 @@ Module Générateur
                     TextSudoku = TS
                     Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient
                     ControleGénération(Erreur, ErreurGrille, Grille, Candidats)
-                    SupprSolution(GTabSolution, GNbSol)
                     NbVal += 1
                     Exit While  ' pour test provoque la sortie à la premiere solution calculée 
                 End If

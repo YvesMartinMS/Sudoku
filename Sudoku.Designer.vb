@@ -113,6 +113,7 @@ Partial Class Sudoku
         Me.LBL_Conseil = New System.Windows.Forms.Label()
         Me.BT_Suivant = New System.Windows.Forms.Button()
         Me.BT_Solutions = New System.Windows.Forms.Button()
+        Me.BT_Smp = New System.Windows.Forms.Button()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -1164,7 +1165,7 @@ Partial Class Sudoku
         '
         'BT_Suivant
         '
-        Me.BT_Suivant.Location = New System.Drawing.Point(32, 259)
+        Me.BT_Suivant.Location = New System.Drawing.Point(32, 200)
         Me.BT_Suivant.Name = "BT_Suivant"
         Me.BT_Suivant.Size = New System.Drawing.Size(75, 23)
         Me.BT_Suivant.TabIndex = 1003
@@ -1173,12 +1174,21 @@ Partial Class Sudoku
         '
         'BT_Solutions
         '
-        Me.BT_Solutions.Location = New System.Drawing.Point(32, 441)
+        Me.BT_Solutions.Location = New System.Drawing.Point(32, 425)
         Me.BT_Solutions.Name = "BT_Solutions"
         Me.BT_Solutions.Size = New System.Drawing.Size(75, 23)
         Me.BT_Solutions.TabIndex = 1004
         Me.BT_Solutions.Text = "Solutions"
         Me.BT_Solutions.UseVisualStyleBackColor = True
+        '
+        'BT_Smp
+        '
+        Me.BT_Smp.Location = New System.Drawing.Point(32, 470)
+        Me.BT_Smp.Name = "BT_Smp"
+        Me.BT_Smp.Size = New System.Drawing.Size(75, 25)
+        Me.BT_Smp.TabIndex = 1005
+        Me.BT_Smp.Text = "Simpifications"
+        Me.BT_Smp.UseVisualStyleBackColor = True
         '
         'Sudoku
         '
@@ -1186,6 +1196,7 @@ Partial Class Sudoku
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(764, 661)
+        Me.Controls.Add(Me.BT_Smp)
         Me.Controls.Add(Me.BT_Solutions)
         Me.Controls.Add(Me.BT_Suivant)
         Me.Controls.Add(Me.LBL_Conseil)
@@ -1377,4 +1388,5 @@ Partial Class Sudoku
     Friend WithEvents LBL_Conseil As Label
     Friend WithEvents BT_Suivant As Button
     Friend WithEvents BT_Solutions As Button
+    Friend WithEvents BT_Smp As Button
 End Class

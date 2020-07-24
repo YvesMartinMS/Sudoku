@@ -1,13 +1,12 @@
 ﻿Public Class Solutions
     Private Sub Solution_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim i As Integer
 
-        For i = 0 To Sudoku.NbSol - 1
+        For Each Solution As Sudoku.StrSolution In Sudoku.QSol
             Dim Element As New ListViewItem
-            Element.Text = Sudoku.TabSolution(i).i
-            Element.SubItems.Add(Sudoku.TabSolution(i).j)
-            Element.SubItems.Add(Sudoku.TabSolution(i).v)
-            Element.SubItems.Add(Sudoku.TabSolution(i).m)
+            Element.Text = Solution.i
+            Element.SubItems.Add(Solution.j)
+            Element.SubItems.Add(Solution.v)
+            Element.SubItems.Add(Solution.m)
             ListSolution.Items.Add(Element)
         Next
     End Sub

@@ -35,15 +35,28 @@
         Dim m As String 'Motif
     End Structure
 
-    Structure StrSimplification
-        Dim n As Integer
-        Dim i() As Integer
-        Dim j() As Integer
-        Dim k() As Integer
-        Dim v() As String 'Valeur
+    Public Solution As New Sudoku.StrSolution
+    Public QSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
+
+    Structure StrSmp ' Simplification 
         Dim m As String 'Motif
         Dim act As Boolean
+        'candidats retenus (ReDim 2) 
+        Dim nr As Integer 'nombre de cancidats éliminés
+        Dim cri() As Integer
+        Dim crj() As Integer
+        Dim crk() As Integer
+        Dim crv() As String 'Valeur
+        'candidats éliminés (ReDim 20)
+        Dim ne As Integer 'nombre de cancidats éliminés
+        Dim cei() As Integer
+        Dim cej() As Integer
+        Dim cek() As Integer
+        Dim cev() As String 'Valeur
     End Structure
+
+    Public Qsmp As Queue(Of Sudoku.StrSmp) = New Queue(Of Sudoku.StrSmp)
+    Dim Smp As New Sudoku.StrSmp
 
     Structure Contexte
         Dim NbVal As Integer
@@ -58,11 +71,9 @@
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
 
-    Public TabSolution(80) As Sudoku.StrSolution
-    Public NbSol As Integer = 0 'Nombre solutions en réserve
+    ' Public TabSolution(80) As Sudoku.StrSolution
 
-    Public Simplification(20) As Sudoku.StrSimplification
-    Public NbSmp As Integer = 0 'Nombre de simplifications en réserve
+    ' Public TabSmp(20) As Sudoku.StrSmp
 
     Public Val As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
 
@@ -80,6 +91,7 @@
     Dim sudoDifficile As String = " 9 8 2     79  1 36   7 5   7    9 2         9 3    6   6 1   42 8  43     2 6 7 "
     Dim SudopairLig As String = "   3    1 13 8 97  6 17    7 9    1     4     8    4 2    93 2  91 2 78 2    5   "
     Dim SudopairCol As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 "
+    Dim SudopairReg As String = "  7 2 53 82   9  4  3       3 87     6     4     32 5       6  9  6   17 76 5 4  "
     Dim SodiCVL1___ As String = "    1  8 1 4   2    97 4    78 9 3  3       2  2 6 84    1 86    5   1 3 1  7    "
     Dim jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
@@ -107,7 +119,7 @@
         Select Case Mode
             Case "Test"
                 TextSudoku = sudo_Modèle
-                TextSudoku = Sudopairlig
+                TextSudoku = SudopairReg
                 InitTest()
                 Initialisations(Grille, Candidats)
                 Contrôle_Saisie()
@@ -338,6 +350,20 @@
 
     End Sub
 
+    Sub RaffraichiGrille()
+        ' pour afficherles candidats de la ligne
+        Dim _i As Integer
+        Dim _j As Integer
+        For _i = 0 To 8
+            For _j = 0 To 8
+                If Grille(_i, _j) = "0" Then
+                    AfficheCandidats(_i, _j)
+                End If
+            Next
+        Next
+
+    End Sub
+
     Sub AfficheCandidats(_i, _j)
 
         TB(_i, _j).Font = TB_petit_modele.Font
@@ -374,7 +400,10 @@
 
     Private Sub Resoudre()
 
-        Calcul_Candidats(Grille, Candidats, TabSolution, NbSol, Simplification, NbSmp)
+        QSol.Clear()
+        Qsmp.Clear()
+
+        Calcul_Candidats(Grille, Candidats, QSol, Qsmp)
 
         '
         ' Affiche les candidats dans la grille
@@ -391,28 +420,21 @@
             Next
         Next
 
-        If NbSol > 0 Then
-            LBL_Conseil.Text = "Ligne " & TabSolution(0).i + 1 & " colonne " & TabSolution(0).j + 1 & " " & TabSolution(0).m & " : " _
-                             & TabSolution(0).v & " / " & NbSol & " / "
-            '    ProchaineSolution(TabSolution, NbSol)
+        If QSol.Count > 0 Then
+            Solution = QSol.Peek()
+            LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " colonne " & Solution.j + 1 & " " & Solution.m & " : " _
+                             & Solution.v & " / " & QSol.Count & " / "
         Else
-            MsgBox("On passe à la suite")
+            If Qsmp.Count > 0 Then
+                Smp = Qsmp.Peek()
+                LBL_Conseil.Text = Smp.m
+            Else
+                MsgBox("Plus de solution")
+            End If
         End If
 
 
     End Sub
-
-    'Private Sub BT_Suivant_Click(sender As Object, e As EventArgs) Handles BT_Suivant.Click
-
-    '    If NbSol > 0 Then
-    '        LBL_Conseil.Text = "Ligne " & TabSolution(0).i + 1 & " colonne " & TabSolution(0).j + 1 & " " & TabSolution(0).m & " : " _
-    '                         & TabSolution(0).v & " / " & NbSol & " / "
-    '        ProchaineSolution(TabSolution, NbSol)
-    '    Else
-    '        MsgBox("On passe à la suite")
-    '    End If
-
-    'End Sub
 
     Private Sub BT_Suivant_Click(sender As Object, e As EventArgs) Handles BT_Suivant.Click
 
@@ -420,11 +442,11 @@
 
         ' s = GetRandom(0, GNbSol - 1)
 
-        If NbSol > 0 Then
-
-            i = TabSolution(NbSol - 1).i
-            j = TabSolution(NbSol - 1).j
-            TB(i, j).Text = TabSolution(NbSol - 1).v
+        If QSol.Count > 0 Then
+            Solution = QSol.Dequeue()
+            i = Solution.i
+            j = Solution.j
+            TB(i, j).Text = Solution.v
             Grille(i, j) = TB(i, j).Text
 
             TB(i, j).Font = TB_grand_modele.Font
@@ -436,26 +458,26 @@
             RaffraichiLigne(i)
             RaffraichiColonne(j)
             RaffraichiRégion(i, j)
-
-            TabSolution(NbSol - 1).i = "0"
-            TabSolution(NbSol - 1).j = "0"
-            TabSolution(NbSol - 1).v = ""
-            TabSolution(NbSol - 1).m = ""
-            NbSol -= 1
         Else
-            If NbSmp > 0 Then
-                SuppressionCandidats(NbSmp, Candidats, Simplification, opk, nuplet)
+            If Qsmp.Count > 0 Then
+                AppliqueUneSimplification(Qsmp, Candidats)
+                RaffraichiGrille()
             End If
         End If
 
         Resoudre()
 
-        If NbSol > 0 Then
-            LBL_Conseil.Text = "Ligne " & TabSolution(0).i + 1 & " colonne " & TabSolution(0).j + 1 & " " & TabSolution(0).m & " : " _
-                             & TabSolution(0).v & " / " & NbSol & " / "
-            '   ProchaineSolution(TabSolution, NbSol)
+        If QSol.Count > 0 Then
+            Solution = QSol.Peek()
+            LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " colonne " & Solution.j + 1 & " " & Solution.m & " : " _
+                             & Solution.v & " / " & QSol.Count & " / "
         Else
-            MsgBox("On passe à la suite")
+            If Qsmp.Count > 0 Then
+                Smp = Qsmp.Peek()
+                LBL_Conseil.Text = Smp.m
+            Else
+                MsgBox("Plus de solution")
+            End If
         End If
     End Sub
 
@@ -463,6 +485,12 @@
     Private Sub BT_Solutions_Click(sender As Object, e As EventArgs) Handles BT_Solutions.Click
 
         Solutions.Show()
+
+    End Sub
+
+    Private Sub BT_Smp_Click(sender As Object, e As EventArgs) Handles BT_Smp.Click
+
+        Simplifications.Show()
 
     End Sub
 
