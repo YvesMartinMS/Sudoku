@@ -14,7 +14,7 @@
     Dim g As Integer = 0
 
     Dim Grille(8, 8) As String ' La grille de Sudoku
-    Dim opk(8, 8) As Integer ' Occurrences de k par case
+    Dim opk(8, 8) As Integer ' Nombre de candidats de k par case
     Dim nuplet(8, 8) As String 'Candidats agrégés
 
     Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
@@ -37,26 +37,35 @@
 
     Public Solution As New Sudoku.StrSolution
     Public QSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
-
-    Structure StrSmp ' Simplification 
-        Dim m As String 'Motif
-        Dim act As Boolean
-        'candidats retenus (ReDim 2) 
-        Dim nr As Integer 'nombre de cancidats éliminés
-        Dim cri() As Integer
-        Dim crj() As Integer
-        Dim crk() As Integer
-        Dim crv() As String 'Valeur
-        'candidats éliminés (ReDim 20)
-        Dim ne As Integer 'nombre de cancidats éliminés
-        Dim cei() As Integer
-        Dim cej() As Integer
-        Dim cek() As Integer
-        Dim cev() As String 'Valeur
+    Structure CandidatsRetenus
+        Dim i() As Integer
+        Dim j() As Integer
+        Dim k() As Integer
+        Dim v() As String
+    End Structure
+    Structure CandidatsEliminés
+        Dim i() As Integer
+        Dim j() As Integer
+        Dim k() As Integer
+        Dim v() As String
     End Structure
 
-    Public Qsmp As Queue(Of Sudoku.StrSmp) = New Queue(Of Sudoku.StrSmp)
-    Dim Smp As New Sudoku.StrSmp
+    Structure StrSmp ' Simplification 
+        Dim motif As String 'Motif
+        Dim act As Boolean
+        'candidats retenus (ReDim 2) 
+        Dim nr As Integer 'nombre de candidats retenus
+        Dim CR As CandidatsRetenus
+        'candidats éliminés (ReDim 20)
+        Dim ne As Integer 'nombre de candidats éliminés
+        Dim CE As CandidatsRetenus
+    End Structure
+
+    Public TSmp(80) As Sudoku.StrSmp
+    Public NbrSmp As Integer
+    Dim Smp As Sudoku.StrSmp
+    Dim Libel As String
+    Public ModeDebug As Boolean = False
 
     Structure Contexte
         Dim NbVal As Integer
@@ -70,10 +79,6 @@
     Dim Erreur As Boolean
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
-
-    ' Public TabSolution(80) As Sudoku.StrSolution
-
-    ' Public TabSmp(20) As Sudoku.StrSmp
 
     Public Val As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
 
@@ -92,7 +97,9 @@
     Dim SudopairLig As String = "   3    1 13 8 97  6 17    7 9    1     4     8    4 2    93 2  91 2 78 2    5   "
     Dim SudopairCol As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 "
     Dim SudopairReg As String = "  7 2 53 82   9  4  3       3 87     6     4     32 5       6  9  6   17 76 5 4  "
-    Dim SodiCVL1___ As String = "    1  8 1 4   2    97 4    78 9 3  3       2  2 6 84    1 86    5   1 3 1  7    "
+    Dim SodiCVL1zzz As String = "    1  8 1 4   2    97 4    78 9 3  3       2  2 6 84    1 86    5   1 3 1  7    "
+    ' 2 pairesnues - à terminer
+    Dim Sudo0010000 As String = "9  3     8   9 42   362     78   5 9  2 7 6  5 9   37     132   51 4   7     6  1"
     Dim jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
 
@@ -115,11 +122,12 @@
                 TBini(i, j) = TB(i, j)
             Next
         Next
+
         Mode = "Test"
         Select Case Mode
             Case "Test"
                 TextSudoku = sudo_Modèle
-                TextSudoku = SudopairReg
+                TextSudoku = Sudo0010000
                 InitTest()
                 Initialisations(Grille, Candidats)
                 Contrôle_Saisie()
@@ -270,6 +278,7 @@
         Next
     End Sub
 #End Region
+
 #Region "Controles préalables"
     Sub Contrôle_Saisie()
 
@@ -400,10 +409,12 @@
 
     Private Sub Resoudre()
 
-        QSol.Clear()
-        Qsmp.Clear()
+        Dim Dsmp As New StrSmp
 
-        Calcul_Candidats(Grille, Candidats, QSol, Qsmp)
+        QSol.Clear()
+        TsmpClear(NbrSmp, TSmp)
+
+        Calcul_Candidats(Grille, Candidats, QSol, NbrSmp, TSmp)
 
         '
         ' Affiche les candidats dans la grille
@@ -425,9 +436,26 @@
             LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " colonne " & Solution.j + 1 & " " & Solution.m & " : " _
                              & Solution.v & " / " & QSol.Count & " / "
         Else
-            If Qsmp.Count > 0 Then
-                Smp = Qsmp.Peek()
-                LBL_Conseil.Text = Smp.m
+            If NbrSmp > 0 Then
+                Smp = TSmp(0)
+                LBL_Conseil.Text = Smp.motif
+                '            If ModeDebug Then
+                '     Dsmp = TSmp(0)
+                '     MsgBox(NbrSmp & " A0 : " & Dsmp.CR.i(0) & Dsmp.CR.j(0) & " " & Dsmp.CR.i(1) & Dsmp.CR.j(1) & " " & Dsmp.CR.k(0) & Dsmp.CR.k(1) & "/" & Dsmp.motif & "/")
+
+                '    _DSmp = _TSmp(1)
+                '    MsgBox(NbrSmp & " A1 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
+
+                '    _DSmp = _TSmp(2)
+                '    MsgBox(NbrSmp & " A2 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
+
+                '    _DSmp = _TSmp(3)
+                '    MsgBox(NbrSmp & " A3 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
+
+                '    _DSmp = _TSmp(4)
+                '    MsgBox(NbrSmp & " A4 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
+
+                '           End If
             Else
                 MsgBox("Plus de solution")
             End If
@@ -441,6 +469,7 @@
         ' La dernière valeur proposée est à la fin du tableau des solutions
 
         ' s = GetRandom(0, GNbSol - 1)
+        Dim DSmp As New StrSmp
 
         If QSol.Count > 0 Then
             Solution = QSol.Dequeue()
@@ -459,8 +488,8 @@
             RaffraichiColonne(j)
             RaffraichiRégion(i, j)
         Else
-            If Qsmp.Count > 0 Then
-                AppliqueUneSimplification(Qsmp, Candidats)
+            If NbrSmp > 0 Then
+                AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
                 RaffraichiGrille()
             End If
         End If
@@ -470,13 +499,29 @@
         If QSol.Count > 0 Then
             Solution = QSol.Peek()
             LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " colonne " & Solution.j + 1 & " " & Solution.m & " : " _
-                             & Solution.v & " / " & QSol.Count & " / "
+                             & Solution.v & " / " & NbVal & " / "
         Else
-            If Qsmp.Count > 0 Then
-                Smp = Qsmp.Peek()
-                LBL_Conseil.Text = Smp.m
+            If NbrSmp > 0 Then
+                Smp = TSmp(0)
+                LBL_Conseil.Text = Smp.motif
+                '          If ModeDebug Then
+                '     Dsmp = TSmp(0)
+                '     MsgBox(NbrSmp & " B0 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/")
+
+                '    _DSmp = _TSmp(1)
+                '    MsgBox(NbrSmp & " B1 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
+
+                '    _DSmp = _TSmp(2)
+                '    MsgBox(NbrSmp & " B2 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
+
+                '    _DSmp = _TSmp(3)
+                '    MsgBox(NbrSmp & " B3 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
+
+                '    _DSmp = _TSmp(4)
+                '    MsgBox(NbrSmp & " B4 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
+                '         End If
             Else
-                MsgBox("Plus de solution")
+                    MsgBox("Plus de solution")
             End If
         End If
     End Sub

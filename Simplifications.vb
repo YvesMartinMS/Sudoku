@@ -1,27 +1,39 @@
 ﻿Public Class Simplifications
+    Private Sub Simplifications_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim _t As Integer
+        For _t = 0 To Sudoku.NbrSmp - 1
+
+            Dim Element As New ListViewItem
+            Element.Text = Sudoku.TSmp(_t).motif
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.i(0))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.j(0))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.v(0))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.i(1))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.j(1))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.v(1))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.i(2))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.j(2))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CR.v(2))
+            Element.SubItems.Add("|")
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.i(0))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.j(0))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.v(0))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.i(1))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.j(1))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.v(1))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.i(2))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.j(2))
+            Element.SubItems.Add(Sudoku.TSmp(_t).CE.v(2))
+            ListSimplifications.Items.Add(Element)
+        Next
+    End Sub
+
     Private Sub BT_Fermer_Smp_Click(sender As Object, e As EventArgs) Handles BT_Fermer_Smp.Click
         Me.Close()
     End Sub
 
     Private Sub ListView1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListSimplifications.SelectedIndexChanged
-        For Each Smp As Sudoku.StrSmp In Sudoku.Qsmp
-            Dim Element As New ListViewItem
-            Element.Text = Smp.m
-            'Dim m As String 'Motif
-            'Dim act As Boolean
-            ''candidats retenus (ReDim 2) 
-            'Dim nr As Integer 'nombre de cancidats éliminés
-            'Dim cri() As Integer
-            'Dim crj() As Integer
-            'Dim crk() As Integer
-            'Dim crv() As String 'Valeur
-            ''candidats éliminés (ReDim 20)
-            'Dim ne As Integer 'nombre de cancidats éliminés
-            'Dim cei() As Integer
-            'Dim cej() As Integer
-            'Dim cek() As Integer
-            'Dim cev() As String 'Valeur
-            ListSimplifications.Items.Add(Element)
-        Next
+
+
     End Sub
 End Class

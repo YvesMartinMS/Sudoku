@@ -23,7 +23,7 @@ Module Générateur
         Dim Erreur As Boolean
         Dim ErreurGrille(8, 8) As String
         Dim GQSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
-        Dim GQSmp As Queue(Of Sudoku.StrSmp) = New Queue(Of Sudoku.StrSmp)
+        Dim GQSmp As Stack(Of Sudoku.StrSmp) = New Stack(Of Sudoku.StrSmp)
         Dim GSolution As Sudoku.StrSolution
         GSolution.i = 0
         GSolution.j = 0
@@ -32,39 +32,8 @@ Module Générateur
         GQSol.Enqueue(GSolution)
         GSolution = GQSol.Dequeue()
 
-        Dim GNbSol As Integer = 0 'Nombre de solutions en réserve
-
-        Dim GTabSmp(20) As Sudoku.StrSmp
-        Dim GNbSmp As Integer = 0 'Nombre de simplifications en réserve
-        ''Dimentionnement du tableau dans la structure _ Initialisation de valeurs nulles
-        For i = 1 To 20
-
-            GTabSmp(i).m = " "
-            GTabSmp(i).act = False
-            ReDim GTabSmp(i).cri(2)
-            ReDim GTabSmp(i).crj(2)
-            ReDim GTabSmp(i).crk(2)
-            ReDim GTabSmp(i).crv(2)
-            ReDim GTabSmp(i).cei(20)
-            ReDim GTabSmp(i).cej(20)
-            ReDim GTabSmp(i).cek(20)
-            ReDim GTabSmp(i).cev(20)
-            GTabSmp(i).ne = 0
-            For j = 0 To 3
-                GTabSmp(i).cri(j) = 0
-                GTabSmp(i).crj(j) = 0
-                GTabSmp(i).crk(j) = 0
-                GTabSmp(i).crv(j) = " "
-            Next
-            GTabSmp(i).nr = 0
-            For j = 0 To 20
-                GTabSmp(i).cei(j) = 0
-                GTabSmp(i).cej(j) = 0
-                GTabSmp(i).cek(j) = 0
-                GTabSmp(i).cev(j) = 0
-
-            Next
-        Next
+        Dim GTSmp() As Sudoku.StrSmp
+        Dim GNbrSmp As Integer
 
         Dim ModeDebug As Boolean = False
         Dim f As Integer = 0
@@ -104,7 +73,7 @@ Module Générateur
         While NbVal < 80 And Not Erreur
 
             ' choisit une case au hasard parmi celles qui sont libres
-            If GNbSol = 0 Then
+            If GQSol.Count = 0 Then
 
                 ChoisitCase(Grille, NbVal, i, j)
                 If ModeDebug Then
@@ -150,9 +119,9 @@ Module Générateur
 
             If NbVal > 25 Then
 
-                GNbSol = 0
-
-                Calcul_Candidats(Grille, Candidats, GQSol, GQSmp)
+                GQSol.Clear()
+                GQSmp.Clear()
+                Calcul_Candidats(Grille, Candidats, GQSol, GNbrSmp, GTSmp)
 
                 If GQSol.Count > 0 Then
                     GSolution = GQSol.Dequeue()
