@@ -23,7 +23,6 @@ Module Générateur
         Dim Erreur As Boolean
         Dim ErreurGrille(8, 8) As String
         Dim GQSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
-        Dim GQSmp As Stack(Of Sudoku.StrSmp) = New Stack(Of Sudoku.StrSmp)
         Dim GSolution As Sudoku.StrSolution
         GSolution.i = 0
         GSolution.j = 0
@@ -120,7 +119,7 @@ Module Générateur
             If NbVal > 25 Then
 
                 GQSol.Clear()
-                GQSmp.Clear()
+                TsmpClear(GNbrSmp, GTSmp)
                 Calcul_Candidats(Grille, Candidats, GQSol, GNbrSmp, GTSmp)
 
                 If GQSol.Count > 0 Then

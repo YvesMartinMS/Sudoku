@@ -64,6 +64,13 @@
     Public TSmp(80) As Sudoku.StrSmp
     Public NbrSmp As Integer
     Dim Smp As Sudoku.StrSmp
+
+    Structure AnlTrp
+        Dim i As Integer
+        Dim j As Integer
+        Dim v() As String
+    End Structure
+
     Dim Libel As String
     Public ModeDebug As Boolean = False
 
@@ -94,12 +101,18 @@
     Dim sudoTestCol As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  8 427    1     9   4"
     Dim sudoTestReg As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  81427    1     9   4"
     Dim sudoDifficile As String = " 9 8 2     79  1 36   7 5   7    9 2         9 3    6   6 1   42 8  43     2 6 7 "
-    Dim SudopairLig As String = "   3    1 13 8 97  6 17    7 9    1     4     8    4 2    93 2  91 2 78 2    5   "
-    Dim SudopairCol As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 "
+
+    Dim SudopairCol As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 " ' ok
     Dim SudopairReg As String = "  7 2 53 82   9  4  3       3 87     6     4     32 5       6  9  6   17 76 5 4  "
+
     Dim SodiCVL1zzz As String = "    1  8 1 4   2    97 4    78 9 3  3       2  2 6 84    1 86    5   1 3 1  7    "
-    ' 2 pairesnues - à terminer
+    ' 2 paires nues + cancdidats véroullés + triplet nus
+    Dim SudopairLig As String = "   3    1 13 8 97  6 17    7 9    1     4     8    4 2    93 2  91 2 78 2    5   " ' 
+    ' 2 pairesnues 
     Dim Sudo0010000 As String = "9  3     8   9 42   362     78   5 9  2 7 6  5 9   37     132   51 4   7     6  1"
+    Dim Tripletnu02 As String = " 8 5297  9          6 3    8    4 9  7298364  4 7    8    6 9          6  6498 2 " 'en colonne cassé?
+    'triplets nus en ligne et en région
+    Dim Tripletnu03 As String = " 8         29  4 1  14   6 8   6  2   57189   9  3   5 6   13  9 3  25         9 " '
     Dim jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
 
@@ -126,8 +139,17 @@
         Mode = "Test"
         Select Case Mode
             Case "Test"
-                TextSudoku = sudo_Modèle
-                TextSudoku = Sudo0010000
+                TextSudoku = Sudo0010000 'OK
+                TextSudoku = SudopairLig ' developper triplets nus
+                TextSudoku = SudopairCol 'OK
+                TextSudoku = sudoDifficile ' OK
+                TextSudoku = SudopairReg ' OK
+                TextSudoku = SodiCVL1zzz ' OK
+                TextSudoku = sudo_Modèle ' OK
+                TextSudoku = Tripletnu02 'OK
+                TextSudoku = Tripletnu03 'OK
+                TextSudoku = SudopairLig 'OK
+
                 InitTest()
                 Initialisations(Grille, Candidats)
                 Contrôle_Saisie()
@@ -137,8 +159,6 @@
                 Initialisations(Grille, Candidats)
                 Contrôle_Saisie()
         End Select
-
-        '     i = 0
 
     End Sub
 #Region "Initialisations"

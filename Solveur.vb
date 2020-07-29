@@ -304,6 +304,9 @@
             PaireNueReg(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             CandidatVérouilléLig(_Candidats, _AnlLig, _AnlReg, _NbrSmp, _TSmp, _opk, _nuplet)
             CandidatVérouilléCol(_Candidats, _AnlCol, _AnlReg, _NbrSmp, _TSmp, _opk, _nuplet)
+            AnalyseTrpLig(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+            AnalyseTrpCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+            AnalyseTrpReg(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
         End If
 
     End Sub
@@ -664,8 +667,8 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Simplification des candidats 
-    ' recense les paires nues d'une ligne
+    ' Technique d'élimination de candidats 
+    ' Recense les paires nues par lignes
     '============================================================================================================================================================
 
     Sub PaireNueLig(ByRef _Candidats(,,) As String,
@@ -684,7 +687,6 @@
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _Smp As New Sudoku.StrSmp
-        Dim _DSmp As New Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -701,11 +703,11 @@
                                         For _k = 0 To 8
                                             If _Candidats(_i, _jter, _k) = Mid(_nuplet(_i, _j), 1, 1) Then
                                                 _Smp.act = True
-                                                _Smp.CR.i(0) = _k
+                                                _k0 = _k
                                             End If
                                             If _Candidats(_i, _jter, _k) = Mid(_nuplet(_i, _j), 2, 1) Then
                                                 _Smp.act = True
-                                                _Smp.CR.i(1) = _k
+                                                _k1 = _k
                                             End If
                                         Next
                                     End If
@@ -714,9 +716,11 @@
                                     _Smp.nr = 1
                                     _Smp.CR.i(0) = _i
                                     _Smp.CR.j(0) = _j
+                                    _Smp.CR.k(0) = _k0
                                     _Smp.CR.v(0) = Mid(_nuplet(_i, _j), 1, 1)
                                     _Smp.CR.i(1) = _i
                                     _Smp.CR.j(1) = _jbis
+                                    _Smp.CR.k(1) = _k1
                                     _Smp.CR.v(1) = Mid(_nuplet(_i, _j), 2, 1)
                                     _Smp.motif = "Paires nues : [" & _nuplet(_i, _j) & "] dans les cases L" & _i + 1 & "C" & _j + 1 & "-L" & _i + 1 & "C" & _jbis + 1
 
@@ -724,8 +728,6 @@
                                     _Smp.ne = 0
                                     For _ej = 0 To 8
                                         If _ej <> _Smp.CR.j(0) And _ej <> _Smp.CR.j(1) Then
-                                            _k0 = _Smp.CR.k(0)
-                                            _k1 = _Smp.CR.k(1)
                                             If _Candidats(_i, _ej, _k0) = _Smp.CR.v(0) Then
                                                 _Smp.CE.i(_Smp.ne) = _i
                                                 _Smp.CE.j(_Smp.ne) = _ej
@@ -747,24 +749,7 @@
                                     _NbrSmp += 1
                                     _Smp = NewSmp()
 
-                                    If Sudoku.ModeDebug Then
-                                        _DSmp = _TSmp(0)
-                                        MsgBox(_NbrSmp & " a0 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                                        '    _DSmp = _TSmp(1)
-                                        '    MsgBox(_NbrSmp & " a1 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                                        '    _DSmp = _TSmp(2)
-                                        '    MsgBox(_NbrSmp & " a2 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                                        '    _DSmp = _TSmp(3)
-                                        '    MsgBox(_NbrSmp & " a3 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                                        '    _DSmp = _TSmp(4)
-                                        '    MsgBox(_NbrSmp & " a4 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-                                    End If
                                     Exit For
-
                                 End If
                             End If
                         End If
@@ -776,8 +761,8 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Simplification des candidats 
-    ' recense les paires nues d'une colonne
+    ' Technique d'élimination de candidats 
+    ' Recense les paires nues par colonnes
     '============================================================================================================================================================
 
     Sub PaireNueCol(ByRef _Candidats(,,) As String,
@@ -796,13 +781,12 @@
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _Smp As New Sudoku.StrSmp
-        Dim _DSmp As New Sudoku.StrSmp
 
         _Smp = NewSmp()
 
         For _j = 0 To 8
             ' appariement
-            For _i = 0 To 8
+            For _i = 0 To 7
                 If _opk(_i, _j) = 2 Then
                     For _ibis = _i + 1 To 8
                         If _opk(_ibis, _j) = 2 Then
@@ -813,13 +797,11 @@
                                         For _k = 0 To 8
                                             If _Candidats(_iter, _j, _k) = Mid(_nuplet(_i, _j), 1, 1) Then
                                                 _Smp.act = True
-                                                _Smp.CR.k(0) = _k
-                                                Exit For
+                                                _k0 = _k
                                             End If
                                             If _Candidats(_iter, _j, _k) = Mid(_nuplet(_i, _j), 2, 1) Then
                                                 _Smp.act = True
-                                                _Smp.CR.k(1) = _k
-                                                Exit For
+                                                _k1 = _k
                                             End If
                                         Next
                                     End If
@@ -828,15 +810,15 @@
                                     _Smp.nr = 1
                                     _Smp.CR.i(0) = _i
                                     _Smp.CR.j(0) = _j
+                                    _Smp.CR.k(0) = _k0
                                     _Smp.CR.v(0) = Mid(_nuplet(_i, _j), 1, 1)
                                     _Smp.CR.i(1) = _ibis
                                     _Smp.CR.j(1) = _j
+                                    _Smp.CR.k(1) = _k1
                                     _Smp.CR.v(1) = Mid(_nuplet(_i, _j), 2, 1)
                                     _Smp.motif = "Paires nues : [" & _nuplet(_i, _j) & "] dans les cases L" & _i + 1 & "C" & _j + 1 & "-L" & _ibis + 1 & "C" & _j + 1
 
                                     'Liste des candidats éliminés
-                                    _k0 = _Smp.CR.k(0)
-                                    _k1 = _Smp.CR.k(1)
                                     _Smp.ne = 0
                                     For _ei = 0 To 8
                                         If _ei <> _Smp.CR.i(0) And _ei <> _Smp.CR.i(1) Then
@@ -861,26 +843,7 @@
                                     _NbrSmp += 1
                                     _Smp = NewSmp()
 
-                                    If Sudoku.ModeDebug Then
-                                        _DSmp = _TSmp(0)
-                                        MsgBox(_NbrSmp & " b0 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                                        _DSmp = _TSmp(1)
-                                        MsgBox(_NbrSmp & " b1 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                                        _DSmp = _TSmp(2)
-                                        MsgBox(_NbrSmp & " b2 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                                        _DSmp = _TSmp(3)
-                                        MsgBox(_NbrSmp & " b3 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                                        _DSmp = _TSmp(4)
-                                        MsgBox(_NbrSmp & " b4 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                                    End If
-
                                     Exit For
-
                                 End If
                             End If
                         End If
@@ -892,8 +855,8 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Simplification des candidats 
-    ' recense les paires nues d'une région
+    ' Technique d'élimination de candidats 
+    ' Recense les paires nues par régions
     '============================================================================================================================================================
 
 
@@ -922,7 +885,6 @@
         Dim _g As Integer
         Dim _gbis As Integer
         Dim _Smp As New Sudoku.StrSmp
-        Dim _DSmp As New Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -943,15 +905,15 @@
                                             'Recherche si les paires sont actives (s'il y a des candidats à effacer)
                                             For _iter = _csgi To _csgi + 2
                                                 For _jter = _csgj To _csgj + 2
-                                                    If Not (_iter = _i And _jter = _j) And Not (_jter = _jbis And _jter = _jbis) Then
+                                                    If Not (_iter = _i And _jter = _j) And Not (_iter = _ibis And _jter = _jbis) Then
                                                         For _k = 0 To 8
                                                             If _Candidats(_iter, _jter, _k) = Mid(_nuplet(_i, _j), 1, 1) Then
                                                                 _Smp.act = True
-                                                                _Smp.CR.k(0) = _k
+                                                                _k0 = _k
                                                             End If
                                                             If _Candidats(_iter, _jter, _k) = Mid(_nuplet(_i, _j), 2, 1) Then
                                                                 _Smp.act = True
-                                                                _Smp.CR.k(1) = _k
+                                                                _k1 = _k
                                                             End If
                                                         Next
                                                     End If
@@ -961,9 +923,11 @@
                                                 _Smp.ne = 1
                                                 _Smp.CR.i(0) = _i
                                                 _Smp.CR.j(0) = _j
+                                                _Smp.CR.k(0) = _k0
                                                 _Smp.CR.v(0) = Mid(_nuplet(_i, _j), 1, 1)
                                                 _Smp.CR.i(1) = _ibis
                                                 _Smp.CR.j(1) = _jbis
+                                                _Smp.CR.k(1) = _k1
                                                 _Smp.CR.v(1) = Mid(_nuplet(_i, _j), 2, 1)
                                                 _Smp.motif = "Paires nues : [" & _nuplet(_i, _j) & "] dans les cases L" & _i + 1 & "C" & _j + 1 & "-L" & _ibis + 1 & "C" & _jbis + 1
 
@@ -971,10 +935,7 @@
                                                 _Smp.ne = 0
                                                 For _ei = _csgi To _csgi + 2
                                                     For _ej = _csgj To _csgj + 2
-                                                        If Not (_ei = _Smp.CR.i(0) And _ej = _Smp.CR.j(0)) And Not (_ei = _Smp.CR.i(1) And _ej = _Smp.CR.j(1)) Then
-                                                            ' If Not (_iter = _i And _jter = _j) And Not (_jter = _jbis And _jter = _jbis) Then
-                                                            _k0 = _Smp.CR.k(0)
-                                                            _k1 = _Smp.CR.k(1)
+                                                        If Not (_ei = _i And _ej = _j) And Not (_ei = _ibis And _ej = _jbis) Then
                                                             If _Candidats(_ei, _ej, _k0) = _Smp.CR.v(0) Then
                                                                 _Smp.CE.i(_Smp.ne) = _ei
                                                                 _Smp.CE.j(_Smp.ne) = _ej
@@ -996,25 +957,6 @@
                                                 _TSmp(_NbrSmp) = _Smp
                                                 _NbrSmp += 1
                                                 _Smp = NewSmp()
-
-                                                If Sudoku.ModeDebug Then
-                                                    _DSmp = _TSmp(0)
-                                                    MsgBox(_NbrSmp & " c0 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                                                    '    _DSmp = _TSmp(1)
-                                                    '    MsgBox(_NbrSmp & " c1 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                                                    '    _DSmp = _TSmp(2)
-                                                    '    MsgBox(_NbrSmp & " c2 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                                                    '    _DSmp = _TSmp(3)
-                                                    '    MsgBox(_NbrSmp & " c3 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                                                    '    _DSmp = _TSmp(4)
-                                                    '    MsgBox(_NbrSmp & " c4 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                                                End If
-
                                                 Exit For
 
                                             End If
@@ -1031,7 +973,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Simplification des candidats 
+    ' Technique d'élimination de candidats 
     ' Candidats verrouillés en ligne (communs à une région et une ligne)
     '============================================================================================================================================================
 
@@ -1048,12 +990,10 @@
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
         Dim _ir As Integer 'indice de ligne limité à l'intérieur d'une région
-        Dim _jr As Integer 'indice de colonne limité à l'intérieur d'une région
         Dim _AnlLigReg(2, 8) As Sudoku.StrAnalyse ' (i,k)
         Dim _irej As Integer ' pour parcourir les candidats rejetés
         Dim _jrej As Integer ' pour parcourir les candidats rejetés
         Dim _Smp As New Sudoku.StrSmp
-        Dim _DSmp As New Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -1062,21 +1002,23 @@
             _csgj = (_r - _csgi) * 3 'calcul coin supérieur gauche d'une région
             For _i = _csgi To _csgi + 2
                 _ir = _i - _csgi 'ligne  de la région (de 0 à 2)
-                ' - Détermine le nombre d'occurrences de k par ligne
+                ' - Détermine le nombre d'occurrences de k par ligne dans la région
                 For _k = 0 To 8
                     _AnlLigReg(_ir, _k).n = 0
                 Next
-                For _k = 0 To 8
-                    _AnlLigReg(_ir, _k).n = 0
-                    For _j = _csgj To _csgj + 2
-                        If _Candidats(_i, _j, _k) <> " " Then
-                            _AnlLigReg(_ir, _k).n += 1
-                            _AnlLigReg(_ir, _k).i = _i
-                            _AnlLigReg(_ir, _k).j = _j
-                            _AnlLigReg(_ir, _k).k = _k
-                        End If
-                    Next
+                For _j = _csgj To _csgj + 2
+                    If _opk(_i, _j) > 0 Then
+                        For _k = 0 To 8
+                            If _Candidats(_i, _j, _k) <> " " Then
+                                _AnlLigReg(_ir, _k).n += 1
+                                _AnlLigReg(_ir, _k).i = _i
+                                _AnlLigReg(_ir, _k).j = _j
+                                _AnlLigReg(_ir, _k).k = _k
+                            End If
+                        Next
+                    End If
                 Next
+
                 '
                 For _k = 0 To 8
                     ' Si on a au moins 2 k dans la ligne de la la région
@@ -1085,10 +1027,10 @@
                     If _AnlLigReg(_ir, _k).n > 1 And _AnlReg(_r, _k).n = _AnlLigReg(_ir, _k).n And _AnlLig(_i, _k).n > _AnlLigReg(_ir, _k).n Then
                         'candidats retenus (vérouillés)
                         _Smp.nr = 0 'nombre de candidats retenus (indice base 0)
-                        For _jr = _csgj To _csgj + 2
-                            If _Candidats(_ir, _jr, _k) <> " " Then
-                                _Smp.CR.i(0) = _ir
-                                _Smp.CR.j(0) = _jr
+                        For _j = _csgj To _csgj + 2
+                            If _Candidats(_i, _j, _k) <> " " Then
+                                _Smp.CR.i(0) = _i
+                                _Smp.CR.j(0) = _j
                                 _Smp.CR.k(0) = _k
                                 _Smp.CR.v(0) = Val(_k + 1)
                                 _Smp.nr += 1
@@ -1098,8 +1040,8 @@
                         _Smp.ne = 0 'nombre de candidats éliminés (indice base 0)
                         For _jrej = 0 To 8
                             If _jrej < _csgj Or _jrej > _csgj + 2 Then
-                                If _Candidats(_ir, _jrej, _k) <> " " Then
-                                    _Smp.CE.i(_Smp.ne) = _ir
+                                If _Candidats(_i, _jrej, _k) <> " " Then
+                                    _Smp.CE.i(_Smp.ne) = _i
                                     _Smp.CE.j(_Smp.ne) = _jrej
                                     _Smp.CE.k(_Smp.ne) = _k
                                     _Smp.CE.v(_Smp.ne) = Val(_k + 1)
@@ -1107,7 +1049,7 @@
                                 End If
                             End If
                         Next
-                        _Smp.motif = "CV Ligne-Ligne "
+                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Ligne " & _i + 1 & " LL"
                         _TSmp(_NbrSmp) = _Smp
                         _NbrSmp += 1
                         _Smp = NewSmp()
@@ -1118,11 +1060,11 @@
                     If _AnlLigReg(_ir, _k).n > 1 And _AnlReg(_r, _k).n > _AnlLigReg(_ir, _k).n And _AnlLig(_i, _k).n = _AnlLigReg(_ir, _k).n Then
                         'candidats retenus (vérouillés)
                         _Smp.nr = 0 'nombre de candidats retenus (indice base 0)
-                        For _jr = _csgj To _csgj + 2
-                            If _Candidats(_ir, _jr, _k) <> " " Then
-                                _Smp.CR.i(_Smp.nr) = _ir
-                                _Smp.CR.j(_Smp.nr) = _jr
-                                _Smp.CR.i(_Smp.nr) = _k
+                        For _j = _csgj To _csgj + 2
+                            If _Candidats(_i, _j, _k) <> " " Then
+                                _Smp.CR.i(_Smp.nr) = _i
+                                _Smp.CR.j(_Smp.nr) = _j
+                                _Smp.CR.k(_Smp.nr) = _k
                                 _Smp.CR.v(_Smp.nr) = Val(_k + 1)
                                 _Smp.nr += 1
                             End If
@@ -1131,39 +1073,24 @@
                         _Smp.ne = 0 'nombre de candidats éliminés (indice base 0)
                         For _irej = _csgi To _csgi + 2
                             For _jrej = _csgj To _csgj + 2
-                                If _irej <> _ir Then
+                                If _irej <> _i Then
                                     If _Candidats(_irej, _jrej, _k) <> " " Then
                                         _Smp.CE.i(_Smp.ne) = _irej
                                         _Smp.CE.j(_Smp.ne) = _jrej
                                         _Smp.CE.k(_Smp.ne) = _k
                                         _Smp.CE.v(_Smp.ne) = Val(_k + 1)
+                                        _Smp.ne += 1
                                     End If
                                 End If
                             Next
                         Next
-                        _Smp.motif = "CV Ligne-Région "
+
+                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Ligne " & _i + 1 & " LR"
 
                         _TSmp(_NbrSmp) = _Smp
                         _NbrSmp += 1
                         _Smp = NewSmp()
 
-                        If Sudoku.ModeDebug Then
-                            _DSmp = _TSmp(0)
-                            MsgBox(_NbrSmp & " r0 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                            '    _DSmp = _TSmp(1)
-                            '    MsgBox(_NbrSmp & " r1 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                            '    _DSmp = _TSmp(2)
-                            '    MsgBox(_NbrSmp & " r2 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                            '    _DSmp = _TSmp(3)
-                            '    MsgBox(_NbrSmp & " r3 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                            '    _DSmp = _TSmp(4)
-                            '    MsgBox(_NbrSmp & " r4 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                        End If
                     End If
                 Next
             Next
@@ -1172,7 +1099,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Simplification des candidats 
+    ' Technique d'élimination de candidats 
     ' Candidats verrouillés en colonne (communs à une région et une colonne)
     '============================================================================================================================================================
 
@@ -1188,13 +1115,11 @@
         Dim _r As Integer
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
-        Dim _ir As Integer 'indice de ligne limité à l'intérieur d'une région
         Dim _jr As Integer 'indice de colonne limité à l'intérieur d'une région
         Dim _AnlLigReg(2, 8) As Sudoku.StrAnalyse ' (i,k)
         Dim _irej As Integer ' pour parcourir les candidats rejetés 
         Dim _jrej As Integer ' pour parcourir les candidats rejetés
         Dim _Smp As New Sudoku.StrSmp
-        Dim _DSmp As New Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -1203,20 +1128,21 @@
             _csgj = (_r - _csgi) * 3 'calcul coin supérieur gauche d'une région
             For _j = _csgj To _csgj + 2
                 _jr = _j - _csgj
-                ' - Détermine le nombre d'occurrences de k par ligne
                 For _k = 0 To 8
                     _AnlLigReg(_jr, _k).n = 0
                 Next
-                For _k = 0 To 8
-                    _AnlLigReg(_jr, _k).n = 0
-                    For _i = _csgi To _csgi + 2
-                        If _Candidats(_i, _j, _k) <> " " Then
-                            _AnlLigReg(_jr, _k).n += 1
-                            _AnlLigReg(_jr, _k).i = _i
-                            _AnlLigReg(_jr, _k).j = _j
-                            _AnlLigReg(_jr, _k).k = _k
-                        End If
-                    Next
+                ' - Détermine le nombre d'occurrences de k par Colonne dans la région
+                For _i = _csgi To _csgi + 2
+                    If _opk(_i, _j) > 0 Then
+                        For _k = 0 To 8
+                            If _Candidats(_i, _j, _k) <> " " Then
+                                _AnlLigReg(_jr, _k).n += 1
+                                _AnlLigReg(_jr, _k).i = _i
+                                _AnlLigReg(_jr, _k).j = _j
+                                _AnlLigReg(_jr, _k).k = _k
+                            End If
+                        Next
+                    End If
                 Next
                 '
                 For _k = 0 To 8
@@ -1226,10 +1152,10 @@
                     If _AnlLigReg(_jr, _k).n > 1 And _AnlReg(_r, _k).n = _AnlLigReg(_jr, _k).n And _AnlCol(_j, _k).n > _AnlLigReg(_jr, _k).n Then
  _                        'candidats retenus (vérouillés)
                         _Smp.nr = 0 'nombre de candidats retenus (indice base 0)
-                        For _ir = _csgj To _csgj + 2
-                            If _Candidats(_ir, _jr, _k) <> " " Then
-                                _Smp.CR.i(_Smp.nr) = _ir
-                                _Smp.CR.j(_Smp.nr) = _jr
+                        For _i = _csgi To _csgi + 2
+                            If _Candidats(_i, _j, _k) <> " " Then
+                                _Smp.CR.i(_Smp.nr) = _i
+                                _Smp.CR.j(_Smp.nr) = _j
                                 _Smp.CR.k(_Smp.nr) = _k
                                 _Smp.CR.v(_Smp.nr) = Val(_k + 1)
                                 _Smp.nr += 1
@@ -1239,16 +1165,17 @@
                         _Smp.ne = 0 'nombre de candidats éliminés (indice base 0)
                         For _irej = 0 To 8
                             If _irej < _csgi Or _irej > _csgi + 2 Then
-                                If _Candidats(_irej, _jr, _k) <> " " Then 'i  = 9
+                                If _Candidats(_irej, _j, _k) <> " " Then 'i  = 9
                                     _Smp.CE.i(_Smp.ne) = _irej
-                                    _Smp.CE.j(_Smp.ne) = _jr
+                                    _Smp.CE.j(_Smp.ne) = _j
                                     _Smp.CE.k(_Smp.ne) = _k
                                     _Smp.CE.v(_Smp.ne) = Val(_k + 1)
                                     _Smp.ne += 1
                                 End If
                             End If
                         Next
-                        _Smp.motif = "CV Colonne-Colonne "
+
+                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Colonne " & _j + 1 & " CC"
 
                         _TSmp(_NbrSmp) = _Smp
                         _NbrSmp += 1
@@ -1262,10 +1189,10 @@
                     If _AnlLigReg(_jr, _k).n > 1 And _AnlReg(_r, _k).n > _AnlLigReg(_jr, _k).n And _AnlCol(_j, _k).n = _AnlLigReg(_jr, _k).n Then
                         'candidats retenus (vérouillés)
                         _Smp.nr = 0 'nombre de candidats retenus (indice base 0)
-                        For _ir = _csgi To _csgi + 2
-                            If _Candidats(_ir, _jr, _k) <> " " Then
-                                _Smp.CR.i(_Smp.nr) = _ir
-                                _Smp.CR.j(_Smp.nr) = _jr
+                        For _i = _csgi To _csgi + 2
+                            If _Candidats(_i, _j, _k) <> " " Then
+                                _Smp.CR.i(_Smp.nr) = _i
+                                _Smp.CR.j(_Smp.nr) = _j
                                 _Smp.CR.k(_Smp.nr) = _k
                                 _Smp.CR.v(_Smp.nr) = Val(_k + 1)
                                 _Smp.nr += 1
@@ -1275,7 +1202,7 @@
                         _Smp.ne = 0 'nombre de candidats éliminés (indice base 0)
                         For _irej = _csgi To _csgi + 2
                             For _jrej = _csgj To _csgj + 2
-                                If _jrej <> _jr Then
+                                If _jrej <> _j Then
                                     If _Candidats(_irej, _jrej, _k) <> " " Then
                                         _Smp.CE.i(_Smp.ne) = _irej
                                         _Smp.CE.j(_Smp.ne) = _jrej
@@ -1286,33 +1213,677 @@
                                 End If
                             Next
                         Next
-                        _Smp.motif = "CV Colonne-Région "
+
+                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Colonne " & _j + 1 & " LR"
 
                         _TSmp(_NbrSmp) = _Smp
                         _NbrSmp += 1
                         _Smp = NewSmp()
 
-                        If Sudoku.ModeDebug Then
-                            '    _DSmp = _TSmp(0)
-                            '    MsgBox(_NbrSmp & " q0 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-                            '    _DSmp = _TSmp(1)
-                            '    MsgBox(_NbrSmp & " q1 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                            '    _DSmp = _TSmp(2)
-                            '    MsgBox(_NbrSmp & " q2 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                            '    _DSmp = _TSmp(3)
-                            '    MsgBox(_NbrSmp & " q3 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                            '    _DSmp = _TSmp(4)
-                            '    MsgBox(_NbrSmp & " q4 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-                        End If
                     End If
                 Next
             Next
         Next
+    End Sub
+
+
+    '============================================================================================================================================================
+    ' Technique d'élimination de candidats
+    ' Analyse des tripets par Ligne
+    '============================================================================================================================================================
+
+    Sub AnalyseTrpLig(ByRef _Candidats(,,) As String,
+                      ByRef _NbrSmp As Integer,
+                      ByRef _TSmp() As Sudoku.StrSmp,
+                      ByVal _opk(,) As Integer,
+                      ByVal _nuplet(,) As String)
+        ' - Détermine le nombre d'occurrences de chaque candidat par ligne
+        ' - Détermine la position d'un candidat seul sur une ligne
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _k As Integer
+
+        Dim _AnlTrp(8) As Sudoku.AnlTrp
+        Dim _cmax As Integer
+        Dim _c0 As Integer
+        Dim _c1 As Integer
+        Dim _c2 As Integer
+        Dim _c3 As Integer
+        Dim _nbk0 As Integer
+        Dim _nbk1 As Integer
+        Dim _nbk2 As Integer
+        Dim _tv0(8) As String
+        Dim _tv1(8) As String
+        Dim _tv2(8) As String
+        Dim _completed As Boolean
+        Dim _i0 As Integer
+        Dim _j0 As Integer
+        Dim _k0 As Integer
+        Dim _v0 As String = " "
+        Dim _i1 As Integer
+        Dim _j1 As Integer
+        Dim _k1 As Integer
+        Dim _v1 As String = " "
+        Dim _i2 As Integer
+        Dim _j2 As Integer
+        Dim _k2 As Integer
+        Dim _v2 As String = " "
+        Dim _tk(2) As Integer
+        Dim _tv(2) As String
+        Dim _ej As Integer
+        Dim _Smp As New Sudoku.StrSmp
+        _Smp = NewSmp()
+
+
+        For _i = 0 To 8
+            _completed = False
+            ' Collecte les cellules de paires ou triplet d'une ligne
+            For _c0 = 0 To 8
+                ReDim _AnlTrp(_c0).v(8)
+                For _k = 0 To 8
+                    _AnlTrp(_c0).v(_k) = " "
+                Next
+            Next
+            _c0 = 0
+            For _j = 0 To 8
+                If _opk(_i, _j) = 2 Or _opk(_i, _j) = 3 Then
+                    _AnlTrp(_c0).i = _i
+                    _AnlTrp(_c0).j = _j
+                    For _k = 0 To 8
+                        _AnlTrp(_c0).v(_k) = _Candidats(_i, _j, _k)
+                    Next
+                    _c0 += 1
+                End If
+            Next
+
+            ' Cherche Les paires ou triplets avec pas plus de 3 valeurs différentes en tout
+
+            _cmax = _c0 - 1
+
+            If _cmax > 1 Then
+
+                ' premier terme
+                For _k = 0 To 8
+                    _tv0(_k) = " "
+                Next
+                For _c0 = 0 To _cmax - 2
+                    _nbk0 = 0
+                    For _k = 0 To 8
+                        If _AnlTrp(_c0).v(_k) <> " " Then
+                            _tv0(_k) = _AnlTrp(_c0).v(_k)
+                            _nbk0 += 1
+                        End If
+                    Next
+                    _i0 = _AnlTrp(_c0).i
+                    _j0 = _AnlTrp(_c0).j
+                    ' deuxième  terme
+                    For _c1 = _c0 + 1 To _cmax - 1
+                        For _k = 0 To 8
+                            _tv1(_k) = _tv0(_k)
+                        Next
+                        For _k = 0 To 8
+                            If _AnlTrp(_c1).v(_k) <> " " Then
+                                _tv1(_k) = _AnlTrp(_c1).v(_k)
+                            End If
+                        Next
+                        _nbk1 = 0
+                        For _k = 0 To 8
+                            If _tv1(_k) <> " " Then
+                                _nbk1 += 1
+                            End If
+                        Next
+                        If _nbk1 < 4 Then
+                            _i1 = _AnlTrp(_c1).i
+                            _j1 = _AnlTrp(_c1).j
+                            ' troisième terme
+                            For _c2 = _c1 + 1 To _cmax
+                                For _k = 0 To 8
+                                    _tv2(_k) = _tv1(_k)
+                                Next
+                                For _k = 0 To 8
+                                    If _AnlTrp(_c2).v(_k) <> " " Then
+                                        _tv2(_k) = _AnlTrp(_c2).v(_k)
+                                    End If
+                                Next
+                                _nbk2 = 0
+                                For _k = 0 To 8
+                                    If _tv2(_k) <> " " Then
+                                        _nbk2 += 1
+                                    End If
+                                Next
+                                If _nbk2 < 4 Then
+                                    _i2 = _AnlTrp(_c2).i
+                                    _j2 = _AnlTrp(_c2).j
+                                    _c3 = 0
+                                    For _k = 0 To 8
+                                        If _tv2(_k) <> " " Then
+                                            _tk(_c3) = _k
+                                            _tv(_c3) = _tv2(_k)
+                                            _c3 += 1
+                                        End If
+                                    Next
+                                    _v0 = _tv(0)
+                                    _v1 = _tv(1)
+                                    _v2 = _tv(2)
+                                    _k0 = _tk(0)
+                                    _k1 = _tk(1)
+                                    _k2 = _tk(2)
+                                    _completed = True
+                                    Exit For
+                                End If
+                                'fin troisième terme
+                            Next
+                        End If
+                        If _completed Then
+                            Exit For
+                        End If
+                    Next
+                    ' fin deuxième terme
+                    If _completed Then
+                        Exit For
+                    End If
+                Next
+                ' fin premier terme
+            End If
+
+            If _completed Then
+                _Smp.nr = 2
+                _Smp.CR.i(0) = _i0
+                _Smp.CR.j(0) = _j0
+                _Smp.CR.k(0) = _k0
+                _Smp.CR.v(0) = _v0
+                _Smp.CR.i(1) = _i1
+                _Smp.CR.j(1) = _j1
+                _Smp.CR.k(1) = _k1
+                _Smp.CR.v(1) = _v1
+                _Smp.CR.i(2) = _i2
+                _Smp.CR.j(2) = _j2
+                _Smp.CR.k(2) = _k2
+                _Smp.CR.v(2) = _v2
+
+                _Smp.motif = "Triplet nu : [" & _v0 & _v1 & _v2 & "] dans les cases L" & _i0 + 1 & "C" & _j0 + 1 & "-L" & _i1 + 1 & "C" & _j1 + 1 & "-L" & _i2 + 1 & "C" & _j2 + 1
+
+                'Liste des candidats éliminés
+                _Smp.ne = 0
+                For _ej = 0 To 8
+                    If _ej <> _j0 And _ej <> _j1 And _ej <> _j2 Then
+                        If _Candidats(_i, _ej, _k0) = _v0 Then
+                            _Smp.CE.i(_Smp.ne) = _i
+                            _Smp.CE.j(_Smp.ne) = _ej
+                            _Smp.CE.k(_Smp.ne) = _k0
+                            _Smp.CE.v(_Smp.ne) = _v0
+                            _Smp.ne += 1
+                        End If
+                        If _Candidats(_i, _ej, _k1) = _v1 Then
+                            _Smp.CE.i(_Smp.ne) = _i
+                            _Smp.CE.j(_Smp.ne) = _ej
+                            _Smp.CE.k(_Smp.ne) = _k1
+                            _Smp.CE.v(_Smp.ne) = _v1
+                            _Smp.ne += 1
+                        End If
+                        If _Candidats(_i, _ej, _k2) = _v2 Then
+                            _Smp.CE.i(_Smp.ne) = _i
+                            _Smp.CE.j(_Smp.ne) = _ej
+                            _Smp.CE.k(_Smp.ne) = _k2
+                            _Smp.CE.v(_Smp.ne) = _v2
+                            _Smp.ne += 1
+                        End If
+                    End If
+                Next
+
+                If _Smp.ne > 0 Then
+                    _TSmp(_NbrSmp) = _Smp
+                    _NbrSmp += 1
+                    _Smp = NewSmp()
+                End If
+
+            End If
+        Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' Technique d'élimination de candidats
+    ' Analyse des tripets par colonne
+    '============================================================================================================================================================
+
+    Sub AnalyseTrpCol(ByRef _Candidats(,,) As String,
+                      ByRef _NbrSmp As Integer,
+                      ByRef _TSmp() As Sudoku.StrSmp,
+                      ByVal _opk(,) As Integer,
+                      ByVal _nuplet(,) As String)
+        ' - Détermine le nombre d'occurrences de chaque candidat par ligne
+        ' - Détermine la position d'un candidat seul sur une ligne
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _k As Integer
+
+        Dim _AnlTrp(8) As Sudoku.AnlTrp
+        Dim _cmax As Integer
+        Dim _c0 As Integer
+        Dim _c1 As Integer
+        Dim _c2 As Integer
+        Dim _c3 As Integer
+        Dim _nbk0 As Integer
+        Dim _nbk1 As Integer
+        Dim _nbk2 As Integer
+        Dim _tv0(8) As String
+        Dim _tv1(8) As String
+        Dim _tv2(8) As String
+        Dim _completed As Boolean
+        Dim _i0 As Integer
+        Dim _j0 As Integer
+        Dim _k0 As Integer
+        Dim _v0 As String = " "
+        Dim _i1 As Integer
+        Dim _j1 As Integer
+        Dim _k1 As Integer
+        Dim _v1 As String = " "
+        Dim _i2 As Integer
+        Dim _j2 As Integer
+        Dim _k2 As Integer
+        Dim _v2 As String = " "
+        Dim _tk(2) As Integer
+        Dim _tv(2) As String
+        Dim _ei As Integer
+        Dim _Smp As New Sudoku.StrSmp
+        _Smp = NewSmp()
+
+
+        For _j = 0 To 8
+            _completed = False
+            ' Collecte les cellules de paires ou triplet d'une colonne
+            For _c0 = 0 To 8
+                ReDim _AnlTrp(_c0).v(8)
+                For _k = 0 To 8
+                    _AnlTrp(_c0).v(_k) = " "
+                Next
+            Next
+            _c0 = 0
+            For _i = 0 To 8
+                If _opk(_i, _j) = 2 Or _opk(_i, _j) = 3 Then
+                    _AnlTrp(_c0).i = _i
+                    _AnlTrp(_c0).j = _j
+                    For _k = 0 To 8
+                        _AnlTrp(_c0).v(_k) = _Candidats(_i, _j, _k)
+                    Next
+                    _c0 += 1
+                End If
+            Next
+
+            ' Cherche Les paires ou triplets avec pas plus de 3 valeurs différentes en tout
+
+            _cmax = _c0 - 1
+
+            If _cmax > 1 Then
+
+                ' premier terme
+                For _k = 0 To 8
+                    _tv0(_k) = " "
+                Next
+                For _c0 = 0 To _cmax - 2
+                    _nbk0 = 0
+                    For _k = 0 To 8
+                        If _AnlTrp(_c0).v(_k) <> " " Then
+                            _tv0(_k) = _AnlTrp(_c0).v(_k)
+                            _nbk0 += 1
+                        End If
+                    Next
+                    _i0 = _AnlTrp(_c0).i
+                    _j0 = _AnlTrp(_c0).j
+                    ' deuxième  terme
+                    For _c1 = _c0 + 1 To _cmax - 1
+                        For _k = 0 To 8
+                            _tv1(_k) = _tv0(_k)
+                        Next
+                        For _k = 0 To 8
+                            If _AnlTrp(_c1).v(_k) <> " " Then
+                                _tv1(_k) = _AnlTrp(_c1).v(_k)
+                            End If
+                        Next
+                        _nbk1 = 0
+                        For _k = 0 To 8
+                            If _tv1(_k) <> " " Then
+                                _nbk1 += 1
+                            End If
+                        Next
+                        If _nbk1 < 4 Then
+                            _i1 = _AnlTrp(_c1).i
+                            _j1 = _AnlTrp(_c1).j
+                            ' troisième terme
+                            For _c2 = _c1 + 1 To _cmax
+                                For _k = 0 To 8
+                                    _tv2(_k) = _tv1(_k)
+                                Next
+                                For _k = 0 To 8
+                                    If _AnlTrp(_c2).v(_k) <> " " Then
+                                        _tv2(_k) = _AnlTrp(_c2).v(_k)
+                                    End If
+                                Next
+                                _nbk2 = 0
+                                For _k = 0 To 8
+                                    If _tv2(_k) <> " " Then
+                                        _nbk2 += 1
+                                    End If
+                                Next
+                                If _nbk2 < 4 Then
+                                    _i2 = _AnlTrp(_c2).i
+                                    _j2 = _AnlTrp(_c2).j
+                                    _c3 = 0
+                                    For _k = 0 To 8
+                                        If _tv2(_k) <> " " Then
+                                            _tk(_c3) = _k
+                                            _tv(_c3) = _tv2(_k)
+                                            _c3 += 1
+                                        End If
+                                    Next
+                                    _v0 = _tv(0)
+                                    _v1 = _tv(1)
+                                    _v2 = _tv(2)
+                                    _k0 = _tk(0)
+                                    _k1 = _tk(1)
+                                    _k2 = _tk(2)
+                                    _completed = True
+                                    Exit For
+                                End If
+                                'fin troisième terme
+                            Next
+                        End If
+                        If _completed Then
+                            Exit For
+                        End If
+                    Next
+                    ' fin deuxième terme
+                    If _completed Then
+                        Exit For
+                    End If
+                Next
+                ' fin premier terme
+            End If
+
+            If _completed Then
+                _Smp.nr = 2
+                _Smp.CR.i(0) = _i0
+                _Smp.CR.j(0) = _j0
+                _Smp.CR.k(0) = _k0
+                _Smp.CR.v(0) = _v0
+                _Smp.CR.i(1) = _i1
+                _Smp.CR.j(1) = _j1
+                _Smp.CR.k(1) = _k1
+                _Smp.CR.v(1) = _v1
+                _Smp.CR.i(2) = _i2
+                _Smp.CR.j(2) = _j2
+                _Smp.CR.k(2) = _k2
+                _Smp.CR.v(2) = _v2
+
+                _Smp.motif = "Triplet nu : [" & _v0 & _v1 & _v2 & "] dans les cases L" & _i0 + 1 & "C" & _j0 + 1 & "-L" & _i1 + 1 & "C" & _j1 + 1 & "-L" & _i2 + 1 & "C" & _j2 + 1
+
+                'Liste des candidats éliminés
+                _Smp.ne = 0
+                For _ei = 0 To 8
+                    If _ei <> _i0 And _ei <> _i1 And _ei <> _i2 Then
+                        If _Candidats(_ei, _j, _k0) = _v0 Then
+                            _Smp.CE.i(_Smp.ne) = _ei
+                            _Smp.CE.j(_Smp.ne) = _j
+                            _Smp.CE.k(_Smp.ne) = _k0
+                            _Smp.CE.v(_Smp.ne) = _v0
+                            _Smp.ne += 1
+                        End If
+                        If _Candidats(_ei, _j, _k1) = _v1 Then
+                            _Smp.CE.i(_Smp.ne) = _ei
+                            _Smp.CE.j(_Smp.ne) = _j
+                            _Smp.CE.k(_Smp.ne) = _k1
+                            _Smp.CE.v(_Smp.ne) = _v1
+                            _Smp.ne += 1
+                        End If
+                        If _Candidats(_ei, _j, _k2) = _v2 Then
+                            _Smp.CE.i(_Smp.ne) = _ei
+                            _Smp.CE.j(_Smp.ne) = _j
+                            _Smp.CE.k(_Smp.ne) = _k2
+                            _Smp.CE.v(_Smp.ne) = _v2
+                            _Smp.ne += 1
+                        End If
+                    End If
+                Next
+
+                If _Smp.ne > 0 Then
+                    _TSmp(_NbrSmp) = _Smp
+                    _NbrSmp += 1
+                    _Smp = NewSmp()
+                End If
+
+            End If
+        Next
+
+    End Sub
+
+
+    '============================================================================================================================================================
+    ' Technique d'élimination de candidats
+    ' Analyse des tripets par région
+    '============================================================================================================================================================
+
+    Sub AnalyseTrpReg(ByRef _Candidats(,,) As String,
+                      ByRef _NbrSmp As Integer,
+                      ByRef _TSmp() As Sudoku.StrSmp,
+                      ByVal _opk(,) As Integer,
+                      ByVal _nuplet(,) As String)
+        ' - Détermine le nombre d'occurrences de chaque candidat par ligne
+        ' - Détermine la position d'un candidat seul sur une ligne
+
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _k As Integer
+        Dim _r As Integer
+        Dim _csgi As Integer
+        Dim _csgj As Integer
+
+        Dim _AnlTrp(8) As Sudoku.AnlTrp
+        Dim _cmax As Integer
+        Dim _c0 As Integer
+        Dim _c1 As Integer
+        Dim _c2 As Integer
+        Dim _c3 As Integer
+        Dim _nbk0 As Integer
+        Dim _nbk1 As Integer
+        Dim _nbk2 As Integer
+        Dim _tv0(8) As String
+        Dim _tv1(8) As String
+        Dim _tv2(8) As String
+        Dim _completed As Boolean
+        Dim _i0 As Integer
+        Dim _j0 As Integer
+        Dim _k0 As Integer
+        Dim _v0 As String = " "
+        Dim _i1 As Integer
+        Dim _j1 As Integer
+        Dim _k1 As Integer
+        Dim _v1 As String = " "
+        Dim _i2 As Integer
+        Dim _j2 As Integer
+        Dim _k2 As Integer
+        Dim _v2 As String = " "
+        Dim _tk(2) As Integer
+        Dim _tv(2) As String
+        Dim _ei As Integer
+        Dim _ej As Integer
+        Dim _Smp As New Sudoku.StrSmp
+        _Smp = NewSmp()
+
+
+        For _r = 0 To 8
+            _csgi = (_r \ 3) * 3 'calcul coin supérieur gauche d'une région
+            _csgj = (_r - _csgi) * 3 'calcul coin supérieur gauche d'une région
+
+            _completed = False
+            ' Collecte les cellules de paires ou triplet d'une région
+            For _c0 = 0 To 8
+                ReDim _AnlTrp(_c0).v(8)
+                For _k = 0 To 8
+                    _AnlTrp(_c0).v(_k) = " "
+                Next
+            Next
+            _c0 = 0
+            For _i = _csgi To _csgi + 2
+                For _j = _csgj To _csgj + 2
+                    If _opk(_i, _j) = 2 Or _opk(_i, _j) = 3 Then
+                        _AnlTrp(_c0).i = _i
+                        _AnlTrp(_c0).j = _j
+                        For _k = 0 To 8
+                            _AnlTrp(_c0).v(_k) = _Candidats(_i, _j, _k)
+                        Next
+                        _c0 += 1
+                    End If
+                Next
+            Next
+
+            ' Cherche Les paires ou triplets avec pas plus de 3 valeurs différentes en tout
+
+            _cmax = _c0 - 1
+
+            If _cmax > 1 Then
+                ' premier terme
+                For _k = 0 To 8
+                    _tv0(_k) = " "
+                Next
+                For _c0 = 0 To _cmax - 2
+                    _nbk0 = 0
+                    For _k = 0 To 8
+                        If _AnlTrp(_c0).v(_k) <> " " Then
+                            _tv0(_k) = _AnlTrp(_c0).v(_k)
+                            _nbk0 += 1
+                        End If
+                    Next
+                    _i0 = _AnlTrp(_c0).i
+                    _j0 = _AnlTrp(_c0).j
+                    ' deuxième  terme
+                    For _c1 = _c0 + 1 To _cmax - 1
+                        For _k = 0 To 8
+                            _tv1(_k) = _tv0(_k)
+                        Next
+                        For _k = 0 To 8
+                            If _AnlTrp(_c1).v(_k) <> " " Then
+                                _tv1(_k) = _AnlTrp(_c1).v(_k)
+                            End If
+                        Next
+                        _nbk1 = 0
+                        For _k = 0 To 8
+                            If _tv1(_k) <> " " Then
+                                _nbk1 += 1
+                            End If
+                        Next
+                        If _nbk1 < 4 Then
+                            _i1 = _AnlTrp(_c1).i
+                            _j1 = _AnlTrp(_c1).j
+                            ' troisième terme
+                            For _c2 = _c1 + 1 To _cmax
+                                For _k = 0 To 8
+                                    _tv2(_k) = _tv1(_k)
+                                Next
+                                For _k = 0 To 8
+                                    If _AnlTrp(_c2).v(_k) <> " " Then
+                                        _tv2(_k) = _AnlTrp(_c2).v(_k)
+                                    End If
+                                Next
+                                _nbk2 = 0
+                                For _k = 0 To 8
+                                    If _tv2(_k) <> " " Then
+                                        _nbk2 += 1
+                                    End If
+                                Next
+                                If _nbk2 < 4 Then
+                                    _i2 = _AnlTrp(_c2).i
+                                    _j2 = _AnlTrp(_c2).j
+                                    _c3 = 0
+                                    For _k = 0 To 8
+                                        If _tv2(_k) <> " " Then
+                                            _tk(_c3) = _k
+                                            _tv(_c3) = _tv2(_k)
+                                            _c3 += 1
+                                        End If
+                                    Next
+                                    _v0 = _tv(0)
+                                    _v1 = _tv(1)
+                                    _v2 = _tv(2)
+                                    _k0 = _tk(0)
+                                    _k1 = _tk(1)
+                                    _k2 = _tk(2)
+                                    _completed = True
+                                    Exit For
+                                End If
+                                'fin troisième terme
+                            Next
+                        End If
+                        If _completed Then
+                            Exit For
+                        End If
+                    Next
+                    ' fin deuxième terme
+                    If _completed Then
+                        Exit For
+                    End If
+                Next
+                ' fin premier terme
+            End If
+
+            If _completed Then
+                _Smp.nr = 2
+                _Smp.CR.i(0) = _i0
+                _Smp.CR.j(0) = _j0
+                _Smp.CR.k(0) = _k0
+                _Smp.CR.v(0) = _v0
+                _Smp.CR.i(1) = _i1
+                _Smp.CR.j(1) = _j1
+                _Smp.CR.k(1) = _k1
+                _Smp.CR.v(1) = _v1
+                _Smp.CR.i(2) = _i2
+                _Smp.CR.j(2) = _j2
+                _Smp.CR.k(2) = _k2
+                _Smp.CR.v(2) = _v2
+
+                _Smp.motif = "Triplet nu : [" & _v0 & _v1 & _v2 & "] dans les cases L" & _i0 + 1 & "C" & _j0 + 1 & "-L" & _i1 + 1 & "C" & _j1 + 1 & "-L" & _i2 + 1 & "C" & _j2 + 1
+
+                'Liste des candidats éliminés
+                _Smp.ne = 0
+                For _ei = _csgi To _csgi + 2
+                    For _ej = _csgj To _csgj + 2
+
+                        If Not (_ei = _i0 And _ej = _j0) And Not (_ei = _i1 And _ej = _j1) And Not (_ei = _i2 And _ej = _j2) Then
+                            If _Candidats(_ei, _ej, _k0) = _v0 Then
+                                _Smp.CE.i(_Smp.ne) = _ei
+                                _Smp.CE.j(_Smp.ne) = _ej
+                                _Smp.CE.k(_Smp.ne) = _k0
+                                _Smp.CE.v(_Smp.ne) = _v0
+                                _Smp.ne += 1
+                            End If
+                            If _Candidats(_ei, _ej, _k1) = _v1 Then
+                                _Smp.CE.i(_Smp.ne) = _ei
+                                _Smp.CE.j(_Smp.ne) = _ej
+                                _Smp.CE.k(_Smp.ne) = _k1
+                                _Smp.CE.v(_Smp.ne) = _v1
+                                _Smp.ne += 1
+                            End If
+                            If _Candidats(_ei, _ej, _k2) = _v2 Then
+                                _Smp.CE.i(_Smp.ne) = _ei
+                                _Smp.CE.j(_Smp.ne) = _ej
+                                _Smp.CE.k(_Smp.ne) = _k2
+                                _Smp.CE.v(_Smp.ne) = _v2
+                                _Smp.ne += 1
+                            End If
+                        End If
+                    Next
+                Next
+
+                If _Smp.ne > 0 Then
+                    _TSmp(_NbrSmp) = _Smp
+                    _NbrSmp += 1
+                    _Smp = NewSmp()
+                End If
+            End If
+        Next
+
     End Sub
 
     '============================================================================================================================================================
@@ -1327,31 +1898,8 @@
         Dim _j As Integer
         Dim _k As Integer
         Dim _Smp As New Sudoku.StrSmp
-        Dim _DSmp As New Sudoku.StrSmp
 
         _Smp = _TSmp(0)
-        '    _DSmp = _TSmp(0)
-        '    MsgBox(_NbrSmp & " s0 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/")
-
-        '    _DSmp = _TSmp(1)
-        '    MsgBox(_NbrSmp & " s1 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-        '    _DSmp = _TSmp(2)
-        '    MsgBox(_NbrSmp & " s2 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-        '    _DSmp = _TSmp(3)
-        '    MsgBox(_NbrSmp & " s3 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-        '    _DSmp = _TSmp(4)
-        '    MsgBox(_NbrSmp & " s4 : " & _DSmp.CR.i(0) & _DSmp.CR.j(0) & " " & _DSmp.CR.i(1) & _DSmp.CR.j(1) & " " & _DSmp.CR.k(0) & _DSmp.CR.k(1) & "/" & _DSmp.motif & "/"
-
-
-        '_Smp = _TSmp(0)
-
-        'MsgBox(_NbrSmp & " Dequeue a : 0 " & _Smp.CR.i(0) & _Smp.CR.j(0) & " " & _Smp.CR.i(1) & _Smp.CR.j(1))
-        ''candidats rejetés
-
-        'MsgBox(_s & " " & _Smp.CE.i(0) & _Smp.CE.j(0) & " " & _Smp.CE.i(1) & _Smp.CE.j(1) & " " & _Smp.CE.i(2) & _Smp.CE.j(2))
 
         For _s = 0 To _Smp.ne
             _i = _Smp.CE.i(_s)
