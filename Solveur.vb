@@ -307,6 +307,7 @@
             AnalyseTrpLig(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             AnalyseTrpCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             AnalyseTrpReg(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+            XYWingLigneColonne(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
         End If
 
     End Sub
@@ -1659,7 +1660,6 @@
 
     End Sub
 
-
     '============================================================================================================================================================
     ' Technique d'élimination de candidats
     ' Analyse des tripets par région
@@ -1883,6 +1883,172 @@
                 End If
             End If
         Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' Technique d'élimination de candidats
+    ' Analyse des tripets par région
+    '============================================================================================================================================================
+
+    Sub XYWingLigneColonne(ByRef _Candidats(,,) As String,
+                      ByRef _NbrSmp As Integer,
+                      ByRef _TSmp() As Sudoku.StrSmp,
+                      ByVal _opk(,) As Integer,
+                      ByVal _nuplet(,) As String)
+        ' - Détermine le nombre d'occurrences de chaque candidat par ligne
+        ' - Détermine la position d'un candidat seul sur une ligne
+        Dim _isup As Integer ' indice i supérieur 
+        Dim _iinf As Integer ' indice i inféreur 
+        Dim _jgau As Integer ' indice j gauche
+        Dim _jdrt As Integer ' indice j droit
+        Dim _idep As Integer 'ligne de départ région en dessous
+        Dim _jdep As Integer 'colonne de départ région à droite
+
+        Dim _aile_g As String
+        Dim _aile_g_i As Integer
+        Dim _aile_g_j As Integer
+        Dim _sommet As String
+        Dim _sommet_i As Integer
+        Dim _sommet_j As Integer
+        Dim _aile_d As String
+        Dim _aile_d_i As Integer
+        Dim _aile_d_j As Integer
+        Dim _exclu As String
+        Dim _exclu_i As Integer
+        Dim _exclu_j As Integer
+        Dim _completed As Boolean
+        Dim _Cv(3) As String 'carré
+        Dim _Ci(3) As Integer 'carré
+        Dim _Cj(3) As Integer 'carré
+        Dim _ic As Integer ' pour la rotation du carré
+
+        Dim _Smp As New Sudoku.StrSmp
+        _Smp = NewSmp()
+
+        For _isup = 0 To 5
+            For _jgau = 0 To 5
+                If _opk(_isup, _jgau) = 2 Then
+                    _jdep = ((_jgau \ 3) + 1) * 3 'debut de région à droite
+                    For _jdrt = _jdep To 8
+                        If _opk(_isup, _jdrt) = 2 Then
+                            _idep = ((_isup \ 3) + 1) * 3 'debut de région en dessous
+                            For _iinf = _idep To 8
+                                If _opk(_iinf, _jdrt) = 2 Then
+                                    If _opk(_iinf, _jgau) = 2 Then ' on tient un carré de paires dans des régions différentes
+                                        _Cv(0) = _nuplet(_isup, _jgau)
+                                        _Ci(0) = _isup
+                                        _Cj(0) = _jgau
+                                        _Cv(1) = _nuplet(_isup, _jdrt)
+                                        _Ci(1) = _isup
+                                        _Cj(1) = _jdrt
+                                        _Cv(2) = _nuplet(_iinf, _jdrt)
+                                        _Ci(2) = _iinf
+                                        _Cj(2) = _jdrt
+                                        _Cv(2) = _nuplet(_iinf, _jdrt)
+                                        _Ci(2) = _iinf
+                                        _Cj(2) = _jdrt
+                                        _Cv(3) = _nuplet(_iinf, _jgau)
+                                        _Ci(3) = _iinf
+                                        _Cj(3) = _jgau
+                                        _completed = False
+                                        _exclu = " "
+                                        For _ic = 0 To 3
+                                            RotationCarré(_Cv, _Ci, _Cj)
+                                            If Not _completed Then
+                                                _aile_g = _Cv(0)
+                                                _aile_g_i = _Ci(0)
+                                                _aile_g_j = _Cj(0)
+                                                _sommet = _Cv(1)
+                                                _sommet_i = _Ci(1)
+                                                _sommet_j = _Cj(1)
+                                                _aile_d = _Cv(2)
+                                                _aile_d_i = _Ci(2)
+                                                _aile_d_j = _Cj(2)
+                                                _exclu = _Cv(3)
+                                                _exclu_i = _Ci(3)
+                                                _exclu_j = _Cj(3)
+                                                XYWing(_completed, _aile_g, _sommet, _aile_d, _exclu)
+                                            End If
+                                        Next
+                                        If _completed Then
+
+                                            _Smp.nr = 2
+                                            _Smp.CR.i(0) = _Ci(0)
+                                            _Smp.CR.j(0) = _aile_g_j
+                                            _Smp.CR.k(0) = CInt(_Cv(3)) - 1
+                                            _Smp.CR.v(0) = _Cv(3)
+                                            _Smp.CR.i(1) = _Ci(1)
+                                            _Smp.CR.j(1) = _Cj(1)
+                                            _Smp.CR.k(1) = CInt(_Cv(3)) - 1
+                                            _Smp.CR.v(1) = _Cv(3)
+                                            _Smp.CR.i(2) = _Ci(2)
+                                            _Smp.CR.j(2) = _Cj(2)
+                                            _Smp.CR.k(2) = CInt(_Cv(3)) - 1
+                                            _Smp.CR.v(2) = _Cv(3)
+
+                                            _Smp.motif = "XY-Wing [" & _exclu & "] dans les cases L" & _aile_g_i + 1 & "C" & _aile_g_j + 1 & "-L" & _sommet_i + 1 & "C" & _sommet_j + 1 & "-L" & _aile_d_i + 1 & "C" & _aile_d_j + 1
+
+                                            _Smp.CE.i(_Smp.ne) = _exclu_i
+                                            _Smp.CE.j(_Smp.ne) = _exclu_j
+                                            _Smp.CE.k(_Smp.ne) = CInt(_exclu) - 1
+                                            _Smp.CE.v(_Smp.ne) = _exclu
+                                            _Smp.ne = 1
+
+                                            If _Smp.ne > 0 Then
+                                                _TSmp(_NbrSmp) = _Smp
+                                                _NbrSmp += 1
+                                                _Smp = NewSmp()
+                                            End If
+
+                                        End If
+                                    End If
+                                End If
+                            Next
+                        End If
+                    Next
+                End If
+            Next
+        Next
+
+    End Sub
+
+    Sub XYWing(ByRef _completed As Boolean, ByRef _aile_g As String, ByRef _sommet As String, ByRef _aile_d As String, ByRef _exclu As String)
+
+        If Mid(_sommet, 1, 1) = Mid(_aile_g, 1, 1) _
+            And Mid(_sommet, 2, 1) = Mid(_aile_d, 2, 1) _
+            And Mid(_aile_g, 2, 1) = Mid(_aile_d, 1, 1) Then
+            _exclu = Mid(_aile_d, 1, 1)
+            _completed = True
+        End If
+
+        If Mid(_sommet, 1, 1) = Mid(_aile_g, 2, 1) _
+            And Mid(_sommet, 2, 1) = Mid(_aile_d, 1, 1) _
+            And Mid(_aile_g, 1, 1) = Mid(_aile_d, 2, 1) Then
+            _exclu = Mid(_aile_d, 2, 1)
+            _completed = True
+        End If
+
+    End Sub
+
+    Sub RotationCarré(ByRef _cv() As String, ByRef _ci() As Integer, ByRef _cj() As Integer)
+
+        Dim _tc As String
+        Dim _ti As Integer
+        Dim _tj As Integer
+        Dim _r As Integer
+
+        _tc = _cv(0)
+        _ti = _ci(0)
+        _tj = _cj(0)
+        For _r = 0 To 2
+            _cv(_r) = _cv(_r + 1)
+            _ci(_r) = _ci(_r + 1)
+            _cj(_r) = _cj(_r + 1)
+        Next
+        _cv(3) = _tc
+        _ci(3) = _ti
+        _cj(3) = _tj
 
     End Sub
 

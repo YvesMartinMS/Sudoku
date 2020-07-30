@@ -65,7 +65,7 @@
     Public NbrSmp As Integer
     Dim Smp As Sudoku.StrSmp
 
-    Structure AnlTrp
+    Structure AnlTrp 'Analyse triplet
         Dim i As Integer
         Dim j As Integer
         Dim v() As String
@@ -112,7 +112,10 @@
     Dim Sudo0010000 As String = "9  3     8   9 42   362     78   5 9  2 7 6  5 9   37     132   51 4   7     6  1"
     Dim Tripletnu02 As String = " 8 5297  9          6 3    8    4 9  7298364  4 7    8    6 9          6  6498 2 " 'en colonne cassé?
     'triplets nus en ligne et en région
-    Dim Tripletnu03 As String = " 8         29  4 1  14   6 8   6  2   57189   9  3   5 6   13  9 3  25         9 " '
+    Dim Tripletnu03 As String = " 8         29  4 1  14   6 8   6  2   57189   9  3   5 6   13  9 3  25         9 "
+
+    Dim XYWingLC001 As String = "  9  27  12  8   5    46   87     16  1   4  24     39   86    4   7  68  62  1  "
+
     Dim jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
 
@@ -139,16 +142,17 @@
         Mode = "Test"
         Select Case Mode
             Case "Test"
-                TextSudoku = Sudo0010000 'OK
-                TextSudoku = SudopairLig ' developper triplets nus
-                TextSudoku = SudopairCol 'OK
-                TextSudoku = sudoDifficile ' OK
-                TextSudoku = SudopairReg ' OK
-                TextSudoku = SodiCVL1zzz ' OK
-                TextSudoku = sudo_Modèle ' OK
-                TextSudoku = Tripletnu02 'OK
-                TextSudoku = Tripletnu03 'OK
-                TextSudoku = SudopairLig 'OK
+                TextSudoku = Sudo0010000
+                TextSudoku = SudopairLig 
+                TextSudoku = SudopairCol
+                TextSudoku = sudoDifficile
+                TextSudoku = SudopairReg
+                TextSudoku = SodiCVL1zzz
+                TextSudoku = sudo_Modèle
+                TextSudoku = Tripletnu02
+                TextSudoku = Tripletnu03
+                TextSudoku = SudopairLig
+                TextSudoku = XYWingLC001
 
                 InitTest()
                 Initialisations(Grille, Candidats)
@@ -459,25 +463,12 @@
             If NbrSmp > 0 Then
                 Smp = TSmp(0)
                 LBL_Conseil.Text = Smp.motif
-                '            If ModeDebug Then
-                '     Dsmp = TSmp(0)
-                '     MsgBox(NbrSmp & " A0 : " & Dsmp.CR.i(0) & Dsmp.CR.j(0) & " " & Dsmp.CR.i(1) & Dsmp.CR.j(1) & " " & Dsmp.CR.k(0) & Dsmp.CR.k(1) & "/" & Dsmp.motif & "/")
-
-                '    _DSmp = _TSmp(1)
-                '    MsgBox(NbrSmp & " A1 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
-
-                '    _DSmp = _TSmp(2)
-                '    MsgBox(NbrSmp & " A2 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
-
-                '    _DSmp = _TSmp(3)
-                '    MsgBox(NbrSmp & " A3 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
-
-                '    _DSmp = _TSmp(4)
-                '    MsgBox(NbrSmp & " A4 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
-
-                '           End If
             Else
-                MsgBox("Plus de solution")
+                If NbVal < 81 Then
+                    MsgBox("Plus de solution " & NbVal)
+                Else
+                    MsgBox("Bravo ! ")
+                End If
             End If
         End If
 
@@ -504,46 +495,19 @@
 
             Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient  
 
-            RaffraichiLigne(i)
-            RaffraichiColonne(j)
-            RaffraichiRégion(i, j)
+            'RaffraichiLigne(i)
+            'RaffraichiColonne(j)
+            'RaffraichiRégion(i, j)
         Else
             If NbrSmp > 0 Then
                 AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
-                RaffraichiGrille()
+                'RaffraichiGrille()
             End If
+            RaffraichiGrille() ' affiche les candidats actualisés
         End If
 
         Resoudre()
 
-        If QSol.Count > 0 Then
-            Solution = QSol.Peek()
-            LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " colonne " & Solution.j + 1 & " " & Solution.m & " : " _
-                             & Solution.v & " / " & NbVal & " / "
-        Else
-            If NbrSmp > 0 Then
-                Smp = TSmp(0)
-                LBL_Conseil.Text = Smp.motif
-                '          If ModeDebug Then
-                '     Dsmp = TSmp(0)
-                '     MsgBox(NbrSmp & " B0 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/")
-
-                '    _DSmp = _TSmp(1)
-                '    MsgBox(NbrSmp & " B1 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
-
-                '    _DSmp = _TSmp(2)
-                '    MsgBox(NbrSmp & " B2 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
-
-                '    _DSmp = _TSmp(3)
-                '    MsgBox(NbrSmp & " B3 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
-
-                '    _DSmp = _TSmp(4)
-                '    MsgBox(NbrSmp & " B4 : " & DSmp.CR.i(0) & DSmp.CR.j(0) & " " & DSmp.CR.i(1) & DSmp.CR.j(1) & " " & DSmp.CR.k(0) & DSmp.CR.k(1) & "/" & DSmp.motif & "/"
-                '         End If
-            Else
-                    MsgBox("Plus de solution")
-            End If
-        End If
     End Sub
 
 
