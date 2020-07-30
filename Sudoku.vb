@@ -113,9 +113,12 @@
     Dim Tripletnu02 As String = " 8 5297  9          6 3    8    4 9  7298364  4 7    8    6 9          6  6498 2 " 'en colonne cassé?
     'triplets nus en ligne et en région
     Dim Tripletnu03 As String = " 8         29  4 1  14   6 8   6  2   57189   9  3   5 6   13  9 3  25         9 "
-
-    Dim XYWingLC001 As String = "  9  27  12  8   5    46   87     16  1   4  24     39   86    4   7  68  62  1  "
-
+    'XY-Wing ligne et colonne
+    Dim S04XYWingLC As String = "  9  27  12  8   5    46   87     16  1   4  24     39   86    4   7  68  62  1  "
+    'XY-Wing ligne et région
+    Dim S05XYWingLR As String = "   21 34   2    5   5 349 72    8 1     6     5 3    97 982 4   2    8   63 57   "
+    'XY-Wing Colonne et région
+    Dim S06XYXingCR As String = "809     5  3   6  5 7  8   67 3 5     1   2     8 1 36   4  3 7  4   1  7     5 8"
     Dim jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
 
@@ -152,7 +155,9 @@
                 TextSudoku = Tripletnu02
                 TextSudoku = Tripletnu03
                 TextSudoku = SudopairLig
-                TextSudoku = XYWingLC001
+                TextSudoku = S04XYWingLC
+                TextSudoku = S05XYWingLR
+                TextSudoku = S06XYXingCR
 
                 InitTest()
                 Initialisations(Grille, Candidats)
