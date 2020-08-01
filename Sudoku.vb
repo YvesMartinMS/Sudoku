@@ -37,12 +37,14 @@
 
     Public Solution As New Sudoku.StrSolution
     Public QSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
+
     Structure CandidatsRetenus
         Dim i() As Integer
         Dim j() As Integer
         Dim k() As Integer
         Dim v() As String
     End Structure
+
     Structure CandidatsEliminés
         Dim i() As Integer
         Dim j() As Integer
@@ -53,12 +55,12 @@
     Structure StrSmp ' Simplification 
         Dim motif As String 'Motif
         Dim act As Boolean
-        'candidats retenus (ReDim 2) 
+        'candidats retenus (ReDim 3) 
         Dim nr As Integer 'nombre de candidats retenus
         Dim CR As CandidatsRetenus
         'candidats éliminés (ReDim 20)
         Dim ne As Integer 'nombre de candidats éliminés
-        Dim CE As CandidatsRetenus
+        Dim CE As CandidatsEliminés
     End Structure
 
     Public TSmp(80) As Sudoku.StrSmp
@@ -118,7 +120,11 @@
     'XY-Wing ligne et région
     Dim S05XYWingLR As String = "   21 34   2    5   5 349 72    8 1     6     5 3    97 982 4   2    8   63 57   "
     'XY-Wing Colonne et région
-    Dim S06XYXingCR As String = "809     5  3   6  5 7  8   67 3 5     1   2     8 1 36   4  3 7  4   1  7     5 8"
+    Dim S006XYWingCR As String = "809     5  3   6  5 7  8   67 3 5     1   2     8 1 36   4  3 7  4   1  7     5 8"
+    Dim S007XWingCC As String = "     3  4 95  1   71     89   3 76   6  2  3   75 9   64     57   4  96 2  7     "
+    Dim S008XWingLL As String = " 3 4     8 5    34 12 85   2   4   1 98   34 6   7   2   52 41 58    9 3     9 5 "
+    'Paire cachée ligne
+    Dim S101PcacheL As String = "7943 6    28  5    5      6     1 6  76 5 48  4 6     8      1    1  94    9 3675"
     Dim jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
 
@@ -142,7 +148,7 @@
             Next
         Next
 
-        Mode = "Test"
+        Mode = "Géné"
         Select Case Mode
             Case "Test"
                 TextSudoku = Sudo0010000
@@ -157,15 +163,18 @@
                 TextSudoku = SudopairLig
                 TextSudoku = S04XYWingLC
                 TextSudoku = S05XYWingLR
-                TextSudoku = S06XYXingCR
+                TextSudoku = S006XYWingCR
+                TextSudoku = S007XWingCC
+                TextSudoku = S008XWingLL
+                TextSudoku = S101PcacheL
 
                 InitTest()
                 Initialisations(Grille, Candidats)
                 Contrôle_Saisie()
             Case "Géné"
                 Générateur.Générateur(typeGrille, TextSudoku)
-                InitTest()
-                Initialisations(Grille, Candidats)
+                InitTest() ' pour voir ce qui est généré
+                Initialisations(Grille, Candidats) ' pour voir ce qui est généré
                 Contrôle_Saisie()
         End Select
 
@@ -283,29 +292,6 @@
         Next
     End Sub
 
-    Sub InitGéné()
-
-        k = 0
-        For i = 0 To 8
-            For j = 0 To 8
-                If Grille(i, j) = "0" Then
-                    TB(i, j).Text = " "
-                Else
-                    TB(i, j).Text = Grille(i, j)
-                End If
-                TB(i, j).Font = TB_grand_modele.Font
-                TBini(i, j) = TB(i, j)
-                If Grille(i, j) <> "0" Then
-                    TB(i, j).Enabled = False
-                    NbVal += 1
-                Else
-                    TB(i, j).ForeColor = Color.BlueViolet
-                    TB(i, j).Enabled = True
-                End If
-                k = k + 1
-            Next
-        Next
-    End Sub
 #End Region
 
 #Region "Controles préalables"
@@ -441,9 +427,10 @@
         Dim Dsmp As New StrSmp
 
         QSol.Clear()
+
         TsmpClear(NbrSmp, TSmp)
 
-        Calcul_Candidats(Grille, Candidats, QSol, NbrSmp, TSmp)
+        RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp)
 
         '
         ' Affiche les candidats dans la grille
@@ -499,10 +486,6 @@
             NbVal += 1
 
             Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient  
-
-            'RaffraichiLigne(i)
-            'RaffraichiColonne(j)
-            'RaffraichiRégion(i, j)
         Else
             If NbrSmp > 0 Then
                 AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
