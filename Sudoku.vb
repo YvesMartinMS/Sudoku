@@ -1,4 +1,9 @@
 ﻿Public Class Sudoku
+    '============================================================================================================================================================
+    '
+    ' Rappel Doc Microsoft : L’argument de tableau doit être transmis selon sa référence (ByRef) !!!
+    '
+    '============================================================================================================================================================
 
 #Region " Déclarations"
 
@@ -6,19 +11,29 @@
     '                                                             D E C L A R A T I O N S  
     '============================================================================================================================================================
 
-    Dim TB(8, 8) As TextBox
-    Dim TBini(8, 8) As TextBox
+    Dim BT(8, 8) As Button
+    Dim iBT As Integer
+    Dim jBT As Integer
+    Dim BTC(9) As Button
+    Dim valSaisie As String
+    Dim iValSaisie As Integer = 0
+
     Dim i As Integer = 0
     Dim j As Integer = 0
+    Dim v As String
     Dim k As Integer = 0
     Dim g As Integer = 0
 
     Dim Grille(8, 8) As String ' La grille de Sudoku
+    Dim GrilleInitiale(8, 8) As String ' La grille en début de partie
+    Public GrilleFinale(8, 8) As String ' La grille en fin de partie
+    Dim SolutionExiste As Boolean
     Dim opk(8, 8) As Integer ' Nombre de candidats de k par case
     Dim nuplet(8, 8) As String 'Candidats agrégés
 
     Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
     Dim NbVal As Integer = 0
+    Dim NbValInitial As Integer = 0
 
     Structure StrAnalyse
         Dim n As Integer ' occurrences par case
@@ -33,6 +48,7 @@
         Dim j As Integer
         Dim v As String 'Valeur
         Dim m As String 'Motif
+        Dim b As Integer 'Barème
     End Structure
 
     Public Solution As New Sudoku.StrSolution
@@ -67,6 +83,7 @@
     Public NbrSmp As Integer
     Dim Smp As Sudoku.StrSmp
 
+
     Structure AnlTrp 'Analyse triplet
         Dim i As Integer
         Dim j As Integer
@@ -74,28 +91,30 @@
     End Structure
 
     Dim Libel As String
-    Public ModeDebug As Boolean = False
-
-    Structure Contexte
-        Dim NbVal As Integer
-        Dim i As Integer
-        Dim j As Integer
-        Dim v As Integer
-        Dim Grille(,) As String ' La grille de Sudoku
-        Dim Candidats(,,) As String ' La grille des candidats ( Valeurs au crayon)
-    End Structure
+    Public PATHFICHIER As String = "Sudoku.txt"
 
     Dim Erreur As Boolean
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
 
+
+    Public pileGrilles(81, 8, 8) As String ' La grille de Sudoku à chaque tour
     Public Val As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
+    Public mode As String
+    Public modeCandidat As Boolean
 
-    ' Dim MyFont As Font = New Font("Arial", 12, FontStyle.Regular)
-    Dim MyFont As Font = New Font("Courier New", 6, FontStyle.Regular)
+    Public taille As Integer = 18
+    Public BarèmeSeulDansUneCase As Integer = 1
+    Public BarèmeSeulDansUneLigne As Integer = 1
+    Public BarèmeSeulDansUneColonne As Integer = 1
+    Public BarèmeSeulDansUneRégion As Integer = 1
 
-    Dim msg As String
-    Dim Mode As String = "Géné"
+    Public ChiffreOffColor As Color = Color.LightSkyBlue
+    Public ChiffreOnColor As Color = Color.AliceBlue
+    Public petiteFont As Font = New Font("Courier New", 9, FontStyle.Regular, GraphicsUnit.Point)
+    Public grandeFont As Font = New Font("Microsoft Sans Serif", 18, FontStyle.Regular, GraphicsUnit.Point)
+    Dim colorIni(8, 8) As Color
+
     Dim typeGrille As String = "Sym"
     ' Grilles pour le dev
     Dim sudo_Modèle As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  8 427    1     9   4" 'Grille modèle
@@ -134,267 +153,471 @@
     '                                                             L O A D E R 
     '============================================================================================================================================================
     '
-    ' Fabrication de la grille qui peut être
-    '    - un cas de test en mémoire
-    '    - de la saise (à developper)
-    '    - une grille générée
 
     Private Sub Sudoku_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim c As Integer
 
-        InitTB()
+        InitBT()
         For i = 0 To 8
             For j = 0 To 8
-                TBini(i, j) = TB(i, j)
+                BT(i, j).Text = ""
+                BT(i, j).Font = grandeFont
+                BT(i, j).ForeColor = Color.Black
+                BT(i, j).Enabled = False
+                c = (i * 9) + j
+                Select Case c
+                    Case 3, 4, 5, 12, 13, 14, 21, 22, 23, 27, 28, 29, 33, 34, 35, 36, 37, 38, 42, 43, 44, 45, 46, 47, 51, 52, 53, 57, 58, 59, 66, 67, 68, 75, 76, 77
+                        colorIni(i, j) = Color.LightCyan
+                    Case Else
+                        colorIni(i, j) = Color.Azure
+                End Select
             Next
         Next
-
-        Mode = "Géné"
-        Select Case Mode
-            Case "Test"
-                TextSudoku = Sudo0010000
-                TextSudoku = SudopairLig 
-                TextSudoku = SudopairCol
-                TextSudoku = sudoDifficile
-                TextSudoku = SudopairReg
-                TextSudoku = SodiCVL1zzz
-                TextSudoku = sudo_Modèle
-                TextSudoku = Tripletnu02
-                TextSudoku = Tripletnu03
-                TextSudoku = SudopairLig
-                TextSudoku = S04XYWingLC
-                TextSudoku = S05XYWingLR
-                TextSudoku = S006XYWingCR
-                TextSudoku = S007XWingCC
-                TextSudoku = S008XWingLL
-                TextSudoku = S101PcacheL
-
-                InitTest()
-                Initialisations(Grille, Candidats)
-                Contrôle_Saisie()
-            Case "Géné"
-                Générateur.Générateur(typeGrille, TextSudoku)
-                InitTest() ' pour voir ce qui est généré
-                Initialisations(Grille, Candidats) ' pour voir ce qui est généré
-                Contrôle_Saisie()
-        End Select
-
+        LBL_Conseil.Text = ""
     End Sub
+
 #Region "Initialisations"
-    Sub InitTB()
+    Sub InitBT()
         '============================================================================================================================================================
         '                                                             T E X T B O X E S  
         '============================================================================================================================================================
-        TB(0, 0) = Me.TB_01
-        TB(0, 1) = Me.TB_02
-        TB(0, 2) = Me.TB_03
-        TB(0, 3) = Me.TB_04
-        TB(0, 4) = Me.TB_05
-        TB(0, 5) = Me.TB_06
-        TB(0, 6) = Me.TB_07
-        TB(0, 7) = Me.TB_08
-        TB(0, 8) = Me.TB_09
-        TB(1, 0) = Me.TB_10
-        TB(1, 1) = Me.TB_11
-        TB(1, 2) = Me.TB_12
-        TB(1, 3) = Me.TB_13
-        TB(1, 4) = Me.TB_14
-        TB(1, 5) = Me.TB_15
-        TB(1, 6) = Me.TB_16
-        TB(1, 7) = Me.TB_17
-        TB(1, 8) = Me.TB_18
-        TB(2, 0) = Me.TB_19
-        TB(2, 1) = Me.TB_20
-        TB(2, 2) = Me.TB_21
-        TB(2, 3) = Me.TB_22
-        TB(2, 4) = Me.TB_23
-        TB(2, 5) = Me.TB_24
-        TB(2, 6) = Me.TB_25
-        TB(2, 7) = Me.TB_26
-        TB(2, 8) = Me.TB_27
-        TB(3, 0) = Me.TB_28
-        TB(3, 1) = Me.TB_29
-        TB(3, 2) = Me.TB_30
-        TB(3, 3) = Me.TB_31
-        TB(3, 4) = Me.TB_32
-        TB(3, 5) = Me.TB_33
-        TB(3, 6) = Me.TB_34
-        TB(3, 7) = Me.TB_35
-        TB(3, 8) = Me.TB_36
-        TB(4, 0) = Me.TB_37
-        TB(4, 1) = Me.TB_38
-        TB(4, 2) = Me.TB_39
-        TB(4, 3) = Me.TB_40
-        TB(4, 4) = Me.TB_41
-        TB(4, 5) = Me.TB_42
-        TB(4, 6) = Me.TB_43
-        TB(4, 7) = Me.TB_44
-        TB(4, 8) = Me.TB_45
-        TB(5, 0) = Me.TB_46
-        TB(5, 1) = Me.TB_47
-        TB(5, 2) = Me.TB_48
-        TB(5, 3) = Me.TB_49
-        TB(5, 4) = Me.TB_50
-        TB(5, 5) = Me.TB_51
-        TB(5, 6) = Me.TB_52
-        TB(5, 7) = Me.TB_53
-        TB(5, 8) = Me.TB_54
-        TB(6, 0) = Me.TB_55
-        TB(6, 1) = Me.TB_56
-        TB(6, 2) = Me.TB_57
-        TB(6, 3) = Me.TB_58
-        TB(6, 4) = Me.TB_59
-        TB(6, 5) = Me.TB_60
-        TB(6, 6) = Me.TB_61
-        TB(6, 7) = Me.TB_62
-        TB(6, 8) = Me.TB_63
-        TB(7, 0) = Me.TB_64
-        TB(7, 1) = Me.TB_65
-        TB(7, 2) = Me.TB_66
-        TB(7, 3) = Me.TB_67
-        TB(7, 4) = Me.TB_68
-        TB(7, 5) = Me.TB_69
-        TB(7, 6) = Me.TB_70
-        TB(7, 7) = Me.TB_71
-        TB(7, 8) = Me.TB_72
-        TB(8, 0) = Me.TB_73
-        TB(8, 1) = Me.TB_74
-        TB(8, 2) = Me.TB_75
-        TB(8, 3) = Me.TB_76
-        TB(8, 4) = Me.TB_77
-        TB(8, 5) = Me.TB_78
-        TB(8, 6) = Me.TB_79
-        TB(8, 7) = Me.TB_80
-        TB(8, 8) = Me.TB_81
+        Dim i As Integer
+        Dim j As Integer
+
+        BT(0, 0) = Me.BT00
+        BT(0, 1) = Me.BT01
+        BT(0, 2) = Me.BT02
+        BT(0, 3) = Me.BT03
+        BT(0, 4) = Me.BT04
+        BT(0, 5) = Me.BT05
+        BT(0, 6) = Me.BT06
+        BT(0, 7) = Me.BT07
+        BT(0, 8) = Me.BT08
+        BT(1, 0) = Me.BT09
+        BT(1, 1) = Me.BT10
+        BT(1, 2) = Me.BT11
+        BT(1, 3) = Me.BT12
+        BT(1, 4) = Me.BT13
+        BT(1, 5) = Me.BT14
+        BT(1, 6) = Me.BT15
+        BT(1, 7) = Me.BT16
+        BT(1, 8) = Me.BT17
+        BT(2, 0) = Me.BT18
+        BT(2, 1) = Me.BT19
+        BT(2, 2) = Me.BT20
+        BT(2, 3) = Me.BT21
+        BT(2, 4) = Me.BT22
+        BT(2, 5) = Me.BT23
+        BT(2, 6) = Me.BT24
+        BT(2, 7) = Me.BT25
+        BT(2, 8) = Me.BT26
+        BT(3, 0) = Me.BT27
+        BT(3, 1) = Me.BT28
+        BT(3, 2) = Me.BT29
+        BT(3, 3) = Me.BT30
+        BT(3, 4) = Me.BT31
+        BT(3, 5) = Me.BT32
+        BT(3, 6) = Me.BT33
+        BT(3, 7) = Me.BT34
+        BT(3, 8) = Me.BT35
+        BT(4, 0) = Me.Bt36
+        BT(4, 1) = Me.BT37
+        BT(4, 2) = Me.BT38
+        BT(4, 3) = Me.BT39
+        BT(4, 4) = Me.BT40
+        BT(4, 5) = Me.BT41
+        BT(4, 6) = Me.BT42
+        BT(4, 7) = Me.BT43
+        BT(4, 8) = Me.BT44
+        BT(5, 0) = Me.BT45
+        BT(5, 1) = Me.BT46
+        BT(5, 2) = Me.BT47
+        BT(5, 3) = Me.BT48
+        BT(5, 4) = Me.BT49
+        BT(5, 5) = Me.BT50
+        BT(5, 6) = Me.BT51
+        BT(5, 7) = Me.BT52
+        BT(5, 8) = Me.BT53
+        BT(6, 0) = Me.BT54
+        BT(6, 1) = Me.BT55
+        BT(6, 2) = Me.BT56
+        BT(6, 3) = Me.BT57
+        BT(6, 4) = Me.BT58
+        BT(6, 5) = Me.Bt59
+        BT(6, 6) = Me.BT60
+        BT(6, 7) = Me.BT61
+        BT(6, 8) = Me.BT62
+        BT(7, 0) = Me.BT63
+        BT(7, 1) = Me.BT64
+        BT(7, 2) = Me.BT65
+        BT(7, 3) = Me.BT66
+        BT(7, 4) = Me.BT67
+        BT(7, 5) = Me.BT68
+        BT(7, 6) = Me.BT69
+        BT(7, 7) = Me.BT70
+        BT(7, 8) = Me.BT71
+        BT(8, 0) = Me.BT72
+        BT(8, 1) = Me.BT73
+        BT(8, 2) = Me.BT74
+        BT(8, 3) = Me.BT75
+        BT(8, 4) = Me.BT76
+        BT(8, 5) = Me.BT77
+        BT(8, 6) = Me.BT78
+        BT(8, 7) = Me.BT79
+        BT(8, 8) = Me.BT80
+
+        BTC(0) = BT_1
+        BTC(1) = BT_2
+        BTC(2) = BT_3
+        BTC(3) = BT_4
+        BTC(4) = BT_5
+        BTC(5) = BT_6
+        BTC(6) = BT_7
+        BTC(7) = BT_8
+        BTC(8) = BT_9
+        BTC(9) = BT_Clear
+
+        For i = 0 To 8
+            For j = 0 To 8
+                With Me.BT(i, j)
+                    .ForeColor = Color.Black
+                    .Text = " "
+                End With
+            Next
+        Next
+
+        For i = 0 To 8
+            With Me.BTC(i)
+                .BackColor = ChiffreOffColor
+                .ForeColor = Color.Black
+            End With
+        Next
+
+        QSol.Clear()
+        TsmpClear(NbrSmp, TSmp)
 
     End Sub
 
-    Sub InitTest()
-        ' Remplace le module de saisie
+    Sub TextSudokuToGrille()
 
+        ' Remplace le module de saisie
+        NbVal = 0
         g = 0
         For i = 0 To 8
             For j = 0 To 8
                 g = (i * 9) + j
-                k = TextSudoku.Length
-                TB(i, j).Text = TextSudoku(g)
-                TB(i, j).Font = TB_grand_modele.Font
-                TBini(i, j) = TB(i, j)
                 If TextSudoku(g) <> " " Then
-                    TB(i, j).Enabled = False
                     Grille(i, j) = TextSudoku(g)
+                    With Me.BT(i, j)
+                        .Text = TextSudoku(g)
+                        .Font = grandeFont
+                        .ForeColor = Color.Black
+                        .BackColor = colorIni(i, j)
+                        .Enabled = False
+                    End With
                     NbVal += 1
+                    LBL_nbVal.Text = NbVal.ToString
                 Else
-                    TB(i, j).ForeColor = Color.BlueViolet
-                    TB(i, j).Enabled = True
                     Grille(i, j) = "0"
+                    With Me.BT(i, j)
+                        .Text = TextSudoku(g)
+                        .Font = grandeFont
+                        .ForeColor = Color.Black
+                        .BackColor = colorIni(i, j)
+                        .Enabled = True
+                    End With
                 End If
             Next
         Next
+
     End Sub
 
 #End Region
 
-#Region "Controles préalables"
-    Sub Contrôle_Saisie()
-
-        ' Recherche de doublons sur les lignes
-        For i = 0 To 8
-            ControleLigne(Erreur, ErreurGrille, Grille, i)
-        Next
-        ' Recherche de doublons sur les colonnes
-        For j = 0 To 8
-            ControleColonne(Erreur, ErreurGrille, Grille, j)
-        Next
-        ' Recherche de doublons sur les régions
-        For r = 0 To 8
-            ControleRégion(Erreur, ErreurGrille, Grille, r)
-        Next
-
-        AfficheErreur()
-
-#End Region
-    End Sub
 
 #Region "Affichages"
 
     '============================================================================================================================================================
+    '
     '                                                             A F F I C H A G E S 
+    '
     '============================================================================================================================================================
 
-    Sub AfficheErreur()
+    Sub Affichage()
+
         For i = 0 To 8
             For j = 0 To 8
+                With Me.BT(i, j)
+                    .BackColor = colorIni(i, j)
+                End With
                 If ErreurGrille(i, j) = "X" Or ErreurGrille(i, j) = "Y" Then
-                    TB(i, j).BackColor = Color.Red
+                    With Me.BT(i, j)
+                        .Text = Grille(i, j)
+                        .Font = grandeFont
+                        .ForeColor = Color.Black
+                        .BackColor = Color.Red
+                    End With
                 Else
-                    TB(i, j).ForeColor = TBini(i, j).ForeColor
-                End If
-            Next
-        Next
-    End Sub
-
-    Sub RaffraichiLigne(_i As Integer)
-        ' pour afficherles candidats de la ligne
-        Dim _j As Integer
-        For _j = 0 To 8
-            If Grille(_i, _j) = "0" Then
-                AfficheCandidats(_i, _j)
-            End If
-        Next
-
-    End Sub
-
-    Sub RaffraichiColonne(_j As Integer)
-        ' pour afficherles candidats de la colonne
-        Dim _i As Integer
-        For _i = 0 To 8
-            If Grille(_i, _j) = "0" Then
-                AfficheCandidats(_i, _j)
-            End If
-        Next
-
-    End Sub
-
-    Sub RaffraichiRégion(_i As Integer, _j As Integer)
-        ' pour afficherles candidats de la région
-        Dim _r As Integer
-        Dim _ir As Integer
-        Dim _jr As Integer
-        _r = ((_i \ 3) * 3) + (_j \ 3)  ' calcule la région d'après i et j
-
-        _ir = (_r \ 3) * 3
-        _jr = (_r - _ir) * 3
-        For _i = _ir To _ir + 2
-            For _j = _jr To _jr + 2
-                If Grille(_i, _j) = "0" Then
-                    AfficheCandidats(_i, _j)
+                    If Grille(i, j) = "0" Then
+                        If modeCandidat Then
+                            With Me.BT(i, j)
+                                .Text =
+                            Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
+                            Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
+                            Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+                                .Font = petiteFont
+                                .ForeColor = Color.Black
+                                .BackColor = colorIni(i, j)
+                                .Enabled = True
+                            End With
+                        Else
+                            With Me.BT(i, j)
+                                .Text = " "
+                                .Font = grandeFont
+                                .ForeColor = Color.Black
+                                .BackColor = colorIni(i, j)
+                                .Enabled = True
+                            End With
+                        End If
+                    Else
+                        With Me.BT(i, j)
+                            .Text = Grille(i, j)
+                            .Font = grandeFont
+                            .ForeColor = Color.Black
+                            .BackColor = colorIni(i, j)
+                            .Enabled = True
+                        End With
+                    End If
                 End If
             Next
         Next
 
+        LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
+
     End Sub
+
+    '============================================================================================================================================================
+    ' Pour afficher tous les candidats         
+    '============================================================================================================================================================
 
     Sub RaffraichiGrille()
-        ' pour afficherles candidats de la ligne
-        Dim _i As Integer
-        Dim _j As Integer
-        For _i = 0 To 8
-            For _j = 0 To 8
-                If Grille(_i, _j) = "0" Then
-                    AfficheCandidats(_i, _j)
+
+        For i = 0 To 8
+            For j = 0 To 8
+                If Grille(i, j) = "0" Then
+                    AfficheCandidats(i, j)
                 End If
             Next
         Next
 
     End Sub
 
-    Sub AfficheCandidats(_i, _j)
+    Sub AfficheCandidats(i, j)
 
-        TB(_i, _j).Font = TB_petit_modele.Font
-        TB(_i, _j).Text =
-                    Candidats(_i, _j, 0) & " " & Candidats(_i, _j, 1) & " " & Candidats(_i, _j, 2) & Environment.NewLine &
-                    Candidats(_i, _j, 3) & " " & Candidats(_i, _j, 4) & " " & Candidats(_i, _j, 5) & Environment.NewLine &
-                    Candidats(_i, _j, 6) & " " & Candidats(_i, _j, 7) & " " & Candidats(_i, _j, 8)
+        With Me.BT(i, j)
+            .Text =
+                            Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
+                            Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
+                            Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+            .Font = petiteFont
+            .ForeColor = Color.Black
+            .BackColor = colorIni(i, j)
+            .Enabled = True
+        End With
+
+    End Sub
+
+#End Region
+
+#Region "Menus"
+
+    '============================================================================================================================================================
+    '
+    '                                                             M E N U S 
+    '
+    '============================================================================================================================================================
+
+
+    '============================================================================================================================================================
+    ' -  M E N U   S A I S I E 
+    '============================================================================================================================================================
+
+    Private Sub SaisieToolStripMenuItem1_Click_1(sender As Object, e As EventArgs) Handles SaisieToolStripMenuItem1.Click
+
+        FonctionSaisie()
+
+    End Sub
+
+    Private Sub SaisirToolStripButton_Click(sender As Object, e As EventArgs) Handles SaisirToolStripButton.Click
+
+        FonctionSaisie()
+
+    End Sub
+
+    Sub FonctionSaisie()
+
+        mode = "Saisie"
+        For i = 0 To 8
+            For j = 0 To 8
+                With Me.BT(i, j)
+                    .Text = ""
+                    .Font = grandeFont
+                    .ForeColor = Color.Black
+                    .BackColor = colorIni(i, j)
+                    .Enabled = True
+                End With
+                Grille(i, j) = "0"
+                For k = 0 To 8
+                    Candidats(i, j, k) = " "
+                Next
+            Next
+        Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   G E N E R E R  
+    '============================================================================================================================================================
+
+    Private Sub GénérerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GénérerToolStripMenuItem.Click
+
+        FonctionGénérer()
+        FonctionJouer()
+    End Sub
+
+    Private Sub GénérerToolStripButton_Click(sender As Object, e As EventArgs) Handles GénérerToolStripButton.Click
+
+        FonctionGénérer()
+        FonctionJouer()
+
+    End Sub
+
+
+    Sub FonctionGénérer()
+
+        mode = "Générer"
+        modeCandidat = False
+        'Générateur.Générateur(typeGrille, TextSudoku)
+        'TextSudokuToGrille() ' pour voir ce qui est généré
+        'ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+        TextSudoku = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
+        TextSudoku = "        9        9        9        9        9        9        9        9        9"
+        TextSudoku = "938467512425981673167352894351849726849726135672513948583174269214695387796238451"
+        TextSudokuToGrille() ' pour voir ce qui est généré
+        ViderPileGrille()
+        EnpileGrille(Grille, NbVal)
+        Problème.Problème(typeGrille, NbVal, Grille, Candidats)
+        ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+        Affichage()
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   O U V R I R   F I C H I E R 
+    '============================================================================================================================================================
+
+    Private Sub OuvrirToolStripButton1_Click(sender As Object, e As EventArgs) Handles OuvrirToolStripButton1.Click
+        mode = "Ouvrir"
+        modeCandidat = False
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   E N R E G I S T R E R   F I C H I E R 
+    '============================================================================================================================================================
+
+    Private Sub EnregistrerToolStripButton_Click(sender As Object, e As EventArgs) Handles EnregistrerToolStripButton.Click
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   J O U E R 
+    '============================================================================================================================================================
+
+    Private Sub JouerToolStripButton1_Click(sender As Object, e As EventArgs) Handles JouerToolStripButton1.Click
+
+        FonctionJouer()
+
+    End Sub
+
+    Sub FonctionJouer()
+
+        mode = "Jouer"
+
+        For i = 0 To 8
+            For j = 0 To 8
+                If Grille(i, j) <> "0" Then
+                    With Me.BT(i, j)
+                        .Enabled = False
+                    End With
+                End If
+            Next
+        Next
+
+        Array.Copy(Grille, GrilleInitiale, 81)
+        NbValInitial = NbVal
+        Array.Copy(Grille, GrilleFinale, 81)
+
+        SolutionGrille(GrilleFinale, NbVal, QSol, NbrSmp, TSmp, SolutionExiste)
+
+        NbVal = NbValInitial
+        If SolutionExiste Then
+        Else
+            MsgBox("Désolé je n'ai pas trouvé de solution unique")
+        End If
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   A F F I C H E R   L E S   C A N D I D A T S  
+    '============================================================================================================================================================
+
+    Private Sub AfficherLesCandidatsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AfficherLesCandidatsToolStripMenuItem.Click
+
+        modeCandidat = True
+        Affichage()
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   E F F A C E R    L E S   C A N D I D A T S  
+    '============================================================================================================================================================
+
+    Private Sub EffacerLesCandidatsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EffacerLesCandidatsToolStripMenuItem.Click
+
+        modeCandidat = False
+        Affichage()
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   T E S T  
+    '============================================================================================================================================================
+
+    Private Sub PaireNueEnLigneToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PaireNueEnLigneToolStripMenuItem.Click
+
+        mode = "démo"
+        TextSudoku = "49    3 5 2  7 94   3   7    1735               4286    2   4   34 6  2 1 9    76"
+        TextSudokuToGrille()
+        CalculCandidats(Grille, Candidats)
+        ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+        Affichage()
+        FonctionJouer()
+
+    End Sub
+
+    Private Sub PaireNueEnColonneToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PaireNueEnColonneToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub EnRégionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EnRégionToolStripMenuItem.Click
+
+        mode = "démo"
+        TextSudoku = "1  7 39        5   79 4  1 3 74 91  8       9  43 18 5 1  3 75   2        85 4  1"
+        TextSudokuToGrille()
+        CalculCandidats(Grille, Candidats)
+        ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+        Affichage()
+        FonctionJouer()
 
     End Sub
 
@@ -403,100 +626,115 @@
 #Region "Boutons"
 
     '============================================================================================================================================================
+    '
     '                                                             B O U T O N S 
+    '
     '============================================================================================================================================================
 
-    Private Sub QuitterToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles QuitterToolStripMenuItem.Click
+    Private Sub QuitterToolStripMenuItem_Click(sender As Object, e As EventArgs)
         'Fermeture avec confirmation
         If MsgBox("Souhaitez-vous vraiment quitter ce magnifique programme ?", 36, "Quitter") = MsgBoxResult.Yes Then
             End
         End If
+
     End Sub
 
 
-    Private Sub RésoudreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RésoudreToolStripMenuItem.Click
-        Resoudre()
+    '============================================================================================================================================================
+    '  - S O L U T I O N   P A S   A   P A S
+    '============================================================================================================================================================
+
+    Private Sub BTStepByStep_Click(sender As Object, e As EventArgs) Handles BTStepByStep.Click
+
+        FonctionStepByStep()
+
     End Sub
 
-    Private Sub BT_Resoudre_Click(sender As Object, e As EventArgs) Handles BT_Resoudre.Click
-        Resoudre()
-    End Sub
+    '============================================================================================================================================================
+    '  - S O L U T I O N   P A S   A   P A S
+    '============================================================================================================================================================
 
-    Private Sub Resoudre()
-
-        Dim Dsmp As New StrSmp
+    Sub FonctionStepByStep()
 
         QSol.Clear()
-
         TsmpClear(NbrSmp, TSmp)
-
         RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp)
+
+        If QSol.Count = 0 And NbrSmp = 0 Then
+            If NbVal < 81 Then
+                MsgBox("Plus de solution " & NbVal & "*")
+            Else
+                MsgBox("Bravo ! ")
+            End If
+        Else
+
+            If QSol.Count > 0 Then
+
+                Solution = QSol.Peek()
+                LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " colonne " & Solution.j + 1 & " " & Solution.m & " : " _
+                                 & Solution.v & " / " & QSol.Count & " / "
+
+                AppliqueUneSolution(QSol, Grille, Candidats, i, j, v) 'Contient la mise à jour des candidats
+
+                With Me.BT(i, j)
+                    .Text = v
+                    .Font = grandeFont
+                    .ForeColor = Color.Black
+                    .BackColor = colorIni(i, j)
+                    .Enabled = True
+                End With
+
+                NbVal += 1
+                LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
+
+            Else
+
+                If NbrSmp > 0 Then
+                    Smp = TSmp(0)
+                    LBL_Conseil.Text = Smp.motif
+                    AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
+                End If
+
+            End If
+        End If
 
         '
         ' Affiche les candidats dans la grille
         '
+
         For i = 0 To 8
             For j = 0 To 8
                 If Grille(i, j) = "0" Then
-                    TB(i, j).Font = TB_petit_modele.Font
-                    TB(i, j).Text =
-                            Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
-                            Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
-                            Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+                    If modeCandidat Then
+                        With Me.BT(i, j)
+                            .Text =
+                                Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
+                                Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
+                                Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+                            .Font = petiteFont
+                            .ForeColor = Color.Black
+                            .BackColor = colorIni(i, j)
+                            .Enabled = True
+                        End With
+                    Else
+                        With Me.BT(i, j)
+                            .Text = " "
+                            .Font = grandeFont
+                            .ForeColor = Color.Black
+                            .BackColor = colorIni(i, j)
+                            .Enabled = True
+                        End With
+
+                    End If
                 End If
             Next
         Next
 
-        If QSol.Count > 0 Then
-            Solution = QSol.Peek()
-            LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " colonne " & Solution.j + 1 & " " & Solution.m & " : " _
-                             & Solution.v & " / " & QSol.Count & " / "
-        Else
-            If NbrSmp > 0 Then
-                Smp = TSmp(0)
-                LBL_Conseil.Text = Smp.motif
-            Else
-                If NbVal < 81 Then
-                    MsgBox("Plus de solution " & NbVal)
-                Else
-                    MsgBox("Bravo ! ")
-                End If
-            End If
-        End If
-
 
     End Sub
-
-    Private Sub BT_Suivant_Click(sender As Object, e As EventArgs) Handles BT_Suivant.Click
-
-        ' La dernière valeur proposée est à la fin du tableau des solutions
-
-        ' s = GetRandom(0, GNbSol - 1)
-        Dim DSmp As New StrSmp
-
-        If QSol.Count > 0 Then
-            Solution = QSol.Dequeue()
-            i = Solution.i
-            j = Solution.j
-            TB(i, j).Text = Solution.v
-            Grille(i, j) = TB(i, j).Text
-
-            TB(i, j).Font = TB_grand_modele.Font
-            TB(i, j).Enabled = False
-            NbVal += 1
-
-            Recalcul_Candidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient  
-        Else
-            If NbrSmp > 0 Then
-                AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
-                'RaffraichiGrille()
-            End If
-            RaffraichiGrille() ' affiche les candidats actualisés
-        End If
-
-        Resoudre()
-
-    End Sub
+    '============================================================================================================================================================
+    '  - Affichage du Tableau des Solutions
+    '============================================================================================================================================================
 
 
     Private Sub BT_Solutions_Click(sender As Object, e As EventArgs) Handles BT_Solutions.Click
@@ -505,12 +743,653 @@
 
     End Sub
 
+    '============================================================================================================================================================
+    '  - - Affichage du Tableau des Simplifications
+    '============================================================================================================================================================
+
     Private Sub BT_Smp_Click(sender As Object, e As EventArgs) Handles BT_Smp.Click
 
         Simplifications.Show()
 
     End Sub
 
+    Private Sub QuitterToolStripMenuItem_Click_1(sender As Object, e As EventArgs) Handles QuitterToolStripMenuItem.Click
+
+        Me.Close()
+
+    End Sub
+    '============================================================================================================================================================
+    '
+    '                                        B O U T O N S   D E   S A I S I E
+    '
+    '============================================================================================================================================================
+
+    Private Sub BT_1_Click(sender As Object, e As EventArgs) Handles BT_1.Click
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 0
+        valSaisie = "1"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_2_Click(sender As Object, e As EventArgs) Handles BT_2.Click
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 1
+        valSaisie = "2"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_3_Click(sender As Object, e As EventArgs) Handles BT_3.Click
+
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 2
+        valSaisie = "3"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_4_Click(sender As Object, e As EventArgs) Handles BT_4.Click
+
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 3
+        valSaisie = "4"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_5_Click(sender As Object, e As EventArgs) Handles BT_5.Click
+
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 4
+        valSaisie = "5"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_6_Click(sender As Object, e As EventArgs) Handles BT_6.Click
+
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 5
+        valSaisie = "6"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_7_Click(sender As Object, e As EventArgs) Handles BT_7.Click
+
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 6
+        valSaisie = "7"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_8_Click(sender As Object, e As EventArgs) Handles BT_8.Click
+
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 7
+        valSaisie = "8"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_9_Click(sender As Object, e As EventArgs) Handles BT_9.Click
+
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 8
+        valSaisie = "9"
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    Private Sub BT_Clear_Click(sender As Object, e As EventArgs) Handles BT_Clear.Click
+
+        BTC(iValSaisie).BackColor = ChiffreOffColor
+        iValSaisie = 9
+        valSaisie = " "
+        BTC(iValSaisie).BackColor = ChiffreOnColor
+
+    End Sub
+
+    '============================================================================================================================================================
+    '
+    '                                        B O U T O N S   D E   L A   G R I L L E
+    '
+    '============================================================================================================================================================
+
+    Private Sub BT00_Click(sender As Object, e As EventArgs) Handles BT00.Click
+        iBT = 0
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT01_Click(sender As Object, e As EventArgs) Handles BT01.Click
+        iBT = 0
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT02_Click(sender As Object, e As EventArgs) Handles BT02.Click
+        iBT = 0
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT03_Click(sender As Object, e As EventArgs) Handles BT03.Click
+        iBT = 0
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT04_Click(sender As Object, e As EventArgs) Handles BT04.Click
+        iBT = 0
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT05_Click(sender As Object, e As EventArgs) Handles BT05.Click
+        iBT = 0
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT06_Click(sender As Object, e As EventArgs) Handles BT06.Click
+        iBT = 0
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT07_Click(sender As Object, e As EventArgs) Handles BT07.Click
+        iBT = 0
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT08_Click(sender As Object, e As EventArgs) Handles BT08.Click
+        iBT = 0
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub BT09_Click(sender As Object, e As EventArgs) Handles BT09.Click
+        iBT = 1
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT10_Click(sender As Object, e As EventArgs) Handles BT10.Click
+        iBT = 1
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT11_Click(sender As Object, e As EventArgs) Handles BT11.Click
+        iBT = 1
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT12_Click(sender As Object, e As EventArgs) Handles BT12.Click
+        iBT = 1
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT13_Click(sender As Object, e As EventArgs) Handles BT13.Click
+        iBT = 1
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT14_Click(sender As Object, e As EventArgs) Handles BT14.Click
+        iBT = 1
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT15_Click(sender As Object, e As EventArgs) Handles BT15.Click
+        iBT = 1
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT16_Click(sender As Object, e As EventArgs) Handles BT16.Click
+        iBT = 1
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT17_Click(sender As Object, e As EventArgs) Handles BT17.Click
+        iBT = 1
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub BT18_Click(sender As Object, e As EventArgs) Handles BT18.Click
+        iBT = 2
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT19_Click(sender As Object, e As EventArgs) Handles BT19.Click
+        iBT = 2
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT20_Click(sender As Object, e As EventArgs) Handles BT20.Click
+        iBT = 2
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT21_Click(sender As Object, e As EventArgs) Handles BT21.Click
+        iBT = 2
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT22_Click(sender As Object, e As EventArgs) Handles BT22.Click
+        iBT = 2
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT23_Click(sender As Object, e As EventArgs) Handles BT23.Click
+        iBT = 2
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT24_Click(sender As Object, e As EventArgs) Handles BT24.Click
+        iBT = 2
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT25_Click(sender As Object, e As EventArgs) Handles BT25.Click
+        iBT = 2
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT26_Click(sender As Object, e As EventArgs) Handles BT26.Click
+        iBT = 2
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub BT27_Click(sender As Object, e As EventArgs) Handles BT27.Click
+        iBT = 3
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT28_Click(sender As Object, e As EventArgs) Handles BT28.Click
+        iBT = 3
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT29_Click(sender As Object, e As EventArgs) Handles BT29.Click
+        iBT = 3
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT30_Click(sender As Object, e As EventArgs) Handles BT30.Click
+        iBT = 3
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT31_Click(sender As Object, e As EventArgs) Handles BT31.Click
+        iBT = 3
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT32_Click(sender As Object, e As EventArgs) Handles BT32.Click
+        iBT = 3
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT33_Click(sender As Object, e As EventArgs) Handles BT33.Click
+        iBT = 3
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT34_Click(sender As Object, e As EventArgs) Handles BT34.Click
+        iBT = 3
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT35_Click(sender As Object, e As EventArgs) Handles BT35.Click
+        iBT = 3
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub Bt36_Click(sender As Object, e As EventArgs) Handles Bt36.Click
+        iBT = 4
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT37_Click(sender As Object, e As EventArgs) Handles BT37.Click
+        iBT = 4
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT38_Click(sender As Object, e As EventArgs) Handles BT38.Click
+        iBT = 4
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT39_Click(sender As Object, e As EventArgs) Handles BT39.Click
+        iBT = 4
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT40_Click(sender As Object, e As EventArgs) Handles BT40.Click
+        iBT = 4
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT41_Click(sender As Object, e As EventArgs) Handles BT41.Click
+        iBT = 4
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT42_Click(sender As Object, e As EventArgs) Handles BT42.Click
+        iBT = 4
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT43_Click(sender As Object, e As EventArgs) Handles BT43.Click
+        iBT = 4
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT44_Click(sender As Object, e As EventArgs) Handles BT44.Click
+        iBT = 4
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub BT45_Click(sender As Object, e As EventArgs) Handles BT45.Click
+        iBT = 5
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT46_Click(sender As Object, e As EventArgs) Handles BT46.Click
+        iBT = 5
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT47_Click(sender As Object, e As EventArgs) Handles BT47.Click
+        iBT = 5
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT48_Click(sender As Object, e As EventArgs) Handles BT48.Click
+        iBT = 5
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT49_Click(sender As Object, e As EventArgs) Handles BT49.Click
+        iBT = 5
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT50_Click(sender As Object, e As EventArgs) Handles BT50.Click
+        iBT = 5
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT51_Click(sender As Object, e As EventArgs) Handles BT51.Click
+        iBT = 5
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT52_Click(sender As Object, e As EventArgs) Handles BT52.Click
+        iBT = 5
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT53_Click(sender As Object, e As EventArgs) Handles BT53.Click
+        iBT = 5
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub BT54_Click(sender As Object, e As EventArgs) Handles BT54.Click
+        iBT = 6
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT55_Click(sender As Object, e As EventArgs) Handles BT55.Click
+        iBT = 6
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT56_Click(sender As Object, e As EventArgs) Handles BT56.Click
+        iBT = 6
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT57_Click(sender As Object, e As EventArgs) Handles BT57.Click
+        iBT = 6
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT58_Click(sender As Object, e As EventArgs) Handles BT58.Click
+        iBT = 6
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub Bt59_Click(sender As Object, e As EventArgs) Handles Bt59.Click
+        iBT = 6
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT60_Click(sender As Object, e As EventArgs) Handles BT60.Click
+        iBT = 6
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT61_Click(sender As Object, e As EventArgs) Handles BT61.Click
+        iBT = 6
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT62_Click(sender As Object, e As EventArgs) Handles BT62.Click
+        iBT = 6
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub BT63_Click(sender As Object, e As EventArgs) Handles BT63.Click
+        iBT = 7
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT64_Click(sender As Object, e As EventArgs) Handles BT64.Click
+        iBT = 7
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT65_Click(sender As Object, e As EventArgs) Handles BT65.Click
+        iBT = 7
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT66_Click(sender As Object, e As EventArgs) Handles BT66.Click
+        iBT = 7
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT67_Click(sender As Object, e As EventArgs) Handles BT67.Click
+        iBT = 7
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT68_Click(sender As Object, e As EventArgs) Handles BT68.Click
+        iBT = 7
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT69_Click(sender As Object, e As EventArgs) Handles BT69.Click
+        iBT = 7
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT70_Click(sender As Object, e As EventArgs) Handles BT70.Click
+        iBT = 7
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT71_Click(sender As Object, e As EventArgs) Handles BT71.Click
+        iBT = 7
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub BT72_Click(sender As Object, e As EventArgs) Handles BT72.Click
+        iBT = 8
+        jBT = 0
+        CtlBT()
+    End Sub
+
+    Private Sub BT73_Click(sender As Object, e As EventArgs) Handles BT73.Click
+        iBT = 8
+        jBT = 1
+        CtlBT()
+    End Sub
+
+    Private Sub BT74_Click(sender As Object, e As EventArgs) Handles BT74.Click
+        iBT = 8
+        jBT = 2
+        CtlBT()
+    End Sub
+
+    Private Sub BT75_Click(sender As Object, e As EventArgs) Handles BT75.Click
+        iBT = 8
+        jBT = 3
+        CtlBT()
+    End Sub
+
+    Private Sub BT76_Click(sender As Object, e As EventArgs) Handles BT76.Click
+        iBT = 8
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT77_Click(sender As Object, e As EventArgs) Handles BT77.Click
+        iBT = 8
+        jBT = 5
+        CtlBT()
+    End Sub
+
+    Private Sub BT78_Click(sender As Object, e As EventArgs) Handles BT78.Click
+        iBT = 8
+        jBT = 6
+        CtlBT()
+    End Sub
+
+    Private Sub BT79_Click(sender As Object, e As EventArgs) Handles BT79.Click
+        iBT = 8
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT80_Click(sender As Object, e As EventArgs) Handles BT80.Click
+        iBT = 8
+        jBT = 8
+        CtlBT()
+    End Sub
+
+
+    Private Sub CtlBT()
+        If mode = "Saisie" Or mode = "Jouer" Then
+            For i = 0 To 8
+                For j = 0 To 8
+                    BT(i, j).BackColor = colorIni(i, j)
+                Next
+            Next
+
+            With Me.BT(iBT, jBT)
+                .Text = valSaisie
+                .Font = grandeFont
+                .ForeColor = Color.Black
+                .BackColor = colorIni(iBT, jBT)
+                .Enabled = True
+            End With
+            If valSaisie = " " Then
+                Grille(iBT, jBT) = "0"
+            Else
+                Grille(iBT, jBT) = valSaisie
+            End If
+            ControleSaisie(Erreur, ErreurGrille, Grille, Candidats)
+            Affichage()
+        End If
+
+    End Sub
+
+    Private Sub BTSolution_Click(sender As Object, e As EventArgs) Handles BTSolution.Click
+
+        QSol.Clear()
+        TsmpClear(NbrSmp, TSmp)
+
+        Array.Copy(Grille, GrilleFinale, 81)
+
+        SolutionGrille(GrilleFinale, NbVal, QSol, NbrSmp, TSmp, SolutionExiste)
+        If SolutionExiste Then
+            Array.Copy(GrilleFinale, Grille, 81)
+            Affichage()
+        Else
+            MsgBox("pas de solution")
+        End If
+
+    End Sub
+
+
+    '============================================================================== F I N ===================================================================== 
 #End Region
 
 

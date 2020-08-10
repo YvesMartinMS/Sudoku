@@ -1,8 +1,15 @@
 ﻿Module Solveur
+    '============================================================================================================================================================
+    '
+    '                                                    G E S T I O N    D E S   C A N D I D A T S 
+    '
+    '============================================================================================================================================================
 
-    Sub Initialisations(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String)
+    '============================================================================================================================================================
+    '  Calcul complet des candidats
+    '============================================================================================================================================================
 
-        Dim _k As Integer
+    Sub CalculCandidats(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String)
 
         ' Initialise les candidats
         For _i = 0 To 8
@@ -19,15 +26,138 @@
             Next
         Next
 
+        ' Efface les candidats dans les lignes
+        For _i = 0 To 8
+            GommeLigne(_Grille, _Candidats, _i)
+        Next
+        ' Efface les candidats dans les colonnes
+        For _j = 0 To 8
+            GommeColonne(_Grille, _Candidats, _j)
+        Next
+        ' Efface les candidats dans les régions
+        For _r = 0 To 8
+            GommeRégion(_Grille, _Candidats, _r)
+        Next
+
     End Sub
 
-    Sub ControleLigne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _i As Integer)
+    '============================================================================================================================================================
+    '  Impacts sur les candidats de la saisie d'une case
+    '============================================================================================================================================================
 
-        ' Contrôle les doublons d'une ligne
-        Dim _j As Integer
-        Dim _jbis As Integer
-        Dim _ierr As Integer
-        Dim _jerr As Integer
+    Sub RecalculCandidats(ByRef _i As Integer, ByRef _j As Integer, ByRef _Grille(,) As String, ByRef _Candidats(,,) As String)
+
+        Dim _r As Integer
+
+        For _k = 0 To 8
+            _Candidats(_i, _j, _k) = " "  ' on enlève les candidats de la case qui vient d'être garnie
+        Next
+
+        ' Efface le candidat dans la ligne
+
+        GommeLigne(_Grille, _Candidats, _i)
+
+        ' Efface le candidat dans la colonne 
+
+        GommeColonne(_Grille, _Candidats, _j)
+
+        ' Efface le candidat dans la région 
+        _r = ((_i \ 3) * 3) + (_j \ 3)  ' calcule la région d'après i et j
+        GommeRégion(_Grille, _Candidats, _r)
+
+    End Sub
+
+    '============================================================================================================================================================
+    '  Elimine les candidats dans une ligne
+    '============================================================================================================================================================
+
+    Sub GommeLigne(ByVal _Grille(,) As String, ByRef _Candidats(,,) As String, _i As Integer)
+
+        Dim _g As Integer
+
+        For _j = 0 To 8
+            If _Grille(_i, _j) <> "0" Then
+                For _k = 0 To 8
+                    If Val(_k + 1) = _Grille(_i, _j) Then
+                        _g = _k
+                    End If
+                Next
+                For _jbis = 0 To 8
+                    _Candidats(_i, _jbis, _g) = " "
+                Next
+            End If
+        Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    '  Elimine les candidats dans une colonne
+    '============================================================================================================================================================
+
+    Sub GommeColonne(ByVal _Grille(,) As String, ByRef _Candidats(,,) As String, _j As Integer)
+
+        Dim _g As Integer
+
+        For _i = 0 To 8
+            If _Grille(_i, _j) <> "0" Then
+                For _k = 0 To 8
+                    If Val(_k + 1) = _Grille(_i, _j) Then
+                        _g = _k
+                    End If
+                Next
+                For _ibis = 0 To 8
+                    _Candidats(_ibis, _j, _g) = " "
+                Next
+            End If
+        Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    '  Elimine les candidats dans une région
+    '============================================================================================================================================================
+
+    Sub GommeRégion(ByVal _Grille(,) As String, ByRef _Candidats(,,) As String, _r As Integer)
+
+        Dim _csgi As Integer 'Coin supérieur gauche région
+        Dim _csgj As Integer 'Coin supérieur gauche région
+        Dim _g As Integer
+
+        _csgi = (_r \ 3) * 3
+        _csgj = (_r - _csgi) * 3
+        For _i = _csgi To _csgi + 2
+            For _j = _csgj To _csgj + 2
+                If _Grille(_i, _j) <> "0" Then
+                    For _k = 0 To 8
+                        If Val(_k + 1) = _Grille(_i, _j) Then
+                            _g = _k
+                        End If
+                    Next
+                    For _ibis = _csgi To _csgi + 2
+                        For _jbis = _csgj To _csgj + 2
+                            _Candidats(_ibis, _jbis, _g) = " "
+                        Next
+                    Next
+                End If
+            Next
+        Next
+
+    End Sub
+
+    '
+    '============================================================================================================================================================
+    '
+    '                                                         C O N T R O L E S 
+    '
+    '============================================================================================================================================================
+
+    ''============================================================================================================================================================
+    '  Contrôle de la validité d'une grille
+    '============================================================================================================================================================
+
+    Sub ControleSaisie(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String)
+        ' Recherche d'erreurs sur les lignes
+        ' case sans candidat ou deux fois la même valeur sur un segment
 
         ' Initialise _ErreurGrille
         For _ierr = 0 To 8
@@ -35,6 +165,32 @@
                 _ErreurGrille(_ierr, _jerr) = " "
             Next
         Next
+        _Erreur = False
+        ' Recherche d'erreurs sur les lignes
+        For _i = 0 To 8
+            If Sudoku.mode <> "Saisie" Then
+                ControleCandidat(_Erreur, _ErreurGrille, _Grille, _Candidats, _i)
+            End If
+            ControleLigne(_Erreur, _ErreurGrille, _Grille, _i)
+        Next
+
+        ' Recherche d'erreurs sur les colonnes
+        For _j = 0 To 8
+            ControleColonne(_Erreur, _ErreurGrille, _Grille, _j)
+        Next
+
+        ' Recherche d'erreurs sur les régions
+        For _r = 0 To 8
+            ControleRégion(_Erreur, _ErreurGrille, _Grille, _r)
+        Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    '  Contrôle les doublons d'une ligne
+    '============================================================================================================================================================
+
+    Sub ControleLigne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _i As Integer)
 
         For _j = 0 To 7
             For _jbis = _j + 1 To 8
@@ -48,11 +204,11 @@
 
     End Sub
 
-    Sub ControleColonne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _j As Integer)
+    '============================================================================================================================================================
+    '  Contrôle les doublons d'une colonne
+    '============================================================================================================================================================
 
-        ' Contrôle les doublons d'une colonne
-        Dim _i As Integer
-        Dim _ibis As Integer
+    Sub ControleColonne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _j As Integer)
 
         For _i = 0 To 7
             For _ibis = _i + 1 To 8
@@ -66,13 +222,12 @@
 
     End Sub
 
+    '============================================================================================================================================================
+    '  Contrôle les doublons d'une région
+    '============================================================================================================================================================
+
     Sub ControleRégion(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _r As Integer)
 
-        ' Contrôle les doublons d'une région
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _ibis As Integer
-        Dim _jbis As Integer
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
 
@@ -96,12 +251,12 @@
 
     End Sub
 
-    Sub ControleCandidatLigne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _i As Integer)
+    '============================================================================================================================================================
+    ' Vérifie que pour une case non occupée il existe au moins un candidat
+    '============================================================================================================================================================
 
-        ' vérifie que pour une case non occupée il existe au moins un candidat
+    Sub ControleCandidat(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _i As Integer)
 
-        Dim _j As Integer
-        Dim _k As Integer
         Dim _ErreurCandidat(8, 8)
 
         For _j = 0 To 8
@@ -120,104 +275,22 @@
         Next
     End Sub
 
-    Sub ControleCandidatColonne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _j As Integer)
-
-        ' vérifie que pour une case non occupée il existe au moins un candidat
-
-        Dim _i As Integer
-        Dim _k As Integer
-        Dim _ErreurCandidat(8, 8)
-
-        For _i = 0 To 8
-            If _Grille(_i, _j) = "0" Then
-                _ErreurCandidat(_i, _j) = "X"
-                For _k = 0 To 8
-                    If _Candidats(_i, _j, _k) <> " " Then
-                        _ErreurCandidat(_i, _j) = " "
-                    End If
-                Next
-                If _ErreurCandidat(_i, _j) = "X" Then
-                    _ErreurGrille(_i, _j) = "X"
-                    _Erreur = True
-                End If
-            End If
-        Next
-    End Sub
-
-    Sub ControleCandidatRégion(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _r As Integer)
-
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _csgi As Integer 'Coin supérieur gauche région
-        Dim _csgj As Integer 'Coin supérieur gauche région
-        Dim _k As Integer
-        Dim _ErreurCandidat(8, 8)
-        _csgi = (_r \ 3) * 3
-        _csgj = (_r - _csgi) * 3
-        For _i = _csgi To _csgi + 2
-            For _j = _csgj To _csgj + 2
-                If _Grille(_i, _j) = "0" Then
-                    _ErreurCandidat(_i, _j) = "X"
-                    For _k = 0 To 8
-                        If _Candidats(_i, _j, _k) <> " " Then
-                            _ErreurCandidat(_i, _j) = " "
-                        End If
-                    Next
-                    If _ErreurCandidat(_i, _j) = "X" Then
-                        _ErreurGrille(_i, _j) = "X"
-                        _Erreur = True
-                    End If
-                End If
-            Next
-        Next
-
-    End Sub
-
-    Sub ControleGénération(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String)
-        ' Recherche d'erreurs sur les lignes
-        ' case sans candidat ou deux fois la même valeur sur un segment
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _r As Integer
-
-        _Erreur = False
-        ' Recherche d'erreurs sur les lignes
-        For _i = 0 To 8
-            ControleLigne(_Erreur, _ErreurGrille, _Grille, _i)
-            ControleCandidatLigne(_Erreur, _ErreurGrille, _Grille, _Candidats, _i)
-        Next
-
-        ' Recherche d'erreurs sur les colonnes
-        For _j = 0 To 8
-            ControleColonne(_Erreur, _ErreurGrille, _Grille, _j)
-            ControleCandidatColonne(_Erreur, _ErreurGrille, _Grille, _Candidats, _j)
-        Next
-
-        ' Recherche d'erreurs sur les régions
-        For _r = 0 To 8
-            ControleRégion(_Erreur, _ErreurGrille, _Grille, _r)
-            ControleCandidatRégion(_Erreur, _ErreurGrille, _Grille, _Candidats, _r)
-        Next
-
-    End Sub
     '
-    ' ============================================================================================================================================
+    '============================================================================================================================================================
     '
     '                                                         M O T E U R
     '
-    '============================================================================================================================================
+    '============================================================================================================================================================
     '
 
-    Sub RechercheSolution(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String,
+    Sub RechercheSolution(ByRef _Grille(,) As String,
+                         ByRef _Candidats(,,) As String,
                          ByRef _Qsol As Queue(Of Sudoku.StrSolution),
                          ByRef _NbrSmp As Integer,
                          ByRef _TSmp() As Sudoku.StrSmp)
         '
-        ' Elimine les candidats dans les lignes colonnes et régions
+        ' On ne touche pas aux candidats, c'est l'application d'une solution ou d'une technique de simplification qui modifie les candidats  
         '
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _r As Integer
 
         Dim _opk(8, 8) As Integer ' Candidats par case
         Dim _nuplet(8, 8) As String ' Candidats agrégés
@@ -225,36 +298,16 @@
         Dim _AnlCol(8, 8) As Sudoku.StrAnalyse ' (j,k)
         Dim _AnlReg(8, 8) As Sudoku.StrAnalyse ' (r,k)
 
-        ' Efface les candidats dans les lignes
-        For _i = 0 To 8
-            GommeLigne(_Grille, _Candidats, _i)
-        Next
-        ' Efface les candidats dans les colonnes
-        For _j = 0 To 8
-            GommeColonne(_Grille, _Candidats, _j)
-        Next
-        ' Efface les candidats dans les régions
-        For _r = 0 To 8
-            GommeRégion(_Grille, _Candidats, _r)
-        Next
-
-        'initialise les compteurs
-        For _i = 0 To 8
-            For _j = 0 To 8
-                _opk(_i, _j) = 0
-            Next
-        Next
-
-        'Mise à jour le tableau des occurrences par case
+        'Mise à jour du tableau des occurrences par case
         AnalyseCase(_Candidats, _opk, _nuplet)
 
-        'Mise à jour le tableau des occurrences par ligne
+        'Mise à jour du tableau des occurrences par ligne
         AnalyseLigne(_Candidats, _AnlLig)
 
-        'Mise à jour le tableau des occurrences par colonne
+        'Mise à jour du tableau des occurrences par colonne
         AnalyseColonne(_Candidats, _AnlCol)
 
-        'Mise à jour le tableau des occurrences par région
+        'Mise à jour du tableau des occurrences par région
         AnalyseRégion(_Candidats, _AnlReg)
 
         SeulDansUneCase(_Candidats, _opk, _Qsol)
@@ -263,14 +316,15 @@
         SeulDansUneRégion(_AnlReg, _Qsol)
 
         If _Qsol.Count = 0 Then
-            PaireCachéeLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _Grille, _opk, _nuplet)
-            PaireCachéeCol(_Candidats, _NbrSmp, _TSmp, _AnlCol, _Grille, _opk, _nuplet)
-            '        PaireCachéeReg(_Candidats, _NbrSmp, _TSmp, _AnlReg, _Grille, _opk, _nuplet)
+
             PaireNueLig(_Candidats, _NbrSmp, _TSmp, _Grille, _opk, _nuplet)
             PaireNueCol(_Candidats, _NbrSmp, _TSmp, _Grille, _opk, _nuplet)
             PaireNueReg(_Candidats, _NbrSmp, _TSmp, _Grille, _opk, _nuplet)
             CandidatVérouilléLig(_Candidats, _AnlLig, _AnlReg, _NbrSmp, _TSmp, _opk, _nuplet)
             CandidatVérouilléCol(_Candidats, _AnlCol, _AnlReg, _NbrSmp, _TSmp, _opk, _nuplet)
+            PaireCachéeLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _Grille, _opk, _nuplet)
+            PaireCachéeCol(_Candidats, _NbrSmp, _TSmp, _AnlCol, _Grille, _opk, _nuplet)
+            PaireCachéeReg(_Candidats, _NbrSmp, _TSmp, _AnlReg, _Grille, _opk, _nuplet)
             AnalyseTrpLig(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             AnalyseTrpCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             AnalyseTrpReg(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
@@ -284,113 +338,6 @@
 
     End Sub
 
-    Sub GommeLigne(ByVal Grille(,) As String, ByRef Candidats(,,) As String, _i As Integer)
-
-        'Elimine les candidats dans une ligne
-
-        Dim _j As Integer
-        Dim _jbis As Integer
-        Dim _k As Integer
-        Dim _g As Integer
-
-        For _j = 0 To 8
-            If Grille(_i, _j) <> "0" Then
-                For _k = 0 To 8
-                    If Val(_k + 1) = Grille(_i, _j) Then
-                        _g = _k
-                    End If
-                Next
-                For _jbis = 0 To 8
-                    Candidats(_i, _jbis, _g) = " "
-                Next
-            End If
-        Next
-
-    End Sub
-
-    Sub GommeColonne(ByVal Grille(,) As String, ByRef Candidats(,,) As String, _j As Integer)
-
-        'Elimine les candidats dans une colonne
-
-        Dim _i As Integer
-        Dim _ibis As Integer
-        Dim _k As Integer
-        Dim _g As Integer
-
-        For _i = 0 To 8
-            If Grille(_i, _j) <> "0" Then
-                For _k = 0 To 8
-                    If Val(_k + 1) = Grille(_i, _j) Then
-                        _g = _k
-                    End If
-                Next
-                For _ibis = 0 To 8
-                    Candidats(_ibis, _j, _g) = " "
-                Next
-            End If
-        Next
-
-    End Sub
-
-    Sub GommeRégion(ByVal Grille(,) As String, ByRef Candidats(,,) As String, _r As Integer)
-
-        'Elimine les candidats dans une région
-
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _ibis As Integer
-        Dim _jbis As Integer
-        Dim _csgi As Integer 'Coin supérieur gauche région
-        Dim _csgj As Integer 'Coin supérieur gauche région
-        Dim _k As Integer
-        Dim _g As Integer
-
-        _csgi = (_r \ 3) * 3
-        _csgj = (_r - _csgi) * 3
-        For _i = _csgi To _csgi + 2
-            For _j = _csgj To _csgj + 2
-                If Grille(_i, _j) <> "0" Then
-                    For _k = 0 To 8
-                        If Val(_k + 1) = Grille(_i, _j) Then
-                            _g = _k
-                        End If
-                    Next
-                    For _ibis = _csgi To _csgi + 2
-                        For _jbis = _csgj To _csgj + 2
-                            Candidats(_ibis, _jbis, _g) = " "
-                        Next
-                    Next
-                End If
-            Next
-        Next
-
-    End Sub
-    '============================================================================================================================================================
-    '  Impacts sur les candidats de la saisie d'une case
-    '============================================================================================================================================================
-
-    Sub Recalcul_Candidats(ByRef _i As Integer, ByRef _j As Integer, ByRef _Grille(,) As String, ByRef _Candidats(,,) As String)
-
-        Dim _k As Integer
-        Dim _r As Integer
-
-        For _k = 0 To 8
-            _Candidats(_i, _j, _k) = " "  ' on enlève les candidats de la case qui vient d'être garnie
-        Next
-
-        ' Efface le candidat dans la ligne
-
-        GommeLigne(_Grille, _Candidats, _i)
-
-        ' Efface le candidat dans la colonne 
-
-        GommeColonne(_Grille, _Candidats, _j)
-
-        ' Efface le candidat dans la région 
-        _r = ((_i \ 3) * 3) + (_j \ 3)  ' calcule la région d'après i et j
-        GommeRégion(_Grille, _Candidats, _r)
-
-    End Sub
 
     '============================================================================================================================================================
     ' Recherche de solution 
@@ -399,9 +346,6 @@
 
     Sub AnalyseCase(ByRef _Candidats(,,) As String, ByRef _opk(,) As Integer, ByRef _nuplet(,) As String)
         ' détermine le nombre de valeurs possibles par case
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _k As Integer
 
         For _i = 0 To 8
             For _j = 0 To 8
@@ -428,11 +372,6 @@
         ' - Détermine le nombre d'occurrences de chaque candidat par ligne
         ' - Détermine la position d'un candidat seul sur une ligne
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _k As Integer
-
-        ' - Détermine le nombre d'occurrences de k par ligne
         For _i = 0 To 8
             For _k = 0 To 8
                 _AnlLig(_i, _k).n = 0
@@ -459,11 +398,6 @@
         ' - Détermine le nombre d'occurrences de chaque candidat par colonne
         ' - Détermine la position d'un candidat seul sur une colonne
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _k As Integer
-
-        ' - Détermine le nombre d'occurrences de k par colonne
         For _j = 0 To 8
             For _k = 0 To 8
                 _AnlCol(_j, _k).n = 0
@@ -491,12 +425,8 @@
         ' - Détermine le nombre d'occurrences de chaque candidat par région
         ' - Détermine la position d'un candidat seul sur une région
 
-        Dim _i As Integer
-        Dim _j As Integer
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
-        Dim _k As Integer
-        Dim _r As Integer
 
         ' - Initialise le nombre d'occurrences de k par région
         For _r = 0 To 8
@@ -532,11 +462,7 @@
 
     Sub SeulDansUneCase(_Candidats(,,) As String, _opk(,) As Integer, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _k As Integer
         Dim _New_Solution As Sudoku.StrSolution
-
 
         For _i = 0 To 8
             For _j = 0 To 8
@@ -547,6 +473,7 @@
                             _New_Solution.j = _j
                             _New_Solution.v = Sudoku.Val(_k)
                             _New_Solution.m = "Seul candidat dans cette case"
+                            _New_Solution.b = Sudoku.BarèmeSeulDansUneCase
                             EnqueueSol(_New_Solution, _Qsol)
                         End If
                     Next
@@ -563,8 +490,6 @@
 
     Sub SeulDansUneLigne(ByRef _AnlLig(,) As Sudoku.StrAnalyse, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
-        Dim _i As Integer
-        Dim _k As Integer
         Dim _New_Solution As Sudoku.StrSolution
 
         ' - Détermine la position d'une occurrence seule sur une ligne
@@ -576,6 +501,7 @@
                     _New_Solution.j = _AnlLig(_i, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlLig(_i, _k).k)
                     _New_Solution.m = "Seule présence dans cette ligne"
+                    _New_Solution.b = Sudoku.BarèmeSeulDansUneLigne
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
             Next
@@ -590,8 +516,6 @@
 
     Sub SeulDansUneColonne(ByRef _AnlCol(,) As Sudoku.StrAnalyse, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
-        Dim _j As Integer
-        Dim _k As Integer
         Dim _New_Solution As Sudoku.StrSolution
 
         ' - Détermine la position d'une occurrence seule sur une colonne
@@ -603,6 +527,7 @@
                     _New_Solution.j = _AnlCol(_j, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlCol(_j, _k).k)
                     _New_Solution.m = "Seule présence dans cette colonne"
+                    _New_Solution.b = Sudoku.BarèmeSeulDansUneColonne
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
             Next
@@ -617,8 +542,6 @@
 
     Sub SeulDansUneRégion(ByRef _AnlReg(,) As Sudoku.StrAnalyse, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
-        Dim _r As Integer
-        Dim _k As Integer
         Dim _New_Solution As Sudoku.StrSolution
 
         ' - Détermine la position d'une occurrence seule sur une région
@@ -630,6 +553,7 @@
                     _New_Solution.j = _AnlReg(_r, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlReg(_r, _k).k)
                     _New_Solution.m = "Seule présence dans cette région"
+                    _New_Solution.b = Sudoku.BarèmeSeulDansUneRégion
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
             Next
@@ -654,10 +578,11 @@
         If Not _doublon Then
             _Qsol.Enqueue(_New_Solution)
         End If
+
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats 
+    ' Techniques d'élimination de candidats 
     ' Recense les paires nues par lignes
     '============================================================================================================================================================
 
@@ -670,11 +595,6 @@
 
         ' - recense les paires et la position de la dernière paire une ligne
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _ej As Integer
-        Dim _jbis As Integer
-        Dim _k As Integer
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _Smp As New Sudoku.StrSmp
@@ -752,7 +672,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Recense les paires nues par colonnes
     '============================================================================================================================================================
 
@@ -764,12 +684,6 @@
                     ByVal _nuplet(,) As String)
         ' - recense les paires et la position de la dernière paire une ligne
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _ei As Integer
-        Dim _ibis As Integer
-        Dim _iter As Integer
-        Dim _k As Integer
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _Smp As New Sudoku.StrSmp
@@ -847,7 +761,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats 
+    ' Techniques d'élimination de candidats 
     ' Recense les paires nues par régions
     '============================================================================================================================================================
 
@@ -861,23 +775,14 @@
 
         ' - recense les paires et la position de la dernière paire une ligne
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _ei As Integer
-        Dim _ej As Integer
-        Dim _ibis As Integer
-        Dim _jbis As Integer
-        Dim _iter As Integer
-        Dim _jter As Integer
-        Dim _k As Integer
         Dim _k0 As Integer
         Dim _k1 As Integer
+        Dim _Smp As New Sudoku.StrSmp
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
         Dim _r As Integer
         Dim _g As Integer
         Dim _gbis As Integer
-        Dim _Smp As New Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -966,7 +871,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Candidats verrouillés en ligne (communs à une région et une ligne)
     '============================================================================================================================================================
 
@@ -977,15 +882,11 @@
                              ByRef _TSmp() As Sudoku.StrSmp,
                              ByVal _opk(,) As Integer, _nuplet(,) As String)
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _r As Integer
+
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
         Dim _ir As Integer 'indice de ligne limité à l'intérieur d'une région
         Dim _AnlLigReg(2, 8) As Sudoku.StrAnalyse ' (i,k)
-        Dim _irej As Integer ' pour parcourir les candidats rejetés
-        Dim _jrej As Integer ' pour parcourir les candidats rejetés
         Dim _Smp As New Sudoku.StrSmp
 
         _Smp = NewSmp()
@@ -1092,7 +993,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Candidats verrouillés en colonne (communs à une région et une colonne)
     '============================================================================================================================================================
 
@@ -1103,15 +1004,10 @@
                              ByRef _TSmp() As Sudoku.StrSmp,
                              ByVal _opk(,) As Integer, _nuplet(,) As String)
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _r As Integer
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
         Dim _jr As Integer 'indice de colonne limité à l'intérieur d'une région
         Dim _AnlLigReg(2, 8) As Sudoku.StrAnalyse ' (i,k)
-        Dim _irej As Integer ' pour parcourir les candidats rejetés 
-        Dim _jrej As Integer ' pour parcourir les candidats rejetés
         Dim _Smp As New Sudoku.StrSmp
 
         _Smp = NewSmp()
@@ -1217,11 +1113,11 @@
                 Next
             Next
         Next
+
     End Sub
 
-
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Analyse des tripets par Ligne
     '============================================================================================================================================================
 
@@ -1232,10 +1128,6 @@
                       ByVal _nuplet(,) As String)
         ' - Détermine le nombre d'occurrences de chaque candidat par ligne
         ' - Détermine la position d'un candidat seul sur une ligne
-
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _k As Integer
 
         Dim _AnlTrp(8) As Sudoku.AnlTrp
         Dim _cmax As Integer
@@ -1437,7 +1329,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Analyse des tripets par colonne
     '============================================================================================================================================================
 
@@ -1448,10 +1340,6 @@
                       ByVal _nuplet(,) As String)
         ' - Détermine le nombre d'occurrences de chaque candidat par ligne
         ' - Détermine la position d'un candidat seul sur une ligne
-
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _k As Integer
 
         Dim _AnlTrp(8) As Sudoku.AnlTrp
         Dim _cmax As Integer
@@ -1653,7 +1541,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Analyse des tripets par région
     '============================================================================================================================================================
 
@@ -1665,9 +1553,6 @@
         ' - Détermine le nombre d'occurrences de chaque candidat par ligne
         ' - Détermine la position d'un candidat seul sur une ligne
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _k As Integer
         Dim _r As Integer
         Dim _csgi As Integer
         Dim _csgj As Integer
@@ -1879,7 +1764,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Analyse des tripets par région
     '============================================================================================================================================================
 
@@ -2005,7 +1890,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats 
+    ' Techniques d'élimination de candidats 
     ' XY-Wing Région - Ligne
     '============================================================================================================================================================
 
@@ -2071,7 +1956,7 @@
                                                             XYWing(_completed, _aile_i, _sommet, _aile_e, _exclu)
 
                                                             If _completed Then
-                                                                _exclu_k = v_To_k(_exclu)
+                                                                _exclu_k = VTok(_exclu)
                                                                 _Smp.nr = 2
                                                                 _Smp.CR.i(0) = _aile_i_i
                                                                 _Smp.CR.j(0) = _aile_i_j
@@ -2137,7 +2022,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats 
+    ' Techniques d'élimination de candidats 
     ' XY-Wing Région - Colonne
     '============================================================================================================================================================
 
@@ -2203,7 +2088,7 @@
                                                             XYWing(_completed, _aile_i, _sommet, _aile_e, _exclu)
 
                                                             If _completed Then
-                                                                _exclu_k = v_To_k(_exclu)
+                                                                _exclu_k = VTok(_exclu)
                                                                 _Smp.nr = 2
                                                                 _Smp.CR.i(0) = _aile_i_i
                                                                 _Smp.CR.j(0) = _aile_i_j
@@ -2268,9 +2153,8 @@
 
     End Sub
 
-
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats 
+    ' Techniques d'élimination de candidats 
     ' Analyse XY-Wing 
     '============================================================================================================================================================
 
@@ -2307,7 +2191,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' X-Wing en ligne
     '============================================================================================================================================================
 
@@ -2406,7 +2290,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' X-Wing en ligne
     '============================================================================================================================================================
 
@@ -2505,7 +2389,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Paire cachée en ligne
     '============================================================================================================================================================
 
@@ -2588,7 +2472,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Paire cachée en région
     '============================================================================================================================================================
 
@@ -2670,7 +2554,7 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Techniques avancées d'élimination de candidats
+    ' Techniques d'élimination de candidats
     ' Paire cachée en région
     '============================================================================================================================================================
 
@@ -2769,6 +2653,85 @@
                 Next
             Next
         Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' Applique Une solution de la grille des solutions
+    '============================================================================================================================================================
+
+    Sub AppliqueUneSolution(ByRef _Qsol As Queue(Of Sudoku.StrSolution),
+                            ByRef _Grille(,) As String,
+                            ByRef _Candidats(,,) As String,
+                            ByRef _i As Integer,
+                            ByRef _j As Integer,
+                            ByRef _v As String)
+
+        Dim _Solution As Sudoku.StrSolution
+
+        _Solution = _Qsol.Dequeue()
+        _i = _Solution.i
+        _j = _Solution.j
+        _v = _Solution.v
+        _Grille(_i, _j) = _v
+
+        RecalculCandidats(_i, _j, _Grille, _Candidats) ' Efface les candidats éliminés par la solution appliquée 
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' Recherche de la solution complète
+    '============================================================================================================================================================
+
+    Sub SolutionGrille(ByVal _Grille(,) As String,
+                       ByRef _NbVal As Integer,
+                       ByRef _Qsol As Queue(Of Sudoku.StrSolution),
+                       ByRef _NbrSmp As Integer,
+                       ByRef _TSmp() As Sudoku.StrSmp,
+                       ByRef _SolutionExiste As Boolean)
+
+
+        Dim _Erreur As Boolean
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _v As String
+        Dim _Candidats(8, 8, 8) As String
+        Dim _ErreurGrille(8, 8) As String
+
+        _Qsol.Clear()
+        TsmpClear(_NbrSmp, _TSmp)
+        _SolutionExiste = True
+
+        For i = 0 To 8
+            For j = 0 To 8
+                For k = 0 To 8
+                    _Candidats(i, j, k) = " "
+                Next
+            Next
+        Next
+
+        CalculCandidats(_Grille, _Candidats) 'Calcul candidat initial
+
+        While _NbVal < 81 And Not _Erreur And _SolutionExiste
+
+            RechercheSolution(_Grille, _Candidats, _Qsol, _NbrSmp, _TSmp) 'Recherche de toutes les solutions possibles
+            If _Qsol.Count = 0 And _NbrSmp = 0 Then
+                _SolutionExiste = False
+            Else
+                While _Qsol.Count > 0  'Tant que la queue des solutions n'est pas vide
+                    AppliqueUneSolution(_Qsol, _Grille, _Candidats, _i, _j, _v) 'Contient le calcul candidat suivant
+                    ControleSaisie(_Erreur, _ErreurGrille, _Grille, _Candidats)
+                    If _Erreur Then
+                        _SolutionExiste = False
+                    End If
+                    _NbVal += 1
+                End While
+            End If
+            While _NbrSmp > 0
+                AppliqueUneSimplification(_NbrSmp, _TSmp, _Candidats)
+            End While
+        End While
+
     End Sub
 
     '============================================================================================================================================================
@@ -2796,7 +2759,7 @@
         Next
 
         For s = 0 To _NbrSmp - 1
-            _TSmp(0) = _TSmp(_NbrSmp + 1)
+            _TSmp(_NbrSmp) = _TSmp(_NbrSmp + 1)
         Next
 
         _TSmp(_NbrSmp) = NewSmp()
@@ -2822,7 +2785,7 @@
     End Sub
 
     '============================================================================================================================================================
-    '  Fonctions & subroutines accéssoires
+    '  Fonctions & subroutines accessoires
     '============================================================================================================================================================
 
     '============================================================================================================================================================
@@ -2871,7 +2834,7 @@
     ' Convertit la valeur v d'une case en indice k
     '============================================================================================================================================================
 
-    Function v_To_k(ByVal _g As String)
+    Function VTok(ByVal _g As String)
         Dim _k As Integer
         For _k = 0 To 8
             If Val(_k + 1) = _g Then
@@ -2883,7 +2846,7 @@
     End Function
 
     '============================================================================================================================================================
-    ' Initialise une structue smp avec les dimensionnements de tableaux
+    ' Initialise une structure Smp avec les dimensionnements de tableaux
     '============================================================================================================================================================
 
     Function NewSmp()
@@ -2921,4 +2884,5 @@
         Return _Newsmp
 
     End Function
+
 End Module
