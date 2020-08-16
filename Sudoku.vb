@@ -1,4 +1,5 @@
-﻿Public Class Sudoku
+﻿Imports System.IO
+Public Class Sudoku
     '============================================================================================================================================================
     '
     ' Rappel Doc Microsoft : L’argument de tableau doit être transmis selon sa référence (ByRef) !!!
@@ -91,8 +92,7 @@
     End Structure
 
     Dim Libel As String
-    Public PATHFICHIER As String = "Sudoku.txt"
-
+    Public myFileNname As String
     Dim Erreur As Boolean
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
@@ -102,6 +102,7 @@
     Public Val As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
     Public mode As String
     Public modeCandidat As Boolean
+    Dim stepByStepApply As Boolean
 
     Public taille As Integer = 18
     Public BarèmeSeulDansUneCase As Integer = 1
@@ -117,34 +118,32 @@
 
     Dim typeGrille As String = "Sym"
     ' Grilles pour le dev
-    Dim sudo_Modèle As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  8 427    1     9   4" 'Grille modèle
-    Dim sudoTestLig As String = "8 11   45      7 6 56   8   9 7  1  8   8       2  538    4  8 427    1     9   4"
-    Dim sudoTestCol As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  8 427    1     9   4"
-    Dim sudoTestReg As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  81427    1     9   4"
-    Dim sudoDifficile As String = " 9 8 2     79  1 36   7 5   7    9 2         9 3    6   6 1   42 8  43     2 6 7 "
-
-    Dim SudopairCol As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 " ' ok
-    Dim SudopairReg As String = "  7 2 53 82   9  4  3       3 87     6     4     32 5       6  9  6   17 76 5 4  "
-
-    Dim SodiCVL1zzz As String = "    1  8 1 4   2    97 4    78 9 3  3       2  2 6 84    1 86    5   1 3 1  7    "
+    ReadOnly sudo_Modèle As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  8 427    1     9   4" 'Grille modèle
+    ReadOnly sudoTestLig As String = "8 11   45      7 6 56   8   9 7  1  8   8       2  538    4  8 427    1     9   4"
+    ReadOnly sudoTestCol As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  8 427    1     9   4"
+    ReadOnly sudoTestReg As String = "8 1    45      7 6 56   8   9 7  1      8       2  538    4  81427    1     9   4"
+    ReadOnly sudoDifficile As String = " 9 8 2     79  1 36   7 5   7    9 2         9 3    6   6 1   42 8  43     2 6 7 "
+    ReadOnly SudopairCol As String = " 132    6 52  97    7 61      91  3    7 8    8  23      19 4    48  67 9    751 " ' ok
+    ReadOnly SudopairReg As String = "  7 2 53 82   9  4  3       3 87     6     4     32 5       6  9  6   17 76 5 4  "
+    ReadOnly SodiCVL1zzz As String = "    1  8 1 4   2    97 4    78 9 3  3       2  2 6 84    1 86    5   1 3 1  7    "
     ' 2 paires nues + cancdidats véroullés + triplet nus
-    Dim SudopairLig As String = "   3    1 13 8 97  6 17    7 9    1     4     8    4 2    93 2  91 2 78 2    5   " ' 
+    ReadOnly SudopairLig As String = "   3    1 13 8 97  6 17    7 9    1     4     8    4 2    93 2  91 2 78 2    5   " ' 
     ' 2 pairesnues 
-    Dim Sudo0010000 As String = "9  3     8   9 42   362     78   5 9  2 7 6  5 9   37     132   51 4   7     6  1"
-    Dim Tripletnu02 As String = " 8 5297  9          6 3    8    4 9  7298364  4 7    8    6 9          6  6498 2 " 'en colonne cassé?
+    ReadOnly Sudo0010000 As String = "9  3     8   9 42   362     78   5 9  2 7 6  5 9   37     132   51 4   7     6  1"
+    ReadOnly Tripletnu02 As String = " 8 5297  9          6 3    8    4 9  7298364  4 7    8    6 9          6  6498 2 " 'en colonne cassé?
     'triplets nus en ligne et en région
-    Dim Tripletnu03 As String = " 8         29  4 1  14   6 8   6  2   57189   9  3   5 6   13  9 3  25         9 "
+    ReadOnly Tripletnu03 As String = " 8         29  4 1  14   6 8   6  2   57189   9  3   5 6   13  9 3  25         9 "
     'XY-Wing ligne et colonne
-    Dim S04XYWingLC As String = "  9  27  12  8   5    46   87     16  1   4  24     39   86    4   7  68  62  1  "
+    ReadOnly S04XYWingLC As String = "  9  27  12  8   5    46   87     16  1   4  24     39   86    4   7  68  62  1  "
     'XY-Wing ligne et région
-    Dim S05XYWingLR As String = "   21 34   2    5   5 349 72    8 1     6     5 3    97 982 4   2    8   63 57   "
+    ReadOnly S05XYWingLR As String = "   21 34   2    5   5 349 72    8 1     6     5 3    97 982 4   2    8   63 57   "
     'XY-Wing Colonne et région
-    Dim S006XYWingCR As String = "809     5  3   6  5 7  8   67 3 5     1   2     8 1 36   4  3 7  4   1  7     5 8"
-    Dim S007XWingCC As String = "     3  4 95  1   71     89   3 76   6  2  3   75 9   64     57   4  96 2  7     "
-    Dim S008XWingLL As String = " 3 4     8 5    34 12 85   2   4   1 98   34 6   7   2   52 41 58    9 3     9 5 "
+    ReadOnly S006XYWingCR As String = "809     5  3   6  5 7  8   67 3 5     1   2     8 1 36   4  3 7  4   1  7     5 8"
+    ReadOnly S007XWingCC As String = "     3  4 95  1   71     89   3 76   6  2  3   75 9   64     57   4  96 2  7     "
+    ReadOnly S008XWingLL As String = " 3 4     8 5    34 12 85   2   4   1 98   34 6   7   2   52 41 58    9 3     9 5 "
     'Paire cachée ligne
-    Dim S101PcacheL As String = "7943 6    28  5    5      6     1 6  76 5 48  4 6     8      1    1  94    9 3675"
-    Dim jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
+    ReadOnly S101PcacheL As String = "7943 6    28  5    5      6     1 6  76 5 48  4 6     8      1    1  94    9 3675"
+    ReadOnly jauge______ As String = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
     Dim TextSudoku As String = "                                                                                 "
 
 
@@ -173,7 +172,7 @@
                 End Select
             Next
         Next
-        LBL_Conseil.Text = ""
+
     End Sub
 
 #Region "Initialisations"
@@ -298,7 +297,7 @@
 
     End Sub
 
-    Sub TextSudokuToGrille()
+    Sub TextSudokuToGrille(TextSudoku As String)
 
         ' Remplace le module de saisie
         NbVal = 0
@@ -496,29 +495,109 @@
     Sub FonctionGénérer()
 
         mode = "Générer"
-        modeCandidat = False
-        'Générateur.Générateur(typeGrille, TextSudoku)
-        'TextSudokuToGrille() ' pour voir ce qui est généré
-        'ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
-        TextSudoku = "123456789123456789123456789123456789123456789123456789123456789123456789123456789"
-        TextSudoku = "        9        9        9        9        9        9        9        9        9"
-        TextSudoku = "938467512425981673167352894351849726849726135672513948583174269214695387796238451"
-        TextSudokuToGrille() ' pour voir ce qui est généré
-        ViderPileGrille()
-        EnpileGrille(Grille, NbVal)
-        Problème.Problème(typeGrille, NbVal, Grille, Candidats)
+
+        Générateur.Générateur(Grille)
         ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+
+        'ViderPileGrille()
+        'EnpileGrille(Grille, NbVal)
+        'Problème.Problème(typeGrille, NbVal, Grille, Candidats)
+        'ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
         Affichage()
+        FonctionJouer()
 
     End Sub
 
     '============================================================================================================================================================
-    ' -  M E N U   O U V R I R   F I C H I E R 
+    ' -  M E N U   O U V R I R   F I C H I E R   -   C H A R G E R   U N E   G R I L L E
     '============================================================================================================================================================
 
     Private Sub OuvrirToolStripButton1_Click(sender As Object, e As EventArgs) Handles OuvrirToolStripButton1.Click
+
         mode = "Ouvrir"
-        modeCandidat = False
+        FonctionOuvrirFichier()
+    End Sub
+
+
+    Private Sub ChToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ChToolStripMenuItem.Click
+
+        mode = "Charger"
+        FonctionOuvrirFichier()
+
+    End Sub
+
+
+    Sub FonctionOuvrirFichier()
+
+        Dim fichierCorrrect As Boolean
+        'Boîte de dialogue d'ouverture de fichier
+        ' avec limitation dans les extensions de fichier
+        Dim openFileDialog As New OpenFileDialog With {
+            .Filter = "Fichier sudoku (*.sud)|*.sud|Tous les fichiers|*.*",
+            .RestoreDirectory = True
+        }
+
+        If openFileDialog.ShowDialog() = DialogResult.OK Then
+
+            myFileNname = openFileDialog.FileName
+            nomFichierOuvert.Text = Path.GetFileName(openFileDialog.FileName)
+            LectureGrille(myFileNname, Grille, fichierCorrrect)
+            If fichierCorrrect Then
+            Else
+                MsgBox("Fichier corrompu ou format invalide")
+                Exit Sub
+            End If
+
+        End If
+
+        For i = 0 To 8
+            For j = 0 To 8
+                If Grille(i, j) = "0" Then
+                    With Me.BT(i, j)
+                        .Text = ""
+                        .Font = grandeFont
+                        .ForeColor = Color.Black
+                        .BackColor = colorIni(i, j)
+                        .Enabled = True
+                    End With
+                Else
+                    With Me.BT(i, j)
+                        .Text = TextSudoku(g)
+                        .Font = grandeFont
+                        .ForeColor = Color.Black
+                        .BackColor = colorIni(i, j)
+                        .Enabled = False
+                    End With
+                    NbVal += 1
+                    LBL_nbVal.Text = NbVal.ToString
+                End If
+            Next
+        Next
+
+        nomFichierOuvert.Text = Path.GetFileName(openFileDialog.FileName)
+        CalculCandidats(Grille, Candidats)
+        ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+        LBL_Conseil.Text = ""
+        Affichage()
+        FonctionJouer()
+
+    End Sub
+
+
+
+    Private Sub SauvegarderUneGrilleToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SauvegarderUneGrilleToolStripMenuItem.Click
+        'Boîte de dialogue de sauvegarde de fichier
+        ' avec limitation dans les extensions de fichier
+        Dim SaveFileDialog1 As New SaveFileDialog With {
+            .Filter = "Fichier texte (*.sud)|*.sud|Tous les fichiers|*.*",
+            .FileName = myFileNname,
+            .RestoreDirectory = True
+        }
+
+        If SaveFileDialog1.ShowDialog() = DialogResult.OK Then
+            'Ouvrez le fichier sélectionné dans le lecteur.
+            ' on    ecrit le nom du fichier selectionné dans la variable "string" nomfic2
+        End If
     End Sub
 
     '============================================================================================================================================================
@@ -542,6 +621,7 @@
     Sub FonctionJouer()
 
         mode = "Jouer"
+        modeCandidat = False
 
         For i = 0 To 8
             For j = 0 To 8
@@ -557,13 +637,45 @@
         NbValInitial = NbVal
         Array.Copy(Grille, GrilleFinale, 81)
 
-        SolutionGrille(GrilleFinale, NbVal, QSol, NbrSmp, TSmp, SolutionExiste)
+        'SolutionGrille(GrilleFinale, NbVal, QSol, NbrSmp, TSmp, SolutionExiste)
+
+        'If SolutionExiste Then
+        'Else
+        '    MsgBox("Désolé je n'ai pas trouvé de solution unique")
+        'End If
 
         NbVal = NbValInitial
-        If SolutionExiste Then
-        Else
-            MsgBox("Désolé je n'ai pas trouvé de solution unique")
+        RecommencerToolStripButton.Enabled = True
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   R E C O M M E N C E R 
+    '============================================================================================================================================================
+
+    Private Sub RecommencerToolStripButton_Click(sender As Object, e As EventArgs) Handles RecommencerToolStripButton.Click
+
+        Dim Msg, Style, Title, Response
+        Msg = "Etes vous sûr de vouloir recommencer la partie ?"  ' Define message.
+        Style = vbYesNo + vbQuestion + vbDefaultButton2    ' Define buttons.
+        Title = "MsgBox Demonstration"    ' Define title.
+
+
+        Response = MsgBox(Msg, Style, Title)
+
+        If Response = vbNo Then    ' User chose Yes.
+            Exit Sub
         End If
+
+        Array.Copy(GrilleInitiale, Grille, 81)
+        NbVal = NbValInitial
+
+        CalculCandidats(Grille, Candidats)
+        ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+        LBL_Conseil.Text = ""
+        modeCandidat = False
+        Affichage()
+        FonctionJouer()
 
     End Sub
 
@@ -593,15 +705,14 @@
     ' -  M E N U   T E S T  
     '============================================================================================================================================================
 
+    '============================================================================================================================================================
+    ' -  M E N U   T E S T   Paire nue en ligne
+    '============================================================================================================================================================
+
     Private Sub PaireNueEnLigneToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PaireNueEnLigneToolStripMenuItem.Click
 
-        mode = "démo"
         TextSudoku = "49    3 5 2  7 94   3   7    1735               4286    2   4   34 6  2 1 9    76"
-        TextSudokuToGrille()
-        CalculCandidats(Grille, Candidats)
-        ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
-        Affichage()
-        FonctionJouer()
+        FonctionDémo(TextSudoku)
 
     End Sub
 
@@ -609,18 +720,73 @@
 
     End Sub
 
+    '============================================================================================================================================================
+    ' -  M E N U   T E S T   Paire nue en région
+    '============================================================================================================================================================
+
     Private Sub EnRégionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EnRégionToolStripMenuItem.Click
 
-        mode = "démo"
         TextSudoku = "1  7 39        5   79 4  1 3 74 91  8       9  43 18 5 1  3 75   2        85 4  1"
-        TextSudokuToGrille()
+        FonctionDémo(TextSudoku)
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   T E S T   XY-WING En Ligne
+    '============================================================================================================================================================
+
+    Private Sub XYWingEnLigneToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles XYWingEnLigneToolStripMenuItem.Click
+
+        TextSudoku = " 5  63  17    2   3    8 6 92   5  6  56 47  6  3   59 3 1    2   2    88  43  7 "
+        FonctionDémo(TextSudoku)
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   T E S T   X-WING En Ligne
+    '============================================================================================================================================================
+
+    Private Sub XWingEnLigneToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles XWingEnLigneToolStripMenuItem.Click
+        TextSudoku = " 3495   616 24   7  5      2    7 4           7 4    9      6      92 713   7859 "
+        FonctionDémo(TextSudoku)
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   T E S T   X-WING En colonne
+    '============================================================================================================================================================
+
+    Private Sub XWingEnColonneToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles XWingEnColonneToolStripMenuItem.Click
+
+        TextSudoku = "   451       7  8 3   98  1 9    14 74  2  35 86    2 8  91   3 7  4       587   "
+        FonctionDémo(TextSudoku)
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' -  M E N U   T E S T   Triplet nu en ligne
+    '============================================================================================================================================================
+
+    Private Sub TripletNuEnLigneToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TripletNuEnLigneToolStripMenuItem.Click
+
+        TextSudoku = " 8         29  4 1  14   6 8   6  2   57189   9  3   5 6   13  9 3  25         9 "
+        FonctionDémo(TextSudoku)
+
+    End Sub
+
+    Private Sub FonctionDémo(TextSudoku)
+
+        modeCandidat = False
+        mode = "démo"
+        TextSudokuToGrille(TextSudoku)
         CalculCandidats(Grille, Candidats)
         ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+        LBL_Conseil.Text = ""
+        nomFichierOuvert.Text = ""
         Affichage()
         FonctionJouer()
 
     End Sub
-
 #End Region
 
 #Region "Boutons"
@@ -658,7 +824,16 @@
 
         QSol.Clear()
         TsmpClear(NbrSmp, TSmp)
-        RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp)
+        RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp, NbVal)
+
+        For i = 0 To 8
+            For j = 0 To 8
+                With Me.BT(i, j)
+                    .ForeColor = Color.Black
+                    .BackColor = colorIni(i, j)
+                End With
+            Next
+        Next
 
         If QSol.Count = 0 And NbrSmp = 0 Then
             If NbVal < 81 Then
@@ -667,34 +842,70 @@
                 MsgBox("Bravo ! ")
             End If
         Else
-
             If QSol.Count > 0 Then
 
                 Solution = QSol.Peek()
-                LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " colonne " & Solution.j + 1 & " " & Solution.m & " : " _
-                                 & Solution.v & " / " & QSol.Count & " / "
+                i = Solution.i
+                j = Solution.j
 
-                AppliqueUneSolution(QSol, Grille, Candidats, i, j, v) 'Contient la mise à jour des candidats
+                LBL_Conseil.Text = "Ligne " & Solution.i + 1 & " Colonne " & Solution.j + 1 & " : " & Solution.m
 
                 With Me.BT(i, j)
-                    .Text = v
-                    .Font = grandeFont
-                    .ForeColor = Color.Black
-                    .BackColor = colorIni(i, j)
-                    .Enabled = True
+                    .BackColor = Color.Plum
                 End With
 
-                NbVal += 1
-                LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
+                If stepByStepApply Then
+                    AppliqueUneSolution(QSol, Grille, Candidats, i, j, v)
+                    With Me.BT(i, j)
+                        .Text = v
+                        .Font = grandeFont
+                        .BackColor = Color.Plum
+                        .Enabled = True
+                    End With
+                    NbVal += 1
+                    LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
+                Else
+                    With Me.BT(i, j)
+                        .Text =
+                            Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
+                            Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
+                            Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+                        .Font = petiteFont
+                        .BackColor = Color.Plum
+                        .Enabled = True
+                    End With
+                End If
 
             Else
 
                 If NbrSmp > 0 Then
                     Smp = TSmp(0)
                     LBL_Conseil.Text = Smp.motif
-                    AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
-                End If
+                    modeCandidat = True
 
+                    If Smp.ne > 0 Then
+                        For s = 0 To Smp.ne - 1
+                            i = Smp.CE.i(s)
+                            j = Smp.CE.j(s)
+                            With Me.BT(i, j)
+                                .ForeColor = Color.Black
+                                .BackColor = Color.Gold
+                            End With
+                        Next
+                    End If
+                    For s = 0 To Smp.nr - 1
+                        i = Smp.CR.i(s)
+                        j = Smp.CR.j(s)
+                        With Me.BT(i, j)
+                            .ForeColor = Color.Black
+                            .BackColor = Color.Plum
+                        End With
+                    Next
+
+                    If stepByStepApply Then
+                        AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
+                    End If
+                End If
             End If
         End If
 
@@ -712,16 +923,12 @@
                                 Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
                                 Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
                             .Font = petiteFont
-                            .ForeColor = Color.Black
-                            .BackColor = colorIni(i, j)
                             .Enabled = True
                         End With
                     Else
                         With Me.BT(i, j)
                             .Text = " "
                             .Font = grandeFont
-                            .ForeColor = Color.Black
-                            .BackColor = colorIni(i, j)
                             .Enabled = True
                         End With
 
@@ -730,8 +937,57 @@
             Next
         Next
 
+        If stepByStepApply Then
+            stepByStepApply = False
+        Else
+            stepByStepApply = True
+        End If
 
     End Sub
+
+    '============================================================================================================================================================
+    '  - S O L U T I O N   C O M P L E T E 
+    '============================================================================================================================================================
+
+    Private Sub BTSolution_Click(sender As Object, e As EventArgs) Handles BTSolution.Click
+
+        QSol.Clear()
+        TsmpClear(NbrSmp, TSmp)
+
+        Array.Copy(Grille, GrilleFinale, 81)
+
+        SolutionGrille(GrilleFinale, NbVal, QSol, NbrSmp, TSmp, SolutionExiste)
+        If SolutionExiste Then
+            Array.Copy(GrilleFinale, Grille, 81)
+            Affichage()
+        Else
+            MsgBox("pas de solution")
+        End If
+
+    End Sub
+
+    '============================================================================================================================================================
+    '  - S O L U T I O N  F O R C E   B R U T E
+    '============================================================================================================================================================
+
+    Private Sub BTForceBrute_Click(sender As Object, e As EventArgs) Handles BTForceBrute.Click
+        Dim NbSol As Integer
+        Array.Copy(Grille, GrilleFinale, 81)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol)
+
+        If NbSol = 1 Then
+            Array.Copy(GrilleFinale, Grille, 81)
+            Affichage()
+        Else
+            If NbSol = 0 Then
+                MsgBox("Pas de solution")
+            Else
+                MsgBox("Cette grille admet plusieurs solutions")
+            End If
+        End If
+
+    End Sub
+
     '============================================================================================================================================================
     '  - Affichage du Tableau des Solutions
     '============================================================================================================================================================
@@ -1370,24 +1626,6 @@
         End If
 
     End Sub
-
-    Private Sub BTSolution_Click(sender As Object, e As EventArgs) Handles BTSolution.Click
-
-        QSol.Clear()
-        TsmpClear(NbrSmp, TSmp)
-
-        Array.Copy(Grille, GrilleFinale, 81)
-
-        SolutionGrille(GrilleFinale, NbVal, QSol, NbrSmp, TSmp, SolutionExiste)
-        If SolutionExiste Then
-            Array.Copy(GrilleFinale, Grille, 81)
-            Affichage()
-        Else
-            MsgBox("pas de solution")
-        End If
-
-    End Sub
-
 
     '============================================================================== F I N ===================================================================== 
 #End Region

@@ -9,7 +9,8 @@
     '  Calcul complet des candidats
     '============================================================================================================================================================
 
-    Sub CalculCandidats(ByRef _Grille(,) As String, ByRef _Candidats(,,) As String)
+    Sub CalculCandidats(ByRef _Grille(,) As String,
+                        ByRef _Candidats(,,) As String)
 
         ' Initialise les candidats
         For _i = 0 To 8
@@ -45,7 +46,10 @@
     '  Impacts sur les candidats de la saisie d'une case
     '============================================================================================================================================================
 
-    Sub RecalculCandidats(ByRef _i As Integer, ByRef _j As Integer, ByRef _Grille(,) As String, ByRef _Candidats(,,) As String)
+    Sub RecalculCandidats(ByVal _i As Integer,
+                          ByVal _j As Integer,
+                          ByRef _Grille(,) As String,
+                          ByRef _Candidats(,,) As String)
 
         Dim _r As Integer
 
@@ -71,7 +75,9 @@
     '  Elimine les candidats dans une ligne
     '============================================================================================================================================================
 
-    Sub GommeLigne(ByVal _Grille(,) As String, ByRef _Candidats(,,) As String, _i As Integer)
+    Sub GommeLigne(ByRef _Grille(,) As String,
+                   ByRef _Candidats(,,) As String,
+                   ByVal _i As Integer)
 
         Dim _g As Integer
 
@@ -94,7 +100,9 @@
     '  Elimine les candidats dans une colonne
     '============================================================================================================================================================
 
-    Sub GommeColonne(ByVal _Grille(,) As String, ByRef _Candidats(,,) As String, _j As Integer)
+    Sub GommeColonne(ByRef _Grille(,) As String,
+                     ByRef _Candidats(,,) As String,
+                     ByVal _j As Integer)
 
         Dim _g As Integer
 
@@ -117,7 +125,9 @@
     '  Elimine les candidats dans une région
     '============================================================================================================================================================
 
-    Sub GommeRégion(ByVal _Grille(,) As String, ByRef _Candidats(,,) As String, _r As Integer)
+    Sub GommeRégion(ByRef _Grille(,) As String,
+                    ByRef _Candidats(,,) As String,
+                    ByVal _r As Integer)
 
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
@@ -155,7 +165,10 @@
     '  Contrôle de la validité d'une grille
     '============================================================================================================================================================
 
-    Sub ControleSaisie(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String)
+    Sub ControleSaisie(ByRef _Erreur As Boolean,
+                       ByRef _ErreurGrille(,) As String,
+                       ByRef _Grille(,) As String,
+                       ByRef _Candidats(,,) As String)
         ' Recherche d'erreurs sur les lignes
         ' case sans candidat ou deux fois la même valeur sur un segment
 
@@ -190,7 +203,10 @@
     '  Contrôle les doublons d'une ligne
     '============================================================================================================================================================
 
-    Sub ControleLigne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _i As Integer)
+    Sub ControleLigne(ByRef _Erreur As Boolean,
+                      ByRef _ErreurGrille(,) As String,
+                      ByRef _Grille(,) As String,
+                      ByVal _i As Integer)
 
         For _j = 0 To 7
             For _jbis = _j + 1 To 8
@@ -208,7 +224,10 @@
     '  Contrôle les doublons d'une colonne
     '============================================================================================================================================================
 
-    Sub ControleColonne(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _j As Integer)
+    Sub ControleColonne(ByRef _Erreur As Boolean,
+                        ByRef _ErreurGrille(,) As String,
+                        ByRef _Grille(,) As String,
+                        ByVal _j As Integer)
 
         For _i = 0 To 7
             For _ibis = _i + 1 To 8
@@ -226,7 +245,10 @@
     '  Contrôle les doublons d'une région
     '============================================================================================================================================================
 
-    Sub ControleRégion(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, _r As Integer)
+    Sub ControleRégion(ByRef _Erreur As Boolean,
+                       ByRef _ErreurGrille(,) As String,
+                       ByRef _Grille(,) As String,
+                       ByVal _r As Integer)
 
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
@@ -255,7 +277,10 @@
     ' Vérifie que pour une case non occupée il existe au moins un candidat
     '============================================================================================================================================================
 
-    Sub ControleCandidat(ByRef _Erreur As Boolean, ByRef _ErreurGrille(,) As String, ByVal _Grille(,) As String, ByVal _Candidats(,,) As String, _i As Integer)
+    Sub ControleCandidat(ByRef _Erreur As Boolean,
+                         ByRef _ErreurGrille(,) As String,
+                         ByRef _Grille(,) As String,
+                         ByRef _Candidats(,,) As String, _i As Integer)
 
         Dim _ErreurCandidat(8, 8)
 
@@ -287,7 +312,9 @@
                          ByRef _Candidats(,,) As String,
                          ByRef _Qsol As Queue(Of Sudoku.StrSolution),
                          ByRef _NbrSmp As Integer,
-                         ByRef _TSmp() As Sudoku.StrSmp)
+                         ByRef _TSmp() As Sudoku.StrSmp,
+                         ByVal _NbVal As Integer)
+
         '
         ' On ne touche pas aux candidats, c'est l'application d'une solution ou d'une technique de simplification qui modifie les candidats  
         '
@@ -305,7 +332,7 @@
         AnalyseLigne(_Candidats, _AnlLig)
 
         'Mise à jour du tableau des occurrences par colonne
-        AnalyseColonne(_Candidats, _AnlCol)
+        AnalyseColonne(_Candidats, _AnlCol, _NbVal)
 
         'Mise à jour du tableau des occurrences par région
         AnalyseRégion(_Candidats, _AnlReg)
@@ -317,22 +344,22 @@
 
         If _Qsol.Count = 0 Then
 
-            PaireNueLig(_Candidats, _NbrSmp, _TSmp, _Grille, _opk, _nuplet)
-            PaireNueCol(_Candidats, _NbrSmp, _TSmp, _Grille, _opk, _nuplet)
-            PaireNueReg(_Candidats, _NbrSmp, _TSmp, _Grille, _opk, _nuplet)
-            CandidatVérouilléLig(_Candidats, _AnlLig, _AnlReg, _NbrSmp, _TSmp, _opk, _nuplet)
-            CandidatVérouilléCol(_Candidats, _AnlCol, _AnlReg, _NbrSmp, _TSmp, _opk, _nuplet)
-            PaireCachéeLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _Grille, _opk, _nuplet)
-            PaireCachéeCol(_Candidats, _NbrSmp, _TSmp, _AnlCol, _Grille, _opk, _nuplet)
-            PaireCachéeReg(_Candidats, _NbrSmp, _TSmp, _AnlReg, _Grille, _opk, _nuplet)
-            AnalyseTrpLig(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
-            AnalyseTrpCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
-            AnalyseTrpReg(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
-            XYWingLigCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+            PaireNueLig(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+            PaireNueCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+            PaireNueReg(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+            CandidatVérouilléLig(_Candidats, _AnlLig, _AnlReg, _NbrSmp, _TSmp, _opk)
+            CandidatVérouilléCol(_Candidats, _AnlCol, _AnlReg, _NbrSmp, _TSmp, _opk)
+            PaireCachéeLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _opk, _NbVal)
+            PaireCachéeCol(_Candidats, _NbrSmp, _TSmp, _AnlCol, _opk, _NbVal)
+            PaireCachéeReg(_Candidats, _NbrSmp, _TSmp, _AnlReg, _opk)
+            AnalyseTrpLig(_Candidats, _NbrSmp, _TSmp, _opk)
+            AnalyseTrpCol(_Candidats, _NbrSmp, _TSmp, _opk)
+            AnalyseTrpReg(_Candidats, _NbrSmp, _TSmp, _opk)
+            XYWingLigCol(_NbrSmp, _TSmp, _opk, _nuplet)
             XYWingRegLig(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             XYWingRegCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
-            XWingLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _Grille, _opk, _nuplet)
-            XWingCol(_Candidats, _NbrSmp, _TSmp, _AnlLig, _Grille, _opk, _nuplet)
+            XWingLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _Grille, _NbVal)
+            XWingCol(_Candidats, _NbrSmp, _TSmp, _AnlCol, _Grille, _NbVal)
 
         End If
 
@@ -344,7 +371,9 @@
     ' Détermine s'il n'y a plus qu'un candidat dans la case 
     '============================================================================================================================================================
 
-    Sub AnalyseCase(ByRef _Candidats(,,) As String, ByRef _opk(,) As Integer, ByRef _nuplet(,) As String)
+    Sub AnalyseCase(ByRef _Candidats(,,) As String,
+                    ByRef _opk(,) As Integer,
+                    ByRef _nuplet(,) As String)
         ' détermine le nombre de valeurs possibles par case
 
         For _i = 0 To 8
@@ -368,7 +397,8 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub AnalyseLigne(ByRef _Candidats(,,) As String, ByRef _AnlLig(,) As Sudoku.StrAnalyse)
+    Sub AnalyseLigne(ByRef _Candidats(,,) As String,
+                     ByRef _AnlLig(,) As Sudoku.StrAnalyse)
         ' - Détermine le nombre d'occurrences de chaque candidat par ligne
         ' - Détermine la position d'un candidat seul sur une ligne
 
@@ -394,7 +424,9 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub AnalyseColonne(ByRef _Candidats(,,) As String, ByRef _AnlCol(,) As Sudoku.StrAnalyse)
+    Sub AnalyseColonne(ByRef _Candidats(,,) As String,
+                       ByRef _AnlCol(,) As Sudoku.StrAnalyse,
+                       ByVal _nbval As Integer)
         ' - Détermine le nombre d'occurrences de chaque candidat par colonne
         ' - Détermine la position d'un candidat seul sur une colonne
 
@@ -420,7 +452,8 @@
     ' S'il n'y a qu'une occurrence c'est la solution retenue 
     '============================================================================================================================================================
 
-    Sub AnalyseRégion(ByRef _Candidats(,,) As String, ByRef _AnlReg(,) As Sudoku.StrAnalyse)
+    Sub AnalyseRégion(ByRef _Candidats(,,) As String,
+                      ByRef _AnlReg(,) As Sudoku.StrAnalyse)
 
         ' - Détermine le nombre d'occurrences de chaque candidat par région
         ' - Détermine la position d'un candidat seul sur une région
@@ -460,7 +493,9 @@
     ' Balaye la table opk - candidats par case - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneCase(_Candidats(,,) As String, _opk(,) As Integer, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
+    Sub SeulDansUneCase(ByRef _Candidats(,,) As String,
+                        ByRef _opk(,) As Integer,
+                        ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
         Dim _New_Solution As Sudoku.StrSolution
 
@@ -472,7 +507,7 @@
                             _New_Solution.i = _i
                             _New_Solution.j = _j
                             _New_Solution.v = Sudoku.Val(_k)
-                            _New_Solution.m = "Seul candidat dans cette case"
+                            _New_Solution.m = "seul candidat dans cette case : [" & _New_Solution.v & "]"
                             _New_Solution.b = Sudoku.BarèmeSeulDansUneCase
                             EnqueueSol(_New_Solution, _Qsol)
                         End If
@@ -488,7 +523,8 @@
     ' Balaye la table opl - possibilités par ligne - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneLigne(ByRef _AnlLig(,) As Sudoku.StrAnalyse, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
+    Sub SeulDansUneLigne(ByRef _AnlLig(,) As Sudoku.StrAnalyse,
+                         ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
         Dim _New_Solution As Sudoku.StrSolution
 
@@ -500,7 +536,7 @@
                     _New_Solution.i = _AnlLig(_i, _k).i
                     _New_Solution.j = _AnlLig(_i, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlLig(_i, _k).k)
-                    _New_Solution.m = "Seule présence dans cette ligne"
+                    _New_Solution.m = "seul [" & _New_Solution.v & "] candidat dans cette ligne"
                     _New_Solution.b = Sudoku.BarèmeSeulDansUneLigne
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
@@ -514,7 +550,8 @@
     ' Balaye la table opc - possibilités par colonne - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneColonne(ByRef _AnlCol(,) As Sudoku.StrAnalyse, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
+    Sub SeulDansUneColonne(ByRef _AnlCol(,) As Sudoku.StrAnalyse,
+                           ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
         Dim _New_Solution As Sudoku.StrSolution
 
@@ -526,7 +563,7 @@
                     _New_Solution.i = _AnlCol(_j, _k).i
                     _New_Solution.j = _AnlCol(_j, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlCol(_j, _k).k)
-                    _New_Solution.m = "Seule présence dans cette colonne"
+                    _New_Solution.m = "seul [" & _New_Solution.v & "] candidat dans cette colonne"
                     _New_Solution.b = Sudoku.BarèmeSeulDansUneColonne
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
@@ -540,7 +577,8 @@
     ' Balaye la table opr - possibilités par région - pour alimenter la table des solutions à proposer
     '============================================================================================================================================================
 
-    Sub SeulDansUneRégion(ByRef _AnlReg(,) As Sudoku.StrAnalyse, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
+    Sub SeulDansUneRégion(ByRef _AnlReg(,) As Sudoku.StrAnalyse,
+                          ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
         Dim _New_Solution As Sudoku.StrSolution
 
@@ -552,7 +590,7 @@
                     _New_Solution.i = _AnlReg(_r, _k).i
                     _New_Solution.j = _AnlReg(_r, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlReg(_r, _k).k)
-                    _New_Solution.m = "Seule présence dans cette région"
+                    _New_Solution.m = "seul [" & _New_Solution.v & "] candidat dans cette région"
                     _New_Solution.b = Sudoku.BarèmeSeulDansUneRégion
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
@@ -566,7 +604,8 @@
     ' Ajoute une entrée dans la queue des solutions, en évitant les doublons
     '============================================================================================================================================================
 
-    Sub EnqueueSol(ByVal _New_Solution As Sudoku.StrSolution, ByRef _Qsol As Queue(Of Sudoku.StrSolution))
+    Sub EnqueueSol(ByVal _New_Solution As Sudoku.StrSolution,
+                   ByRef _Qsol As Queue(Of Sudoku.StrSolution))
 
         Dim _doublon As Boolean
         _doublon = False
@@ -589,15 +628,14 @@
     Sub PaireNueLig(ByRef _Candidats(,,) As String,
                     ByRef _NbrSmp As Integer,
                     ByRef _TSmp() As Sudoku.StrSmp,
-                    ByVal _Grille(,) As String,
-                    ByVal _opk(,) As Integer,
-                    ByVal _nuplet(,) As String)
+                    ByRef _opk(,) As Integer,
+                    ByRef _nuplet(,) As String)
 
         ' - recense les paires et la position de la dernière paire une ligne
 
         Dim _k0 As Integer
         Dim _k1 As Integer
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -624,7 +662,7 @@
                                     End If
                                 Next
                                 If _Smp.act = True Then
-                                    _Smp.nr = 1
+                                    _Smp.nr = 2
                                     _Smp.CR.i(0) = _i
                                     _Smp.CR.j(0) = _j
                                     _Smp.CR.k(0) = _k0
@@ -656,9 +694,11 @@
                                         End If
                                     Next
 
-                                    _TSmp(_NbrSmp) = _Smp
-                                    _NbrSmp += 1
-                                    _Smp = NewSmp()
+                                    If _Smp.ne > 0 Then
+                                        _TSmp(_NbrSmp) = _Smp
+                                        _NbrSmp += 1
+                                        _Smp = NewSmp()
+                                    End If
 
                                     Exit For
                                 End If
@@ -679,14 +719,13 @@
     Sub PaireNueCol(ByRef _Candidats(,,) As String,
                     ByRef _NbrSmp As Integer,
                     ByRef _TSmp() As Sudoku.StrSmp,
-                    ByVal _Grille(,) As String,
-                    ByVal _opk(,) As Integer,
-                    ByVal _nuplet(,) As String)
+                    ByRef _opk(,) As Integer,
+                    ByRef _nuplet(,) As String)
         ' - recense les paires et la position de la dernière paire une ligne
 
         Dim _k0 As Integer
         Dim _k1 As Integer
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -713,7 +752,7 @@
                                     End If
                                 Next
                                 If _Smp.act = True Then
-                                    _Smp.nr = 1
+                                    _Smp.nr = 2
                                     _Smp.CR.i(0) = _i
                                     _Smp.CR.j(0) = _j
                                     _Smp.CR.k(0) = _k0
@@ -745,9 +784,11 @@
                                         End If
                                     Next
 
-                                    _TSmp(_NbrSmp) = _Smp
-                                    _NbrSmp += 1
-                                    _Smp = NewSmp()
+                                    If _Smp.ne > 0 Then
+                                        _TSmp(_NbrSmp) = _Smp
+                                        _NbrSmp += 1
+                                        _Smp = NewSmp()
+                                    End If
 
                                     Exit For
                                 End If
@@ -769,15 +810,14 @@
     Sub PaireNueReg(ByRef _Candidats(,,) As String,
                     ByRef _NbrSmp As Integer,
                     ByRef _TSmp() As Sudoku.StrSmp,
-                    ByVal _Grille(,) As String,
-                    ByVal _opk(,) As Integer,
-                    ByVal _nuplet(,) As String)
+                    ByRef _opk(,) As Integer,
+                    ByRef _nuplet(,) As String)
 
         ' - recense les paires et la position de la dernière paire une ligne
 
         Dim _k0 As Integer
         Dim _k1 As Integer
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
         Dim _r As Integer
@@ -818,7 +858,7 @@
                                                 Next
                                             Next
                                             If _Smp.act = True Then
-                                                _Smp.ne = 1
+                                                _Smp.nr = 2
                                                 _Smp.CR.i(0) = _i
                                                 _Smp.CR.j(0) = _j
                                                 _Smp.CR.k(0) = _k0
@@ -852,9 +892,12 @@
                                                     Next
                                                 Next
 
-                                                _TSmp(_NbrSmp) = _Smp
-                                                _NbrSmp += 1
-                                                _Smp = NewSmp()
+                                                If _Smp.ne > 0 Then
+                                                    _TSmp(_NbrSmp) = _Smp
+                                                    _NbrSmp += 1
+                                                    _Smp = NewSmp()
+                                                End If
+
                                                 Exit For
 
                                             End If
@@ -876,18 +919,18 @@
     '============================================================================================================================================================
 
     Sub CandidatVérouilléLig(ByRef _Candidats(,,) As String,
-                             ByVal _AnlLig(,) As Sudoku.StrAnalyse,
-                             ByVal _AnlReg(,) As Sudoku.StrAnalyse,
+                             ByRef _AnlLig(,) As Sudoku.StrAnalyse,
+                             ByRef _AnlReg(,) As Sudoku.StrAnalyse,
                              ByRef _NbrSmp As Integer,
                              ByRef _TSmp() As Sudoku.StrSmp,
-                             ByVal _opk(,) As Integer, _nuplet(,) As String)
+                             ByRef _opk(,) As Integer)
 
 
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
         Dim _ir As Integer 'indice de ligne limité à l'intérieur d'une région
         Dim _AnlLigReg(2, 8) As Sudoku.StrAnalyse ' (i,k)
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -919,17 +962,19 @@
                     ' si il y a autant de k dans dans la région entière que la ligne de la région
                     ' si il y a plus de k dans la ligne de la région que dans la ligne entière 
                     If _AnlLigReg(_ir, _k).n > 1 And _AnlReg(_r, _k).n = _AnlLigReg(_ir, _k).n And _AnlLig(_i, _k).n > _AnlLigReg(_ir, _k).n Then
+
                         'candidats retenus (vérouillés)
-                        _Smp.nr = 0 'nombre de candidats retenus (indice base 0)
+                        _Smp.nr = -0 'nombre de candidats retenus (indice base 0)
                         For _j = _csgj To _csgj + 2
                             If _Candidats(_i, _j, _k) <> " " Then
-                                _Smp.CR.i(0) = _i
-                                _Smp.CR.j(0) = _j
-                                _Smp.CR.k(0) = _k
-                                _Smp.CR.v(0) = Val(_k + 1)
+                                _Smp.CR.i(_Smp.nr) = _i
+                                _Smp.CR.j(_Smp.nr) = _j
+                                _Smp.CR.k(_Smp.nr) = _k
+                                _Smp.CR.v(_Smp.nr) = Val(_k + 1)
                                 _Smp.nr += 1
                             End If
                         Next
+
                         'candidats éliminés ligne
                         _Smp.ne = 0 'nombre de candidats éliminés (indice base 0)
                         For _jrej = 0 To 8
@@ -943,11 +988,17 @@
                                 End If
                             End If
                         Next
+
                         _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Ligne " & _i + 1 & " LL"
-                        _TSmp(_NbrSmp) = _Smp
-                        _NbrSmp += 1
-                        _Smp = NewSmp()
+
+                        If _Smp.ne > 0 Then
+                            _TSmp(_NbrSmp) = _Smp
+                            _NbrSmp += 1
+                            _Smp = NewSmp()
+                        End If
+
                     End If
+
                     ' Si on a au moins 2 k dans la ligne de la la région
                     ' si il y a plus de k dans dans la région entière que la ligne de la région
                     ' si il y a autant de k dans la ligne de la région que dans la ligne entière 
@@ -963,6 +1014,7 @@
                                 _Smp.nr += 1
                             End If
                         Next
+
                         'candidats éliminés région
                         _Smp.ne = 0 'nombre de candidats éliminés (indice base 0)
                         For _irej = _csgi To _csgi + 2
@@ -979,12 +1031,13 @@
                             Next
                         Next
 
-                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Ligne " & _i + 1 & " LR"
+                        _Smp.motif = "Candidat vérouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Ligne " & _i + 1 & " LR"
 
-                        _TSmp(_NbrSmp) = _Smp
-                        _NbrSmp += 1
-                        _Smp = NewSmp()
-
+                        If _Smp.ne > 0 Then
+                            _TSmp(_NbrSmp) = _Smp
+                            _NbrSmp += 1
+                            _Smp = NewSmp()
+                        End If
                     End If
                 Next
             Next
@@ -998,17 +1051,17 @@
     '============================================================================================================================================================
 
     Sub CandidatVérouilléCol(ByRef _Candidats(,,) As String,
-                             ByVal _AnlCol(,) As Sudoku.StrAnalyse,
-                             ByVal _AnlReg(,) As Sudoku.StrAnalyse,
+                             ByRef _AnlCol(,) As Sudoku.StrAnalyse,
+                             ByRef _AnlReg(,) As Sudoku.StrAnalyse,
                              ByRef _NbrSmp As Integer,
                              ByRef _TSmp() As Sudoku.StrSmp,
-                             ByVal _opk(,) As Integer, _nuplet(,) As String)
+                             ByRef _opk(,) As Integer)
 
         Dim _csgi As Integer 'Coin supérieur gauche région
         Dim _csgj As Integer 'Coin supérieur gauche région
         Dim _jr As Integer 'indice de colonne limité à l'intérieur d'une région
         Dim _AnlLigReg(2, 8) As Sudoku.StrAnalyse ' (i,k)
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
 
         _Smp = NewSmp()
 
@@ -1050,6 +1103,7 @@
                                 _Smp.nr += 1
                             End If
                         Next
+
                         'candidats rejetés colonne
                         _Smp.ne = 0 'nombre de candidats éliminés (indice base 0)
                         For _irej = 0 To 8
@@ -1064,11 +1118,13 @@
                             End If
                         Next
 
-                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Colonne " & _j + 1 & " CC"
+                        _Smp.motif = "Candidat vérouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Colonne " & _j + 1 & " CC"
 
-                        _TSmp(_NbrSmp) = _Smp
-                        _NbrSmp += 1
-                        _Smp = NewSmp()
+                        If _Smp.ne > 0 Then
+                            _TSmp(_NbrSmp) = _Smp
+                            _NbrSmp += 1
+                            _Smp = NewSmp()
+                        End If
 
                     End If
 
@@ -1087,6 +1143,7 @@
                                 _Smp.nr += 1
                             End If
                         Next
+
                         'candidats rejetés région
                         _Smp.ne = 0 'nombre de candidats éliminés (indice base 0)
                         For _irej = _csgi To _csgi + 2
@@ -1103,11 +1160,13 @@
                             Next
                         Next
 
-                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Colonne " & _j + 1 & " LR"
+                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Colonne " & _j + 1 & " CR"
 
-                        _TSmp(_NbrSmp) = _Smp
-                        _NbrSmp += 1
-                        _Smp = NewSmp()
+                        If _Smp.ne > 0 Then
+                            _TSmp(_NbrSmp) = _Smp
+                            _NbrSmp += 1
+                            _Smp = NewSmp()
+                        End If
 
                     End If
                 Next
@@ -1124,8 +1183,8 @@
     Sub AnalyseTrpLig(ByRef _Candidats(,,) As String,
                       ByRef _NbrSmp As Integer,
                       ByRef _TSmp() As Sudoku.StrSmp,
-                      ByVal _opk(,) As Integer,
-                      ByVal _nuplet(,) As String)
+                      ByRef _opk(,) As Integer)
+
         ' - Détermine le nombre d'occurrences de chaque candidat par ligne
         ' - Détermine la position d'un candidat seul sur une ligne
 
@@ -1157,9 +1216,9 @@
         Dim _tk(2) As Integer
         Dim _tv(2) As String
         Dim _ej As Integer
-        Dim _Smp As New Sudoku.StrSmp
-        _Smp = NewSmp()
+        Dim _Smp As Sudoku.StrSmp
 
+        _Smp = NewSmp()
 
         For _i = 0 To 8
             _completed = False
@@ -1273,7 +1332,7 @@
             End If
 
             If _completed Then
-                _Smp.nr = 2
+                _Smp.nr = 3
                 _Smp.CR.i(0) = _i0
                 _Smp.CR.j(0) = _j0
                 _Smp.CR.k(0) = _k0
@@ -1336,8 +1395,8 @@
     Sub AnalyseTrpCol(ByRef _Candidats(,,) As String,
                       ByRef _NbrSmp As Integer,
                       ByRef _TSmp() As Sudoku.StrSmp,
-                      ByVal _opk(,) As Integer,
-                      ByVal _nuplet(,) As String)
+                      ByRef _opk(,) As Integer)
+
         ' - Détermine le nombre d'occurrences de chaque candidat par ligne
         ' - Détermine la position d'un candidat seul sur une ligne
 
@@ -1369,9 +1428,9 @@
         Dim _tk(2) As Integer
         Dim _tv(2) As String
         Dim _ei As Integer
-        Dim _Smp As New Sudoku.StrSmp
-        _Smp = NewSmp()
+        Dim _Smp As Sudoku.StrSmp
 
+        _Smp = NewSmp()
 
         For _j = 0 To 8
             _completed = False
@@ -1485,7 +1544,7 @@
             End If
 
             If _completed Then
-                _Smp.nr = 2
+                _Smp.nr = 3
                 _Smp.CR.i(0) = _i0
                 _Smp.CR.j(0) = _j0
                 _Smp.CR.k(0) = _k0
@@ -1548,8 +1607,8 @@
     Sub AnalyseTrpReg(ByRef _Candidats(,,) As String,
                       ByRef _NbrSmp As Integer,
                       ByRef _TSmp() As Sudoku.StrSmp,
-                      ByVal _opk(,) As Integer,
-                      ByVal _nuplet(,) As String)
+                      ByRef _opk(,) As Integer)
+
         ' - Détermine le nombre d'occurrences de chaque candidat par ligne
         ' - Détermine la position d'un candidat seul sur une ligne
 
@@ -1586,9 +1645,9 @@
         Dim _tv(2) As String
         Dim _ei As Integer
         Dim _ej As Integer
-        Dim _Smp As New Sudoku.StrSmp
-        _Smp = NewSmp()
+        Dim _Smp As Sudoku.StrSmp
 
+        _Smp = NewSmp()
 
         For _r = 0 To 8
             _csgi = (_r \ 3) * 3 'calcul coin supérieur gauche d'une région
@@ -1706,7 +1765,7 @@
             End If
 
             If _completed Then
-                _Smp.nr = 2
+                _Smp.nr = 3
                 _Smp.CR.i(0) = _i0
                 _Smp.CR.j(0) = _j0
                 _Smp.CR.k(0) = _k0
@@ -1765,14 +1824,13 @@
 
     '============================================================================================================================================================
     ' Techniques d'élimination de candidats
-    ' Analyse des tripets par région
+    ' XY-Wing Ligne - Colonne
     '============================================================================================================================================================
 
-    Sub XYWingLigCol(ByRef _Candidats(,,) As String,
-                       ByRef _NbrSmp As Integer,
-                       ByRef _TSmp() As Sudoku.StrSmp,
-                       ByVal _opk(,) As Integer,
-                       ByVal _nuplet(,) As String)
+    Sub XYWingLigCol(ByRef _NbrSmp As Integer,
+                     ByRef _TSmp() As Sudoku.StrSmp,
+                     ByRef _opk(,) As Integer,
+                     ByRef _nuplet(,) As String)
 
         Dim _isup As Integer ' indice i ligne supérieure 
         Dim _iinf As Integer ' indice i ligne inférieure 
@@ -1799,7 +1857,8 @@
         Dim _Cj(3) As Integer 'carré
         Dim _ic As Integer ' pour la rotation du carré
 
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
+
         _Smp = NewSmp()
 
         For _isup = 0 To 5
@@ -1849,7 +1908,7 @@
                                         Next
                                         If _completed Then
 
-                                            _Smp.nr = 2
+                                            _Smp.nr = 3
                                             _Smp.CR.i(0) = _Ci(0)
                                             _Smp.CR.j(0) = _aile_g_j
                                             _Smp.CR.k(0) = CInt(_Cv(3)) - 1
@@ -1869,7 +1928,7 @@
                                             _Smp.CE.j(_Smp.ne) = _exclu_j
                                             _Smp.CE.k(_Smp.ne) = CInt(_exclu) - 1
                                             _Smp.CE.v(_Smp.ne) = _exclu
-                                            _Smp.ne = 1
+                                            _Smp.ne += 1
 
                                             If _Smp.ne > 0 Then
                                                 _TSmp(_NbrSmp) = _Smp
@@ -1895,10 +1954,10 @@
     '============================================================================================================================================================
 
     Sub XYWingRegLig(ByRef _Candidats(,,) As String,
-                       ByRef _NbrSmp As Integer,
-                       ByRef _TSmp() As Sudoku.StrSmp,
-                       ByVal _opk(,) As Integer,
-                       ByVal _nuplet(,) As String)
+                     ByRef _NbrSmp As Integer,
+                     ByRef _TSmp() As Sudoku.StrSmp,
+                     ByRef _opk(,) As Integer,
+                     ByRef _nuplet(,) As String)
 
         Dim _r As Integer 'indice région
         Dim _csgi As Integer 'Coin supérieur gauche région
@@ -1920,10 +1979,9 @@
         Dim _aej As Integer      'calcul départ j aile extérieure à la région
         Dim _exclu As String
         Dim _exclu_k As Integer
-
         Dim _completed As Boolean
+        Dim _Smp As Sudoku.StrSmp
 
-        Dim _Smp As New Sudoku.StrSmp
         _Smp = NewSmp()
 
         For _r = 0 To 8
@@ -1957,7 +2015,7 @@
 
                                                             If _completed Then
                                                                 _exclu_k = VTok(_exclu)
-                                                                _Smp.nr = 2
+                                                                _Smp.nr = 3
                                                                 _Smp.CR.i(0) = _aile_i_i
                                                                 _Smp.CR.j(0) = _aile_i_j
                                                                 _Smp.CR.k(0) = _exclu_k
@@ -2027,10 +2085,10 @@
     '============================================================================================================================================================
 
     Sub XYWingRegCol(ByRef _Candidats(,,) As String,
-                       ByRef _NbrSmp As Integer,
-                       ByRef _TSmp() As Sudoku.StrSmp,
-                       ByVal _opk(,) As Integer,
-                       ByVal _nuplet(,) As String)
+                     ByRef _NbrSmp As Integer,
+                     ByRef _TSmp() As Sudoku.StrSmp,
+                     ByRef _opk(,) As Integer,
+                     ByRef _nuplet(,) As String)
 
         Dim _r As Integer 'indice région
         Dim _csgi As Integer 'Coin supérieur gauche région
@@ -2052,10 +2110,9 @@
         Dim _aei As Integer      'calcul départ i aile extérieure à la région
         Dim _exclu As String
         Dim _exclu_k As Integer
-
         Dim _completed As Boolean
+        Dim _Smp As Sudoku.StrSmp
 
-        Dim _Smp As New Sudoku.StrSmp
         _Smp = NewSmp()
 
         For _r = 0 To 8
@@ -2089,7 +2146,7 @@
 
                                                             If _completed Then
                                                                 _exclu_k = VTok(_exclu)
-                                                                _Smp.nr = 2
+                                                                _Smp.nr = 3
                                                                 _Smp.CR.i(0) = _aile_i_i
                                                                 _Smp.CR.j(0) = _aile_i_j
                                                                 _Smp.CR.k(0) = _exclu_k
@@ -2198,10 +2255,9 @@
     Sub XWingLig(ByRef _Candidats(,,) As String,
                        ByRef _NbrSmp As Integer,
                        ByRef _TSmp() As Sudoku.StrSmp,
-                       ByVal _AnlLig(,) As Sudoku.StrAnalyse,
-                       ByVal _Grille(,) As String,
-                       ByVal _opk(,) As Integer,
-                       ByVal _nuplet(,) As String)
+                       ByRef _AnlLig(,) As Sudoku.StrAnalyse,
+                       ByRef _Grille(,) As String,
+                       ByVal _nbVal As Integer)
 
         Dim _isup As Integer ' indice i ligne supérieure 
         Dim _iinf As Integer ' indice i ligne inférieure 
@@ -2209,7 +2265,8 @@
         Dim _jdrt As Integer ' indice j colonne droite
         Dim _k As Integer
         Dim _actif As Boolean
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
+
         _Smp = NewSmp()
 
         For _isup = 0 To 7
@@ -2233,7 +2290,7 @@
                                                             _Smp.CE.j(_Smp.ne) = _jgau
                                                             _Smp.CE.k(_Smp.ne) = _k
                                                             _Smp.CE.v(_Smp.ne) = _Candidats(_i, _jgau, _k)
-                                                            _Smp.ne = 1
+                                                            _Smp.ne += 1
                                                         End If
                                                     End If
                                                     If _Grille(_i, _jdrt) = "0" Then
@@ -2243,14 +2300,14 @@
                                                             _Smp.CE.j(_Smp.ne) = _jdrt
                                                             _Smp.CE.k(_Smp.ne) = _k
                                                             _Smp.CE.v(_Smp.ne) = _Candidats(_i, _jdrt, _k)
-                                                            _Smp.ne = 1
+                                                            _Smp.ne += 1
                                                         End If
                                                     End If
                                                 End If
                                             Next
 
                                             If _actif Then
-                                                _Smp.nr = 3
+                                                _Smp.nr = 4
                                                 _Smp.CR.i(0) = _isup
                                                 _Smp.CR.j(0) = _jgau
                                                 _Smp.CR.k(0) = _k
@@ -2291,16 +2348,15 @@
 
     '============================================================================================================================================================
     ' Techniques d'élimination de candidats
-    ' X-Wing en ligne
+    ' X-Wing en colonne
     '============================================================================================================================================================
 
     Sub XWingCol(ByRef _Candidats(,,) As String,
                        ByRef _NbrSmp As Integer,
                        ByRef _TSmp() As Sudoku.StrSmp,
-                       ByVal _AnlCol(,) As Sudoku.StrAnalyse,
-                       ByVal _Grille(,) As String,
-                       ByVal _opk(,) As Integer,
-                       ByVal _nuplet(,) As String)
+                       ByRef _AnlCol(,) As Sudoku.StrAnalyse,
+                       ByRef _Grille(,) As String,
+                       ByVal _nbVal As Integer)
 
         Dim _isup As Integer ' indice i ligne supérieure 
         Dim _iinf As Integer ' indice i ligne inférieure 
@@ -2308,7 +2364,8 @@
         Dim _jdrt As Integer ' indice j colonne droite
         Dim _k As Integer
         Dim _actif As Boolean
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
+
         _Smp = NewSmp()
 
         For _jgau = 0 To 7
@@ -2317,9 +2374,9 @@
                     For _jdrt = _jgau + 1 To 8
                         If _AnlCol(_jdrt, _k).n = 2 Then
                             For _isup = 0 To 7
-                                If _Candidats(_jgau, _isup, _k) <> " " And _Candidats(_jgau, _isup, _k) = _Candidats(_jdrt, _isup, _k) Then
+                                If _Candidats(_isup, _jgau, _k) <> " " And _Candidats(_isup, _jgau, _k) = _Candidats(_isup, _jdrt, _k) Then
                                     For _iinf = _isup + 1 To 8
-                                        If _Candidats(_jgau, _iinf, _k) <> " " And _Candidats(_jgau, _iinf, _k) = _Candidats(_jdrt, _iinf, _k) Then
+                                        If _Candidats(_iinf, _jgau, _k) <> " " And _Candidats(_iinf, _jgau, _k) = _Candidats(_iinf, _jdrt, _k) Then
                                             ' on tient un X-Wing
                                             _Smp.ne = 0
                                             _actif = False
@@ -2332,7 +2389,7 @@
                                                             _Smp.CE.j(_Smp.ne) = _j
                                                             _Smp.CE.k(_Smp.ne) = _k
                                                             _Smp.CE.v(_Smp.ne) = _Candidats(_isup, _j, _k)
-                                                            _Smp.ne = 1
+                                                            _Smp.ne += 1
                                                         End If
                                                     End If
                                                     If _Grille(_iinf, _j) = "0" Then
@@ -2342,28 +2399,28 @@
                                                             _Smp.CE.j(_Smp.ne) = _j
                                                             _Smp.CE.k(_Smp.ne) = _k
                                                             _Smp.CE.v(_Smp.ne) = _Candidats(_iinf, _j, _k)
-                                                            _Smp.ne = 1
+                                                            _Smp.ne += 1
                                                         End If
                                                     End If
                                                 End If
                                             Next
 
                                             If _actif Then
-                                                _Smp.nr = 3
-                                                _Smp.CR.i(0) = _jgau
-                                                _Smp.CR.j(0) = _isup
+                                                _Smp.nr = 4
+                                                _Smp.CR.i(0) = _isup
+                                                _Smp.CR.j(0) = _jgau
                                                 _Smp.CR.k(0) = _k
                                                 _Smp.CR.v(0) = _Smp.CE.v(0)
-                                                _Smp.CR.i(1) = _jgau
-                                                _Smp.CR.j(1) = _iinf
+                                                _Smp.CR.i(1) = _isup
+                                                _Smp.CR.j(1) = _jdrt
                                                 _Smp.CR.k(1) = _k
                                                 _Smp.CR.v(1) = _Smp.CE.v(0)
-                                                _Smp.CR.i(2) = _jdrt
-                                                _Smp.CR.j(2) = _iinf
+                                                _Smp.CR.i(2) = _iinf
+                                                _Smp.CR.j(2) = _jdrt
                                                 _Smp.CR.k(2) = _k
                                                 _Smp.CR.v(2) = _Smp.CE.v(0)
-                                                _Smp.CR.i(3) = _jdrt
-                                                _Smp.CR.j(3) = _isup
+                                                _Smp.CR.i(3) = _iinf
+                                                _Smp.CR.j(3) = _jgau
                                                 _Smp.CR.k(3) = _k
                                                 _Smp.CR.v(3) = _Smp.CE.v(0)
 
@@ -2396,10 +2453,9 @@
     Sub PaireCachéeLig(ByRef _Candidats(,,) As String,
                        ByRef _NbrSmp As Integer,
                        ByRef _TSmp() As Sudoku.StrSmp,
-                       ByVal _AnlLig(,) As Sudoku.StrAnalyse,
-                       ByVal _Grille(,) As String,
-                       ByVal _opk(,) As Integer,
-                       ByVal _nuplet(,) As String)
+                       ByRef _AnlLig(,) As Sudoku.StrAnalyse,
+                       ByRef _opk(,) As Integer,
+                       ByVal _nbval As Integer)
 
         Dim _i As Integer
         Dim _j As Integer
@@ -2407,9 +2463,8 @@
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _kbis As Integer
+        Dim _Smp As Sudoku.StrSmp
 
-
-        Dim _Smp As New Sudoku.StrSmp
         _Smp = NewSmp()
 
         For _i = 0 To 8
@@ -2441,15 +2496,16 @@
                                                         End If
                                                     End If
                                                 Next
-                                                _Smp.nr = 1
+
+                                                _Smp.nr = 2
                                                 _Smp.CR.i(0) = _i
                                                 _Smp.CR.j(0) = _j
                                                 _Smp.CR.k(0) = _k0
                                                 _Smp.CR.v(0) = _Candidats(_i, _j, _k0)
-                                                _Smp.CR.i(0) = _i
-                                                _Smp.CR.j(0) = _jbis
-                                                _Smp.CR.k(0) = _k1
-                                                _Smp.CR.v(0) = _Candidats(_i, _j, _k0)
+                                                _Smp.CR.i(1) = _i
+                                                _Smp.CR.j(1) = _jbis
+                                                _Smp.CR.k(1) = _k1
+                                                _Smp.CR.v(1) = _Candidats(_i, _j, _k0)
 
                                                 _Smp.motif = "Paire cachée [" & _k0 + 1 & _k1 + 1 & "] trouvé dans les cases : L" & _i + 1 & "C" & _j + 1 & "-L" & _i + 1 & "C" & _jbis + 1
 
@@ -2473,16 +2529,15 @@
 
     '============================================================================================================================================================
     ' Techniques d'élimination de candidats
-    ' Paire cachée en région
+    ' Paire cachée en colonne
     '============================================================================================================================================================
 
     Sub PaireCachéeCol(ByRef _Candidats(,,) As String,
                        ByRef _NbrSmp As Integer,
                        ByRef _TSmp() As Sudoku.StrSmp,
-                       ByVal _AnlCol(,) As Sudoku.StrAnalyse,
-                       ByVal _Grille(,) As String,
-                       ByVal _opk(,) As Integer,
-                       ByVal _nuplet(,) As String)
+                       ByRef _AnlCol(,) As Sudoku.StrAnalyse,
+                       ByRef _opk(,) As Integer,
+                       ByVal _nbval As Integer)
 
         Dim _i As Integer
         Dim _j As Integer
@@ -2490,15 +2545,15 @@
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _kbis As Integer
+        Dim _Smp As Sudoku.StrSmp
 
-        Dim _Smp As New Sudoku.StrSmp
         _Smp = NewSmp()
 
         For _j = 0 To 8
             For _k0 = 0 To 8
                 If _AnlCol(_j, _k0).n = 2 Then ' recherche de la première paire de la colonne
                     For _k1 = _k0 + 1 To 8
-                        If _AnlCol(_i, _k1).n = 2 Then ' recherche de la deuxième paire de la colonne
+                        If _AnlCol(_j, _k1).n = 2 Then ' recherche de la deuxième paire de la colonne
                             For _i = 0 To 7
                                 If _Candidats(_i, _j, _k0) <> " " And _Candidats(_i, _j, _k1) <> " " Then 'localisation de la première paire sur la colonne
                                     For _ibis = _i + 1 To 8
@@ -2523,7 +2578,8 @@
                                                         End If
                                                     End If
                                                 Next
-                                                _Smp.nr = 1
+
+                                                _Smp.nr = 2
                                                 _Smp.CR.i(0) = _i
                                                 _Smp.CR.j(0) = _j
                                                 _Smp.CR.k(0) = _k0
@@ -2561,18 +2617,15 @@
     Sub PaireCachéeReg(ByRef _Candidats(,,) As String,
                        ByRef _NbrSmp As Integer,
                        ByRef _TSmp() As Sudoku.StrSmp,
-                       ByVal _AnlReg(,) As Sudoku.StrAnalyse,
-                       ByVal _Grille(,) As String,
-                       ByVal _opk(,) As Integer,
-                       ByVal _nuplet(,) As String)
+                       ByRef _AnlReg(,) As Sudoku.StrAnalyse,
+                       ByRef _opk(,) As Integer)
 
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _r As Integer
-        Dim _ibis As Integer
-        Dim _jbis As Integer
-        Dim _iter As Integer
-        Dim _jter As Integer
+        'Dim _i As Integer
+        'Dim _j As Integer
+        'Dim _r As Integer
+        'Dim _ibis As Integer
+        'Dim _jbis As Integer
+
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _kbis As Integer
@@ -2580,77 +2633,77 @@
         Dim _csgj As Integer 'Coin supérieur gauche région
         Dim _g As Integer
         Dim _gbis As Integer
+        Dim _Smp As Sudoku.StrSmp
 
-        Dim _Smp As New Sudoku.StrSmp
         _Smp = NewSmp()
 
-        _csgi = (_r \ 3) * 3
-        _csgj = (_r - _csgi) * 3
-        For _i = _csgi To _csgi + 2
-            For _j = _csgj To _csgj + 2
-                For _k0 = 0 To 8
-                    If _AnlReg(_i, _k0).n = 2 Then ' recherche de la première paire de la région
-                        For _k1 = _k0 + 1 To 8
-                            If _AnlReg(_i, _k1).n = 2 Then ' recherche de la deuxième paire de la région
-                                For _ibis = _csgi To _csgi + 2 'parcours de l'élément 2
-                                    For _jbis = _csgj To _csgj + 2 'parcours de l'élément 2
-                                        _g = (_i * 9) + _j
-                                        _gbis = (_ibis * 9) + _jbis
-                                        If _g < _gbis Then ' on ne cherche que dans un sens (élément 2 tjrs > élément 1) 
-                                            If _Candidats(_i, _j, _k0) <> " " And _Candidats(_i, _j, _k1) <> " " Then 'localisation de la première paire de la région
-                                                For _iter = _csgi To _csgi + 2
-                                                    For _jter = _csgj To _csgj + 2
-                                                        If _Candidats(_iter, _jter, _k0) <> " " And _Candidats(_iter, _jter, _k1) <> " " Then 'localisation de la deuxième paire de la région
-                                                            If _opk(_i, _j) > 2 Or _opk(_i, _jbis) > 2 Then 'défini s'il y a des candidats à éliminer
-                                                                _Smp.ne = 0
-                                                                For _kbis = 0 To 8
-                                                                    If _k0 <> _kbis And _k1 <> _kbis Then
-                                                                        If _Candidats(_i, _j, _kbis) <> " " Then
-                                                                            _Smp.CE.i(_Smp.ne) = _i
-                                                                            _Smp.CE.j(_Smp.ne) = _j
-                                                                            _Smp.CE.k(_Smp.ne) = _kbis
-                                                                            _Smp.CE.v(_Smp.ne) = _Candidats(_i, _j, _kbis)
-                                                                            _Smp.ne += 1
-                                                                        End If
-                                                                        If _Candidats(_i, _jbis, _kbis) <> " " Then
-                                                                            _Smp.CE.i(_Smp.ne) = _i
-                                                                            _Smp.CE.j(_Smp.ne) = _jbis
-                                                                            _Smp.CE.k(_Smp.ne) = _kbis
-                                                                            _Smp.CE.v(_Smp.ne) = _Candidats(_i, _jbis, _kbis)
-                                                                            _Smp.ne += 1
-                                                                        End If
+        For _r = 0 To 8
+            _csgi = (_r \ 3) * 3
+            _csgj = (_r - _csgi) * 3
+
+            For _k0 = 0 To 8
+                If _AnlReg(_r, _k0).n = 2 Then ' recherche de la première paire de la région
+                    For _k1 = _k0 + 1 To 8
+                        If _AnlReg(_r, _k1).n = 2 Then ' recherche de la deuxième paire de la région
+                            For _i = _csgi To _csgi + 2 'parcours de l'élément 1
+                                For _j = _csgj To _csgj + 2 'parcours de l'élément 1
+                                    If _Candidats(_i, _j, _k0) <> " " And _Candidats(_i, _j, _k1) <> " " Then 'localisation de la première paire de la région
+                                        For _ibis = _csgi To _csgi + 2 'parcours de l'élément 2
+                                            For _jbis = _csgj To _csgj + 2 'parcours de l'élément 2
+                                                _g = (_i * 3) + _j
+                                                _gbis = (_ibis * 3) + _jbis
+                                                If _g < _gbis Then ' on ne cherche que dans un sens (élément 2 tjrs > élément 1) 
+                                                    If _Candidats(_ibis, _jbis, _k0) <> " " And _Candidats(_ibis, _jbis, _k1) <> " " Then 'localisation de la deuxième paire de la région
+                                                        If _opk(_i, _j) > 2 Or _opk(_ibis, _jbis) > 2 Then 'défini s'il y a des candidats à éliminer
+                                                            _Smp.ne = 0
+                                                            For _kbis = 0 To 8
+                                                                If _k0 <> _kbis And _k1 <> _kbis Then
+                                                                    If _Candidats(_i, _j, _kbis) <> " " Then
+                                                                        _Smp.CE.i(_Smp.ne) = _i
+                                                                        _Smp.CE.j(_Smp.ne) = _j
+                                                                        _Smp.CE.k(_Smp.ne) = _kbis
+                                                                        _Smp.CE.v(_Smp.ne) = _Candidats(_i, _j, _kbis)
+                                                                        _Smp.ne += 1
                                                                     End If
-                                                                Next
-                                                                _Smp.nr = 1
-                                                                _Smp.CR.i(0) = _i
-                                                                _Smp.CR.j(0) = _j
-                                                                _Smp.CR.k(0) = _k0
-                                                                _Smp.CR.v(0) = _Candidats(_i, _j, _k0)
-                                                                _Smp.CR.i(0) = _i
-                                                                _Smp.CR.j(0) = _jbis
-                                                                _Smp.CR.k(0) = _k1
-                                                                _Smp.CR.v(0) = _Candidats(_i, _j, _k0)
-
-                                                                _Smp.motif = "Paire cachée [" & _k0 + 1 & _k1 + 1 & "] trouvé dans les cases : L" & _i + 1 & "C" & _j + 1 & "-L" & _i + 1 & "C" & _jbis + 1
-
-                                                                If _Smp.ne > 0 Then
-                                                                    _TSmp(_NbrSmp) = _Smp
-                                                                    _NbrSmp += 1
-                                                                    _Smp = NewSmp()
+                                                                    If _Candidats(_ibis, _jbis, _kbis) <> " " Then
+                                                                        _Smp.CE.i(_Smp.ne) = _ibis
+                                                                        _Smp.CE.j(_Smp.ne) = _jbis
+                                                                        _Smp.CE.k(_Smp.ne) = _kbis
+                                                                        _Smp.CE.v(_Smp.ne) = _Candidats(_ibis, _jbis, _kbis)
+                                                                        _Smp.ne += 1
+                                                                    End If
                                                                 End If
+                                                            Next
 
+                                                            _Smp.nr = 2
+                                                            _Smp.CR.i(0) = _i
+                                                            _Smp.CR.j(0) = _j
+                                                            _Smp.CR.k(0) = _k0
+                                                            _Smp.CR.v(0) = _Candidats(_i, _j, _k0)
+                                                            _Smp.CR.i(1) = _ibis
+                                                            _Smp.CR.j(1) = _jbis
+                                                            _Smp.CR.k(1) = _k1
+                                                            _Smp.CR.v(1) = _Candidats(_ibis, _jbis, _k1)
+
+                                                            _Smp.motif = "Paire cachée [" & _k0 + 1 & _k1 + 1 & "] trouvé dans les cases : L" & _i + 1 & "C" & _j + 1 & "-L" & _ibis + 1 & "C" & _jbis + 1
+
+                                                            If _Smp.ne > 0 Then
+                                                                _TSmp(_NbrSmp) = _Smp
+                                                                _NbrSmp += 1
+                                                                _Smp = NewSmp()
                                                             End If
+
                                                         End If
-                                                    Next
-                                                Next
-                                            End If
-                                        End If
-                                    Next
+                                                    End If
+                                                End If
+                                            Next
+                                        Next
+                                    End If
                                 Next
-                            End If
-                        Next
-                    End If
-                Next
+                            Next
+                        End If
+                    Next
+                End If
             Next
         Next
 
@@ -2683,7 +2736,7 @@
     ' Recherche de la solution complète
     '============================================================================================================================================================
 
-    Sub SolutionGrille(ByVal _Grille(,) As String,
+    Sub SolutionGrille(ByRef _Grille(,) As String,
                        ByRef _NbVal As Integer,
                        ByRef _Qsol As Queue(Of Sudoku.StrSolution),
                        ByRef _NbrSmp As Integer,
@@ -2714,7 +2767,7 @@
 
         While _NbVal < 81 And Not _Erreur And _SolutionExiste
 
-            RechercheSolution(_Grille, _Candidats, _Qsol, _NbrSmp, _TSmp) 'Recherche de toutes les solutions possibles
+            RechercheSolution(_Grille, _Candidats, _Qsol, _NbrSmp, _TSmp, _NbVal) 'Recherche de toutes les solutions possibles
             If _Qsol.Count = 0 And _NbrSmp = 0 Then
                 _SolutionExiste = False
             Else
@@ -2741,17 +2794,19 @@
     '============================================================================================================================================================
     '============================================================================================================================================================
 
-    Sub AppliqueUneSimplification(ByRef _NbrSmp As Integer, ByRef _TSmp() As Sudoku.StrSmp, ByRef _Candidats(,,) As String)
+    Sub AppliqueUneSimplification(ByRef _NbrSmp As Integer,
+                                  ByRef _TSmp() As Sudoku.StrSmp,
+                                  ByRef _Candidats(,,) As String)
 
         Dim _s As Integer
         Dim _i As Integer
         Dim _j As Integer
         Dim _k As Integer
-        Dim _Smp As New Sudoku.StrSmp
+        Dim _Smp As Sudoku.StrSmp
 
         _Smp = _TSmp(0)
 
-        For _s = 0 To _Smp.ne
+        For _s = 0 To _Smp.ne - 1
             _i = _Smp.CE.i(_s)
             _j = _Smp.CE.j(_s)
             _k = _Smp.CE.k(_s)
@@ -2772,7 +2827,8 @@
     ' Remise à zéro de la table des simplifications
     '============================================================================================================================================================
 
-    Sub TsmpClear(ByRef _NbrSmp As String, ByRef _TSmp() As Sudoku.StrSmp)
+    Sub TsmpClear(ByRef _NbrSmp As String,
+                  ByRef _TSmp() As Sudoku.StrSmp)
 
         Dim _t As Integer
 
@@ -2791,7 +2847,9 @@
     '============================================================================================================================================================
     ' Fait une rotation des paires en carré
     '============================================================================================================================================================
-    Sub RotationCarré(ByRef _cv() As String, ByRef _ci() As Integer, ByRef _cj() As Integer)
+    Sub RotationCarré(ByRef _cv() As String,
+                      ByRef _ci() As Integer,
+                      ByRef _cj() As Integer)
 
         Dim _tc As String
         Dim _ti As Integer
@@ -2813,10 +2871,11 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Détermine si 2 paires ont une valuer en commun 
+    ' Détermine si 2 paires ont une valeur en commun 
     '============================================================================================================================================================
 
-    Function Commun(ByVal _sommet As String, ByVal _aile As String)
+    Function Commun(ByVal _sommet As String,
+                    ByVal _aile As String)
 
         Dim _commun As Boolean = False
 

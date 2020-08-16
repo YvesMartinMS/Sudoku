@@ -34,7 +34,6 @@ Partial Class Simplifications
         Me.j3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.v3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.z = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.BT_Fermer_Smp = New System.Windows.Forms.Button()
         Me.ei1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ej1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ev1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
@@ -44,6 +43,7 @@ Partial Class Simplifications
         Me.ei3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ej3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ev3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.BT_Fermer_Smp = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'ListSimplifications
@@ -62,7 +62,7 @@ Partial Class Simplifications
         'Technique
         '
         Me.Technique.Text = "Technique"
-        Me.Technique.Width = 270
+        Me.Technique.Width = 401
         '
         'i1
         '
@@ -114,15 +114,6 @@ Partial Class Simplifications
         Me.z.Text = "|"
         Me.z.Width = 25
         '
-        'BT_Fermer_Smp
-        '
-        Me.BT_Fermer_Smp.Location = New System.Drawing.Point(13, 22)
-        Me.BT_Fermer_Smp.Name = "BT_Fermer_Smp"
-        Me.BT_Fermer_Smp.Size = New System.Drawing.Size(96, 23)
-        Me.BT_Fermer_Smp.TabIndex = 1
-        Me.BT_Fermer_Smp.Text = "Fermer"
-        Me.BT_Fermer_Smp.UseVisualStyleBackColor = True
-        '
         'ei1
         '
         Me.ei1.Text = "i1"
@@ -167,6 +158,15 @@ Partial Class Simplifications
         '
         Me.ev3.Text = "v3"
         Me.ev3.Width = 25
+        '
+        'BT_Fermer_Smp
+        '
+        Me.BT_Fermer_Smp.Location = New System.Drawing.Point(13, 22)
+        Me.BT_Fermer_Smp.Name = "BT_Fermer_Smp"
+        Me.BT_Fermer_Smp.Size = New System.Drawing.Size(96, 23)
+        Me.BT_Fermer_Smp.TabIndex = 1
+        Me.BT_Fermer_Smp.Text = "Fermer"
+        Me.BT_Fermer_Smp.UseVisualStyleBackColor = True
         '
         'Simplifications
         '

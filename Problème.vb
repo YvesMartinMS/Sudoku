@@ -1,6 +1,9 @@
 ﻿Imports System.IO
 Module Problème
-    Sub Problème(ByVal typeGrille As String, ByRef NbVal As Integer, ByRef Grille(,) As String, ByRef Candidats(,,) As String)
+    Sub Problème(ByVal typeGrille As String,
+                 ByRef NbVal As Integer,
+                 ByRef Grille(,) As String,
+                 ByRef Candidats(,,) As String)
 
         Dim i As Integer
         Dim j As Integer
@@ -28,7 +31,6 @@ Module Problème
             Next
         Next
 
-        File.WriteAllText(Sudoku.PATHFICHIER, "")
         While NbVal > 30 ' And ok
             '     While (Eval < EvalMin Or Eval > EvalMax) And nbVal > 60
 
@@ -41,7 +43,7 @@ Module Problème
             'If opk(i, j) > 1 Then
             '    ' Vérifier les solutionsmultiples
             'End If
-            RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp)
+            RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp, NbVal)
             If QSol.Count = 0 And NbrSmp = 0 Then
                 MsgBox("???")
             Else
@@ -49,8 +51,6 @@ Module Problème
                     ok = False
                     For Each Solution As Sudoku.StrSolution In QSol
                         Eval = Eval + Solution.b
-                        enreg = NbVal & ";" & previousCase & ";" & Solution.i & ";" & Solution.j & ";" & Solution.v & ";" & Solution.m & ";" & vbCrLf
-                        File.AppendAllText(Sudoku.PATHFICHIER, enreg)
                         If Solution.i = i And Solution.j = j And previousCase = Solution.v Then
                             ok = True
                         End If
@@ -67,7 +67,10 @@ Module Problème
 
     End Sub
 
-    Sub ChoisitCase(ByVal Grille(,) As String, ByVal nbVal As Integer, ByRef i As Integer, ByRef j As Integer)
+    Sub ChoisitCase(ByRef Grille(,) As String,
+                    ByVal nbVal As Integer,
+                    ByRef i As Integer,
+                    ByRef j As Integer)
 
         Dim g As Integer
         Dim h As Integer
@@ -86,7 +89,8 @@ Module Problème
         Next
     End Sub
 
-    Sub EnpileGrille(ByVal Grille(,) As String, ByVal nbVal As Integer)
+    Sub EnpileGrille(ByRef Grille(,) As String,
+                     ByVal nbVal As Integer)
 
         For i = 0 To 8
             For j = 0 To 8

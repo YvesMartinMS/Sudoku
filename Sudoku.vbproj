@@ -89,6 +89,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Fichier.vb" />
+    <Compile Include="ForceBrute.vb" />
     <Compile Include="Problème.vb" />
     <Compile Include="Simplifications.Designer.vb">
       <DependentUpon>Simplifications.vb</DependentUpon>

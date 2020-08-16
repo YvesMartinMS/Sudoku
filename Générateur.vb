@@ -1,16 +1,14 @@
 ﻿Imports System.IO
 Module Générateur
 
-    Sub Générateur(ByRef TextSudoku As String)
+    Sub Générateur(ByRef Grille(,) As String)
 
         Dim i As Integer = 0
         Dim j As Integer = 0
         Dim g As Integer
 
         Dim nbVal As Integer = 0
-        Dim Grille(8, 8) As String ' La grille de Sudoku
         Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
-        Dim Solution As Sudoku.StrSolution
 
         Dim NbTentatives As Integer
         Dim NbRéussi As Integer
@@ -18,22 +16,18 @@ Module Générateur
         Dim TentativeCandidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
 
         Dim Erreur As Boolean
-        Dim NbErreur As Integer
-        Dim ErreurGrille(8, 8) As String 'affichage des cases en rouge
-        Dim QSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
 
-        Dim Impasse As Boolean
-        Dim NbImpasse As Integer
+        Dim ErreurGrille(8, 8) As String 'affichage des cases en rouge
+
         Dim Réussi As Boolean
 
-        Dim TSmp(80) As Sudoku.StrSmp
-        Dim NbrSmp As Integer
-
         Dim TSIni As String = "                                                                                 "
-        Dim TS As String = "                                                                                 "
+        Dim TS As String
 
         Dim SW As New Stopwatch
         Dim TSW As String
+        Dim NbSol As Integer
+        Dim GrilleFinale(8, 8) As String ' La grille en fin de partie
 
         '============================================================================================================================================================
         '  Procédure principale
@@ -41,12 +35,10 @@ Module Générateur
 
         SW.Start()
 
-        While NbTentatives < 200 And Not Réussi
+        While Not Réussi
 
             NbTentatives += 1
             Réussi = False
-            TS = TSIni
-            TextSudoku = TSIni
 
             For i = 0 To 8
                 For j = 0 To 8
@@ -58,77 +50,31 @@ Module Générateur
             CalculCandidats(Grille, Candidats)
             nbVal = 0
 
-            While nbVal < 25 And Not Erreur
+            While nbVal < 28 And Not Erreur
 
-                If QSol.Count = 0 Then
-                    ChoisitCase(Grille, nbVal, i, j) ' choisit une case au hasard parmi celles qui sont libres
-                    GénéCase(Grille, Candidats, i, j, nbVal, TextSudoku) 'affecte une valeur à la case choisie
+                ChoisitCase(Grille, nbVal, i, j) ' choisit une case au hasard parmi celles qui sont libres
+                GénéCase(Grille, Candidats, i, j, nbVal) 'affecte une valeur à la case choisie
                     RecalculCandidats(i, j, Grille, Candidats) ' Efface les candidats éliminés par la case généréee 
                     ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
                     'Génération symétrique
                     If i <> 4 Or j <> 4 Then
                         i = 8 - i
                         j = 8 - j
-                        GénéCase(Grille, Candidats, i, j, nbVal, TextSudoku) 'affecte une valeur à la case choisie
+                        GénéCase(Grille, Candidats, i, j, nbVal) 'affecte une valeur à la case choisie
                         RecalculCandidats(i, j, Grille, Candidats) ' Efface les candidats éliminés par la case généréee  
                         ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
                     End If
 
-                End If
-
             End While
 
-            Impasse = False
-            While nbVal < 81 And Not Erreur And Not Impasse And Not Réussi
-                ' à partir de là on essaie de résoudre la grille générée aléatoirement par les routines du solveur 
+            Array.Copy(Grille, GrilleFinale, 81)
+            ForceBrute.ForceBrute(GrilleFinale, NbSol)
 
-                RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp) 'Recherche de toutes les solutions possibles
-                If QSol.Count = 0 And NbrSmp = 0 Then
-                    If Not Erreur Then
-                        Impasse = True
-                        NbImpasse += 1
-                    End If
-                Else
-                    While QSol.Count > 0  'Tant que la queue des solutions n'est pas vide
-                        Solution = QSol.Dequeue()
-                        i = Solution.i
-                        j = Solution.j
-                        Grille(i, j) = Solution.v
-
-                        g = (i * 9) + j
-                        Select Case g
-                            Case 0
-                                TS = Grille(i, j) & Mid(TextSudoku, 2, 80)
-                            Case 80
-                                TS = Mid(TextSudoku, 1, 80) & Grille(i, j)
-                            Case Else
-                                TS = Mid(TextSudoku, 1, g) & Grille(i, j) & Mid(TextSudoku, g + 2, 82 - g)
-                        End Select
-                        TextSudoku = TS
-                        RecalculCandidats(i, j, Grille, Candidats) ' Retire la valeur saisie des groupes auxquels la case appartient
-                        ControleSaisie(Erreur, ErreurGrille, Grille, Candidats)
-                        nbVal += 1
-
-                    End While
-
-                    While NbrSmp > 0
-                        AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
-                    End While
-
-                End If
-            End While
-
-            If Erreur Then
-                TextSudoku = TSIni
-                NbErreur += 1
-            End If
-
-            If nbVal = 81 Then
+            If NbSol > 0 Then
+                Array.Copy(GrilleFinale, Grille, 81)
                 Réussi = True
                 NbRéussi += 1
             End If
-
-            '    System.Threading.Thread.Sleep(50)
 
         End While
 
@@ -141,10 +87,14 @@ Module Générateur
     '  Choisit une case libre dahs la grille
     '============================================================================================================================================================
 
-    Sub ChoisitCase(ByVal Grille(,) As String, ByVal NbVal As Integer, ByRef i As Integer, ByRef j As Integer)
+    Sub ChoisitCase(ByRef Grille(,) As String,
+                    ByVal NbVal As Integer,
+                    ByRef i As Integer,
+                    ByRef j As Integer)
 
         Dim g As Integer
         Dim h As Integer
+
         g = GetRandom(0, 81 - NbVal)
         h = 0
 
@@ -158,17 +108,20 @@ Module Générateur
                 End If
             Next
         Next
+
     End Sub
 
     '============================================================================================================================================================
     '  Choisit un candidat dans une case libre de la grille
     '============================================================================================================================================================
 
-    Sub GénéCase(ByRef Grille(,) As String, ByRef Candidats(,,) As String, i As Integer, j As Integer, ByRef NbVal As Integer, ByRef TextSudoku As String)
+    Sub GénéCase(ByRef Grille(,) As String,
+                 ByRef Candidats(,,) As String,
+                 ByVal i As Integer,
+                 ByVal j As Integer, ByRef NbVal As Integer)
 
         Dim k As Integer
         Dim g As Integer
-        Dim r As Integer
 
         Dim iRandom As Integer
         Dim NombreCandidats As Integer
@@ -191,18 +144,7 @@ Module Générateur
             If Candidats(i, j, k) <> " " Then
                 If CompteurCandidat = iRandom Then
                     Grille(i, j) = Candidats(i, j, k) 'affecte à la grille le candidat choisi aléatoirement
-                    g = (i * 9) + j
-                    Select Case g
-                        Case 0
-                            TS = Grille(i, j) & Mid(TextSudoku, 2, 80)
-                        Case 80
-                            TS = Mid(TextSudoku, 1, 80) & Grille(i, j)
-                        Case Else
-                            TS = Mid(TextSudoku, 1, g) & Grille(i, j) & Mid(TextSudoku, g + 2, 82 - g)
-                    End Select
-                    TextSudoku = TS
                     NbVal += 1
-
                 End If
                 CompteurCandidat += 1
             End If

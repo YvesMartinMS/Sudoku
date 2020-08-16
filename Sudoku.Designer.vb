@@ -25,12 +25,22 @@ Partial Class Sudoku
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Sudoku))
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.FichierToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ChToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SauvegarderUneGrilleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PartieToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaisieToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.TestToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.PaireNueToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PaireNueEnLigneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PaireNueEnColonneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EnRégionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.XYwingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.XYWingEnLigneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.XWingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.XWingEnLigneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.XWingEnColonneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TripletNuToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TripletNuEnLigneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GénérerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.QuitterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GrilleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -137,15 +147,18 @@ Partial Class Sudoku
         Me.EnregistrerToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.SaisirToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.JouerToolStripButton1 = New System.Windows.Forms.ToolStripButton()
+        Me.RecommencerToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.BTStepByStep = New System.Windows.Forms.Button()
         Me.LBL_nbVal = New System.Windows.Forms.Label()
+        Me.nomFichierOuvert = New System.Windows.Forms.Label()
+        Me.BTForceBrute = New System.Windows.Forms.Button()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FichierToolStripMenuItem, Me.GrilleToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FichierToolStripMenuItem, Me.PartieToolStripMenuItem, Me.GrilleToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(10, 2, 0, 2)
@@ -155,59 +168,123 @@ Partial Class Sudoku
         '
         'FichierToolStripMenuItem
         '
-        Me.FichierToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaisieToolStripMenuItem1, Me.TestToolStripMenuItem1, Me.GénérerToolStripMenuItem, Me.QuitterToolStripMenuItem})
+        Me.FichierToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ChToolStripMenuItem, Me.SauvegarderUneGrilleToolStripMenuItem})
         Me.FichierToolStripMenuItem.Name = "FichierToolStripMenuItem"
         Me.FichierToolStripMenuItem.Size = New System.Drawing.Size(54, 20)
         Me.FichierToolStripMenuItem.Text = "Fichier"
         '
+        'ChToolStripMenuItem
+        '
+        Me.ChToolStripMenuItem.Name = "ChToolStripMenuItem"
+        Me.ChToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.ChToolStripMenuItem.Text = "Charger une Grille"
+        '
+        'SauvegarderUneGrilleToolStripMenuItem
+        '
+        Me.SauvegarderUneGrilleToolStripMenuItem.Name = "SauvegarderUneGrilleToolStripMenuItem"
+        Me.SauvegarderUneGrilleToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.SauvegarderUneGrilleToolStripMenuItem.Text = "Sauvegarder une Grille"
+        '
+        'PartieToolStripMenuItem
+        '
+        Me.PartieToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaisieToolStripMenuItem1, Me.TestToolStripMenuItem1, Me.GénérerToolStripMenuItem, Me.QuitterToolStripMenuItem})
+        Me.PartieToolStripMenuItem.Name = "PartieToolStripMenuItem"
+        Me.PartieToolStripMenuItem.Size = New System.Drawing.Size(49, 20)
+        Me.PartieToolStripMenuItem.Text = "Partie"
+        '
         'SaisieToolStripMenuItem1
         '
         Me.SaisieToolStripMenuItem1.Name = "SaisieToolStripMenuItem1"
-        Me.SaisieToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
+        Me.SaisieToolStripMenuItem1.Size = New System.Drawing.Size(153, 22)
         Me.SaisieToolStripMenuItem1.Text = "Saisie"
         '
         'TestToolStripMenuItem1
         '
-        Me.TestToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PaireNueToolStripMenuItem})
+        Me.TestToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PaireNueToolStripMenuItem, Me.XYwingToolStripMenuItem, Me.XWingToolStripMenuItem, Me.TripletNuToolStripMenuItem})
         Me.TestToolStripMenuItem1.Name = "TestToolStripMenuItem1"
-        Me.TestToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
+        Me.TestToolStripMenuItem1.Size = New System.Drawing.Size(153, 22)
         Me.TestToolStripMenuItem1.Text = "Démonstration"
         '
         'PaireNueToolStripMenuItem
         '
         Me.PaireNueToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PaireNueEnLigneToolStripMenuItem, Me.PaireNueEnColonneToolStripMenuItem, Me.EnRégionToolStripMenuItem})
         Me.PaireNueToolStripMenuItem.Name = "PaireNueToolStripMenuItem"
-        Me.PaireNueToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.PaireNueToolStripMenuItem.Size = New System.Drawing.Size(123, 22)
         Me.PaireNueToolStripMenuItem.Text = "Paire nue"
         '
         'PaireNueEnLigneToolStripMenuItem
         '
         Me.PaireNueEnLigneToolStripMenuItem.Name = "PaireNueEnLigneToolStripMenuItem"
-        Me.PaireNueEnLigneToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.PaireNueEnLigneToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
         Me.PaireNueEnLigneToolStripMenuItem.Text = "En ligne"
         '
         'PaireNueEnColonneToolStripMenuItem
         '
         Me.PaireNueEnColonneToolStripMenuItem.Name = "PaireNueEnColonneToolStripMenuItem"
-        Me.PaireNueEnColonneToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.PaireNueEnColonneToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
         Me.PaireNueEnColonneToolStripMenuItem.Text = "En Colonne"
         '
         'EnRégionToolStripMenuItem
         '
         Me.EnRégionToolStripMenuItem.Name = "EnRégionToolStripMenuItem"
-        Me.EnRégionToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.EnRégionToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
         Me.EnRégionToolStripMenuItem.Text = "En Région"
+        '
+        'XYwingToolStripMenuItem
+        '
+        Me.XYwingToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.XYWingEnLigneToolStripMenuItem})
+        Me.XYwingToolStripMenuItem.Name = "XYwingToolStripMenuItem"
+        Me.XYwingToolStripMenuItem.Size = New System.Drawing.Size(123, 22)
+        Me.XYwingToolStripMenuItem.Text = "XY-wing"
+        '
+        'XYWingEnLigneToolStripMenuItem
+        '
+        Me.XYWingEnLigneToolStripMenuItem.Name = "XYWingEnLigneToolStripMenuItem"
+        Me.XYWingEnLigneToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
+        Me.XYWingEnLigneToolStripMenuItem.Text = "En Ligne"
+        '
+        'XWingToolStripMenuItem
+        '
+        Me.XWingToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.XWingEnLigneToolStripMenuItem, Me.XWingEnColonneToolStripMenuItem})
+        Me.XWingToolStripMenuItem.Name = "XWingToolStripMenuItem"
+        Me.XWingToolStripMenuItem.Size = New System.Drawing.Size(123, 22)
+        Me.XWingToolStripMenuItem.Text = "X-Wing"
+        '
+        'XWingEnLigneToolStripMenuItem
+        '
+        Me.XWingEnLigneToolStripMenuItem.Name = "XWingEnLigneToolStripMenuItem"
+        Me.XWingEnLigneToolStripMenuItem.Size = New System.Drawing.Size(133, 22)
+        Me.XWingEnLigneToolStripMenuItem.Text = "En ligne"
+        '
+        'XWingEnColonneToolStripMenuItem
+        '
+        Me.XWingEnColonneToolStripMenuItem.Name = "XWingEnColonneToolStripMenuItem"
+        Me.XWingEnColonneToolStripMenuItem.Size = New System.Drawing.Size(133, 22)
+        Me.XWingEnColonneToolStripMenuItem.Text = "En colonne"
+        '
+        'TripletNuToolStripMenuItem
+        '
+        Me.TripletNuToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TripletNuEnLigneToolStripMenuItem})
+        Me.TripletNuToolStripMenuItem.Name = "TripletNuToolStripMenuItem"
+        Me.TripletNuToolStripMenuItem.Size = New System.Drawing.Size(123, 22)
+        Me.TripletNuToolStripMenuItem.Text = "Triplet nu"
+        '
+        'TripletNuEnLigneToolStripMenuItem
+        '
+        Me.TripletNuEnLigneToolStripMenuItem.Name = "TripletNuEnLigneToolStripMenuItem"
+        Me.TripletNuEnLigneToolStripMenuItem.Size = New System.Drawing.Size(116, 22)
+        Me.TripletNuEnLigneToolStripMenuItem.Text = "En ligne"
         '
         'GénérerToolStripMenuItem
         '
         Me.GénérerToolStripMenuItem.Name = "GénérerToolStripMenuItem"
-        Me.GénérerToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.GénérerToolStripMenuItem.Size = New System.Drawing.Size(153, 22)
         Me.GénérerToolStripMenuItem.Text = "Générer"
         '
         'QuitterToolStripMenuItem
         '
         Me.QuitterToolStripMenuItem.Name = "QuitterToolStripMenuItem"
-        Me.QuitterToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.QuitterToolStripMenuItem.Size = New System.Drawing.Size(153, 22)
         Me.QuitterToolStripMenuItem.Text = "Quitter"
         '
         'GrilleToolStripMenuItem
@@ -357,7 +434,7 @@ Partial Class Sudoku
         Me.BT_Clear.Name = "BT_Clear"
         Me.BT_Clear.Size = New System.Drawing.Size(45, 45)
         Me.BT_Clear.TabIndex = 1092
-        Me.BT_Clear.Text = "Efface"
+        Me.BT_Clear.Text = "Effacer"
         Me.BT_Clear.UseVisualStyleBackColor = False
         '
         'BT00
@@ -1265,7 +1342,7 @@ Partial Class Sudoku
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GénérerToolStripButton, Me.OuvrirToolStripButton1, Me.EnregistrerToolStripButton, Me.SaisirToolStripButton, Me.JouerToolStripButton1})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GénérerToolStripButton, Me.OuvrirToolStripButton1, Me.EnregistrerToolStripButton, Me.SaisirToolStripButton, Me.JouerToolStripButton1, Me.RecommencerToolStripButton})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(1184, 25)
@@ -1317,6 +1394,16 @@ Partial Class Sudoku
         Me.JouerToolStripButton1.Size = New System.Drawing.Size(23, 22)
         Me.JouerToolStripButton1.Text = "Jouer"
         '
+        'RecommencerToolStripButton
+        '
+        Me.RecommencerToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.RecommencerToolStripButton.Enabled = False
+        Me.RecommencerToolStripButton.Image = CType(resources.GetObject("RecommencerToolStripButton.Image"), System.Drawing.Image)
+        Me.RecommencerToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.RecommencerToolStripButton.Name = "RecommencerToolStripButton"
+        Me.RecommencerToolStripButton.Size = New System.Drawing.Size(23, 22)
+        Me.RecommencerToolStripButton.Text = "Recommencer"
+        '
         'BTStepByStep
         '
         Me.BTStepByStep.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
@@ -1338,12 +1425,36 @@ Partial Class Sudoku
         Me.LBL_nbVal.Size = New System.Drawing.Size(0, 25)
         Me.LBL_nbVal.TabIndex = 1096
         '
+        'nomFichierOuvert
+        '
+        Me.nomFichierOuvert.AutoSize = True
+        Me.nomFichierOuvert.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.nomFichierOuvert.Location = New System.Drawing.Point(350, 761)
+        Me.nomFichierOuvert.Name = "nomFichierOuvert"
+        Me.nomFichierOuvert.Size = New System.Drawing.Size(77, 25)
+        Me.nomFichierOuvert.TabIndex = 1097
+        Me.nomFichierOuvert.Text = "Fichier"
+        '
+        'BTForceBrute
+        '
+        Me.BTForceBrute.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.BTForceBrute.ForeColor = System.Drawing.Color.Black
+        Me.BTForceBrute.Location = New System.Drawing.Point(1000, 74)
+        Me.BTForceBrute.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.BTForceBrute.Name = "BTForceBrute"
+        Me.BTForceBrute.Size = New System.Drawing.Size(117, 45)
+        Me.BTForceBrute.TabIndex = 1098
+        Me.BTForceBrute.Text = "Force Brute"
+        Me.BTForceBrute.UseVisualStyleBackColor = False
+        '
         'Sudoku
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(1184, 810)
+        Me.Controls.Add(Me.BTForceBrute)
+        Me.Controls.Add(Me.nomFichierOuvert)
         Me.Controls.Add(Me.LBL_nbVal)
         Me.Controls.Add(Me.BTStepByStep)
         Me.Controls.Add(Me.ToolStrip1)
@@ -1460,7 +1571,7 @@ Partial Class Sudoku
     End Sub
 
     Friend WithEvents MenuStrip1 As MenuStrip
-    Friend WithEvents FichierToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PartieToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents LBL_Conseil As Label
     Friend WithEvents BT_Solutions As Button
     Friend WithEvents BT_Smp As Button
@@ -1575,4 +1686,17 @@ Partial Class Sudoku
     Friend WithEvents EffacerLesCandidatsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BTStepByStep As Button
     Friend WithEvents LBL_nbVal As Label
+    Friend WithEvents XYwingToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents XYWingEnLigneToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents XWingToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents XWingEnColonneToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents XWingEnLigneToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents TripletNuToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents TripletNuEnLigneToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents FichierToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ChToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SauvegarderUneGrilleToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents nomFichierOuvert As Label
+    Friend WithEvents RecommencerToolStripButton As ToolStripButton
+    Friend WithEvents BTForceBrute As Button
 End Class
