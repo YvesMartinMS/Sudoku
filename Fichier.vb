@@ -1,32 +1,23 @@
 ﻿Imports System.IO
 Module Fichier
-    'Const PATHFICHIER As String = "E:\Sudoku3D\Tripletnu002.sud"
 
-    'Private Sub BT_ECRIRE_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BT_ECRIRE.Click
-    '    If Me.CHK_DEBUT.Checked Then
-    '        'Depuis le début
-    '        File.WriteAllText(PATHFICHIER, Me.TXT_ECRITURE.Text)
-    '    Else
-    '        'À la suite
-    '        File.AppendAllText(PATHFICHIER, Me.TXT_ECRITURE.Text)
-    '    End If
-
-    'End Sub
-
-    Sub LectureGrille(ByVal LectureGrille As String,
-                      ByRef grille(,) As String,
+    Sub LectureGrille(ByRef grille(,) As String,
                       ByRef fichierCorrrect As Boolean)
 
-        Dim Enreg As String
+        Dim Enreg As String = ""
         Dim TextSudoku As String
         Dim g As Integer
 
         fichierCorrrect = True
-        Enreg = File.ReadAllText(Sudoku.myFileNname)
 
-        If Enreg.Length <> 99 Then
+        Try
+            Enreg = File.ReadAllText(Sudoku.myFileNname)
+        Catch ex As Exception
             fichierCorrrect = False
-        End If
+        Finally
+            fichierCorrrect = True
+        End Try
+
         For i = 0 To 8
             If Mid(Enreg, (i * 11) + 10, 2) <> vbCrLf Then
                 fichierCorrrect = False
@@ -57,4 +48,33 @@ Module Fichier
         End If
 
     End Sub
+
+
+    Sub EcritureGrille(ByRef grille(,) As String, ByRef fichierCorrrect As Boolean)
+
+        Dim filename As String
+        Dim TextSudoku As String = ""
+        Dim g As Integer
+
+        For i = 0 To 8
+            For j = 0 To 8
+                If grille(i, j) = "0" Then
+                    TextSudoku &= "."
+                Else
+                    TextSudoku &= grille(i, j)
+                End If
+            Next
+            TextSudoku &= vbCrLf
+        Next
+        filename = Sudoku.myFileNname
+
+        Try
+            File.WriteAllText(Sudoku.myFileNname, TextSudoku)
+        Catch ex As Exception
+            fichierCorrrect = False
+        Finally
+            fichierCorrrect = True
+        End Try
+    End Sub
+
 End Module

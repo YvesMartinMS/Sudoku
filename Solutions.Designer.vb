@@ -24,9 +24,6 @@ Partial Class Solutions
     Private Sub InitializeComponent()
         Me.BT_Fermer = New System.Windows.Forms.Button()
         Me.ListSolution = New System.Windows.Forms.ListView()
-        Me.i = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.j = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.v = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.m = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.SuspendLayout()
         '
@@ -42,29 +39,17 @@ Partial Class Solutions
         'ListSolution
         '
         Me.ListSolution.BackColor = System.Drawing.Color.Gainsboro
-        Me.ListSolution.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.i, Me.j, Me.v, Me.m})
+        Me.ListSolution.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.m})
         Me.ListSolution.ForeColor = System.Drawing.SystemColors.WindowFrame
         Me.ListSolution.FullRowSelect = True
         Me.ListSolution.HideSelection = False
         Me.ListSolution.Location = New System.Drawing.Point(26, 42)
         Me.ListSolution.MultiSelect = False
         Me.ListSolution.Name = "ListSolution"
-        Me.ListSolution.Size = New System.Drawing.Size(427, 385)
+        Me.ListSolution.Size = New System.Drawing.Size(543, 385)
         Me.ListSolution.TabIndex = 1
         Me.ListSolution.UseCompatibleStateImageBehavior = False
         Me.ListSolution.View = System.Windows.Forms.View.Details
-        '
-        'i
-        '
-        Me.i.Text = "i"
-        '
-        'j
-        '
-        Me.j.Text = "j"
-        '
-        'v
-        '
-        Me.v.Text = "v"
         '
         'm
         '
@@ -76,7 +61,7 @@ Partial Class Solutions
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Gray
-        Me.ClientSize = New System.Drawing.Size(477, 450)
+        Me.ClientSize = New System.Drawing.Size(591, 450)
         Me.Controls.Add(Me.ListSolution)
         Me.Controls.Add(Me.BT_Fermer)
         Me.Name = "Solutions"
@@ -87,8 +72,5 @@ Partial Class Solutions
 
     Friend WithEvents BT_Fermer As Button
     Friend WithEvents ListSolution As ListView
-    Friend WithEvents i As ColumnHeader
-    Friend WithEvents j As ColumnHeader
-    Friend WithEvents v As ColumnHeader
     Friend WithEvents m As ColumnHeader
 End Class

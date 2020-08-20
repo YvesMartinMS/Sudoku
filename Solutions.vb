@@ -3,10 +3,7 @@
 
         For Each Solution As Sudoku.StrSolution In Sudoku.QSol
             Dim Element As New ListViewItem
-            Element.Text = Solution.i
-            Element.SubItems.Add(Solution.j)
-            Element.SubItems.Add(Solution.v)
-            Element.SubItems.Add(Solution.m)
+            Element.Text = Solution.m
             ListSolution.Items.Add(Element)
         Next
     End Sub

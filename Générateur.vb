@@ -25,10 +25,14 @@ Module Générateur
         Dim TS As String
 
         Dim SW As New Stopwatch
-        Dim TSW As String
+        Dim T1SW As String
+        Dim T2SW As String
         Dim NbSol As Integer
         Dim GrilleFinale(8, 8) As String ' La grille en fin de partie
 
+        Dim Grillemodèle As String = "002700000008509630005060080980000040030000010050000023060080400027306900000005100"
+        Dim Grillemodtle As String = "012345678012345678012345678012345678012345678012345678012345678012345678012345678"
+        Dim Grillemorrre As String = "0        1        2        3        4        5        6        7        8        "
         '============================================================================================================================================================
         '  Procédure principale
         '============================================================================================================================================================
@@ -54,32 +58,44 @@ Module Générateur
 
                 ChoisitCase(Grille, nbVal, i, j) ' choisit une case au hasard parmi celles qui sont libres
                 GénéCase(Grille, Candidats, i, j, nbVal) 'affecte une valeur à la case choisie
-                    RecalculCandidats(i, j, Grille, Candidats) ' Efface les candidats éliminés par la case généréee 
+                RecalculCandidats(i, j, Grille, Candidats) ' Efface les candidats éliminés par la case généréee 
+                ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
+                'Génération symétrique
+                If i <> 4 Or j <> 4 Then
+                    i = 8 - i
+                    j = 8 - j
+                    GénéCase(Grille, Candidats, i, j, nbVal) 'affecte une valeur à la case choisie
+                    RecalculCandidats(i, j, Grille, Candidats) ' Efface les candidats éliminés par la case généréee  
                     ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
-                    'Génération symétrique
-                    If i <> 4 Or j <> 4 Then
-                        i = 8 - i
-                        j = 8 - j
-                        GénéCase(Grille, Candidats, i, j, nbVal) 'affecte une valeur à la case choisie
-                        RecalculCandidats(i, j, Grille, Candidats) ' Efface les candidats éliminés par la case généréee  
-                        ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
-                    End If
+                End If
 
             End While
+            SW.Stop()
+            T1SW = SW.ElapsedMilliseconds.ToString & " milliseconde(s)"
+            SW.Reset()
+            SW.Start()
+            'For i = 0 To 8
+            '    For j = 0 To 8
+            '        g = (i * 9) + j + 1
+            '        Grille(i, j) = Mid(Grillemodèle, g, 1)
+            '        nbVal += 1
+            '    Next
+            'Next
+            'CalculCandidats(Grille, Candidats)
 
             Array.Copy(Grille, GrilleFinale, 81)
             ForceBrute.ForceBrute(GrilleFinale, NbSol)
 
             If NbSol > 0 Then
+                ' If NbSol = 1 Then
                 Array.Copy(GrilleFinale, Grille, 81)
                 Réussi = True
                 NbRéussi += 1
             End If
-
+            SW.Stop()
+            T2SW = SW.ElapsedMilliseconds.ToString & " milliseconde(s)"
         End While
 
-        SW.Stop()
-        TSW = SW.ElapsedMilliseconds.ToString & " milliseconde(s)"
 
     End Sub
 
@@ -127,7 +143,6 @@ Module Générateur
         Dim NombreCandidats As Integer
         Dim CompteurCandidat As Integer
 
-        Dim TS As String
 
         NombreCandidats = 0
         For k = 0 To 8
@@ -161,8 +176,8 @@ Module Générateur
         ' by making Generator static, we preserve the same instance '
         ' (i.e., do not create new instances with the same seed over and over) '
         ' between calls '
-        Static Generator As System.Random = New System.Random()
-        Return Generator.Next(Min, Max)
+        '   Static Generator As System.Random = New System.Random()
+        Return Sudoku.Generator.Next(Min, Max)
 
     End Function
 

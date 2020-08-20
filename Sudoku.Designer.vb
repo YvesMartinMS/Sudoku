@@ -27,28 +27,14 @@ Partial Class Sudoku
         Me.FichierToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ChToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SauvegarderUneGrilleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.QuitterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PartieToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaisieToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.TestToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PaireNueToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PaireNueEnLigneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PaireNueEnColonneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.EnRégionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.XYwingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.XYWingEnLigneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.XWingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.XWingEnLigneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.XWingEnColonneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.TripletNuToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.TripletNuEnLigneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GénérerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.QuitterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GrilleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AfficherLesCandidatsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EffacerLesCandidatsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LBL_Conseil = New System.Windows.Forms.Label()
-        Me.BT_Solutions = New System.Windows.Forms.Button()
-        Me.BT_Smp = New System.Windows.Forms.Button()
         Me.BT_1 = New System.Windows.Forms.Button()
         Me.BT_2 = New System.Windows.Forms.Button()
         Me.BT_3 = New System.Windows.Forms.Button()
@@ -134,24 +120,28 @@ Partial Class Sudoku
         Me.BT62 = New System.Windows.Forms.Button()
         Me.BT61 = New System.Windows.Forms.Button()
         Me.BT60 = New System.Windows.Forms.Button()
-        Me.Bt59 = New System.Windows.Forms.Button()
+        Me.BT59 = New System.Windows.Forms.Button()
         Me.BT58 = New System.Windows.Forms.Button()
         Me.BT57 = New System.Windows.Forms.Button()
         Me.BT56 = New System.Windows.Forms.Button()
         Me.BT55 = New System.Windows.Forms.Button()
         Me.BT54 = New System.Windows.Forms.Button()
-        Me.BTSolution = New System.Windows.Forms.Button()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.GénérerToolStripButton = New System.Windows.Forms.ToolStripButton()
-        Me.OuvrirToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        Me.EnregistrerToolStripButton = New System.Windows.Forms.ToolStripButton()
         Me.SaisirToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.GénérerToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.OuvrirToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.BTEnregistrer = New System.Windows.Forms.ToolStripButton()
         Me.JouerToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        Me.RecommencerToolStripButton = New System.Windows.Forms.ToolStripButton()
+        Me.toolStripSeparator = New System.Windows.Forms.ToolStripSeparator()
+        Me.BTRecommencer = New System.Windows.Forms.ToolStripButton()
+        Me.BTPrécédent = New System.Windows.Forms.ToolStripButton()
+        Me.BTSuivant = New System.Windows.Forms.ToolStripButton()
+        Me.BTTerminé = New System.Windows.Forms.ToolStripButton()
         Me.BTStepByStep = New System.Windows.Forms.Button()
         Me.LBL_nbVal = New System.Windows.Forms.Label()
         Me.nomFichierOuvert = New System.Windows.Forms.Label()
         Me.BTForceBrute = New System.Windows.Forms.Button()
+        Me.BTPossibilités = New System.Windows.Forms.Button()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -168,7 +158,7 @@ Partial Class Sudoku
         '
         'FichierToolStripMenuItem
         '
-        Me.FichierToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ChToolStripMenuItem, Me.SauvegarderUneGrilleToolStripMenuItem})
+        Me.FichierToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ChToolStripMenuItem, Me.SauvegarderUneGrilleToolStripMenuItem, Me.QuitterToolStripMenuItem})
         Me.FichierToolStripMenuItem.Name = "FichierToolStripMenuItem"
         Me.FichierToolStripMenuItem.Size = New System.Drawing.Size(54, 20)
         Me.FichierToolStripMenuItem.Text = "Fichier"
@@ -185,9 +175,15 @@ Partial Class Sudoku
         Me.SauvegarderUneGrilleToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
         Me.SauvegarderUneGrilleToolStripMenuItem.Text = "Sauvegarder une Grille"
         '
+        'QuitterToolStripMenuItem
+        '
+        Me.QuitterToolStripMenuItem.Name = "QuitterToolStripMenuItem"
+        Me.QuitterToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.QuitterToolStripMenuItem.Text = "Quitter"
+        '
         'PartieToolStripMenuItem
         '
-        Me.PartieToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaisieToolStripMenuItem1, Me.TestToolStripMenuItem1, Me.GénérerToolStripMenuItem, Me.QuitterToolStripMenuItem})
+        Me.PartieToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaisieToolStripMenuItem1, Me.GénérerToolStripMenuItem})
         Me.PartieToolStripMenuItem.Name = "PartieToolStripMenuItem"
         Me.PartieToolStripMenuItem.Size = New System.Drawing.Size(49, 20)
         Me.PartieToolStripMenuItem.Text = "Partie"
@@ -195,97 +191,14 @@ Partial Class Sudoku
         'SaisieToolStripMenuItem1
         '
         Me.SaisieToolStripMenuItem1.Name = "SaisieToolStripMenuItem1"
-        Me.SaisieToolStripMenuItem1.Size = New System.Drawing.Size(153, 22)
-        Me.SaisieToolStripMenuItem1.Text = "Saisie"
-        '
-        'TestToolStripMenuItem1
-        '
-        Me.TestToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PaireNueToolStripMenuItem, Me.XYwingToolStripMenuItem, Me.XWingToolStripMenuItem, Me.TripletNuToolStripMenuItem})
-        Me.TestToolStripMenuItem1.Name = "TestToolStripMenuItem1"
-        Me.TestToolStripMenuItem1.Size = New System.Drawing.Size(153, 22)
-        Me.TestToolStripMenuItem1.Text = "Démonstration"
-        '
-        'PaireNueToolStripMenuItem
-        '
-        Me.PaireNueToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PaireNueEnLigneToolStripMenuItem, Me.PaireNueEnColonneToolStripMenuItem, Me.EnRégionToolStripMenuItem})
-        Me.PaireNueToolStripMenuItem.Name = "PaireNueToolStripMenuItem"
-        Me.PaireNueToolStripMenuItem.Size = New System.Drawing.Size(123, 22)
-        Me.PaireNueToolStripMenuItem.Text = "Paire nue"
-        '
-        'PaireNueEnLigneToolStripMenuItem
-        '
-        Me.PaireNueEnLigneToolStripMenuItem.Name = "PaireNueEnLigneToolStripMenuItem"
-        Me.PaireNueEnLigneToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
-        Me.PaireNueEnLigneToolStripMenuItem.Text = "En ligne"
-        '
-        'PaireNueEnColonneToolStripMenuItem
-        '
-        Me.PaireNueEnColonneToolStripMenuItem.Name = "PaireNueEnColonneToolStripMenuItem"
-        Me.PaireNueEnColonneToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
-        Me.PaireNueEnColonneToolStripMenuItem.Text = "En Colonne"
-        '
-        'EnRégionToolStripMenuItem
-        '
-        Me.EnRégionToolStripMenuItem.Name = "EnRégionToolStripMenuItem"
-        Me.EnRégionToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
-        Me.EnRégionToolStripMenuItem.Text = "En Région"
-        '
-        'XYwingToolStripMenuItem
-        '
-        Me.XYwingToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.XYWingEnLigneToolStripMenuItem})
-        Me.XYwingToolStripMenuItem.Name = "XYwingToolStripMenuItem"
-        Me.XYwingToolStripMenuItem.Size = New System.Drawing.Size(123, 22)
-        Me.XYwingToolStripMenuItem.Text = "XY-wing"
-        '
-        'XYWingEnLigneToolStripMenuItem
-        '
-        Me.XYWingEnLigneToolStripMenuItem.Name = "XYWingEnLigneToolStripMenuItem"
-        Me.XYWingEnLigneToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
-        Me.XYWingEnLigneToolStripMenuItem.Text = "En Ligne"
-        '
-        'XWingToolStripMenuItem
-        '
-        Me.XWingToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.XWingEnLigneToolStripMenuItem, Me.XWingEnColonneToolStripMenuItem})
-        Me.XWingToolStripMenuItem.Name = "XWingToolStripMenuItem"
-        Me.XWingToolStripMenuItem.Size = New System.Drawing.Size(123, 22)
-        Me.XWingToolStripMenuItem.Text = "X-Wing"
-        '
-        'XWingEnLigneToolStripMenuItem
-        '
-        Me.XWingEnLigneToolStripMenuItem.Name = "XWingEnLigneToolStripMenuItem"
-        Me.XWingEnLigneToolStripMenuItem.Size = New System.Drawing.Size(133, 22)
-        Me.XWingEnLigneToolStripMenuItem.Text = "En ligne"
-        '
-        'XWingEnColonneToolStripMenuItem
-        '
-        Me.XWingEnColonneToolStripMenuItem.Name = "XWingEnColonneToolStripMenuItem"
-        Me.XWingEnColonneToolStripMenuItem.Size = New System.Drawing.Size(133, 22)
-        Me.XWingEnColonneToolStripMenuItem.Text = "En colonne"
-        '
-        'TripletNuToolStripMenuItem
-        '
-        Me.TripletNuToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TripletNuEnLigneToolStripMenuItem})
-        Me.TripletNuToolStripMenuItem.Name = "TripletNuToolStripMenuItem"
-        Me.TripletNuToolStripMenuItem.Size = New System.Drawing.Size(123, 22)
-        Me.TripletNuToolStripMenuItem.Text = "Triplet nu"
-        '
-        'TripletNuEnLigneToolStripMenuItem
-        '
-        Me.TripletNuEnLigneToolStripMenuItem.Name = "TripletNuEnLigneToolStripMenuItem"
-        Me.TripletNuEnLigneToolStripMenuItem.Size = New System.Drawing.Size(116, 22)
-        Me.TripletNuEnLigneToolStripMenuItem.Text = "En ligne"
+        Me.SaisieToolStripMenuItem1.Size = New System.Drawing.Size(115, 22)
+        Me.SaisieToolStripMenuItem1.Text = "Saisir"
         '
         'GénérerToolStripMenuItem
         '
         Me.GénérerToolStripMenuItem.Name = "GénérerToolStripMenuItem"
-        Me.GénérerToolStripMenuItem.Size = New System.Drawing.Size(153, 22)
+        Me.GénérerToolStripMenuItem.Size = New System.Drawing.Size(115, 22)
         Me.GénérerToolStripMenuItem.Text = "Générer"
-        '
-        'QuitterToolStripMenuItem
-        '
-        Me.QuitterToolStripMenuItem.Name = "QuitterToolStripMenuItem"
-        Me.QuitterToolStripMenuItem.Size = New System.Drawing.Size(153, 22)
-        Me.QuitterToolStripMenuItem.Text = "Quitter"
         '
         'GrilleToolStripMenuItem
         '
@@ -310,36 +223,16 @@ Partial Class Sudoku
         '
         Me.LBL_Conseil.AutoSize = True
         Me.LBL_Conseil.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LBL_Conseil.Location = New System.Drawing.Point(347, 715)
+        Me.LBL_Conseil.Location = New System.Drawing.Point(347, 757)
         Me.LBL_Conseil.Name = "LBL_Conseil"
         Me.LBL_Conseil.Size = New System.Drawing.Size(60, 25)
         Me.LBL_Conseil.TabIndex = 1002
         Me.LBL_Conseil.Text = "Label"
         '
-        'BT_Solutions
-        '
-        Me.BT_Solutions.Location = New System.Drawing.Point(50, 150)
-        Me.BT_Solutions.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.BT_Solutions.Name = "BT_Solutions"
-        Me.BT_Solutions.Size = New System.Drawing.Size(123, 35)
-        Me.BT_Solutions.TabIndex = 1004
-        Me.BT_Solutions.Text = "Solutions"
-        Me.BT_Solutions.UseVisualStyleBackColor = True
-        '
-        'BT_Smp
-        '
-        Me.BT_Smp.Location = New System.Drawing.Point(50, 210)
-        Me.BT_Smp.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.BT_Smp.Name = "BT_Smp"
-        Me.BT_Smp.Size = New System.Drawing.Size(123, 37)
-        Me.BT_Smp.TabIndex = 1005
-        Me.BT_Smp.Text = "Simplifications"
-        Me.BT_Smp.UseVisualStyleBackColor = True
-        '
         'BT_1
         '
         Me.BT_1.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_1.Location = New System.Drawing.Point(50, 74)
+        Me.BT_1.Location = New System.Drawing.Point(50, 114)
         Me.BT_1.Name = "BT_1"
         Me.BT_1.Size = New System.Drawing.Size(45, 45)
         Me.BT_1.TabIndex = 1083
@@ -349,7 +242,7 @@ Partial Class Sudoku
         'BT_2
         '
         Me.BT_2.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_2.Location = New System.Drawing.Point(101, 74)
+        Me.BT_2.Location = New System.Drawing.Point(101, 114)
         Me.BT_2.Name = "BT_2"
         Me.BT_2.Size = New System.Drawing.Size(45, 45)
         Me.BT_2.TabIndex = 1084
@@ -359,7 +252,7 @@ Partial Class Sudoku
         'BT_3
         '
         Me.BT_3.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_3.Location = New System.Drawing.Point(150, 74)
+        Me.BT_3.Location = New System.Drawing.Point(150, 114)
         Me.BT_3.Name = "BT_3"
         Me.BT_3.Size = New System.Drawing.Size(45, 45)
         Me.BT_3.TabIndex = 1085
@@ -369,7 +262,7 @@ Partial Class Sudoku
         'BT_4
         '
         Me.BT_4.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_4.Location = New System.Drawing.Point(200, 74)
+        Me.BT_4.Location = New System.Drawing.Point(200, 114)
         Me.BT_4.Name = "BT_4"
         Me.BT_4.Size = New System.Drawing.Size(45, 45)
         Me.BT_4.TabIndex = 1086
@@ -379,7 +272,7 @@ Partial Class Sudoku
         'BT_5
         '
         Me.BT_5.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_5.Location = New System.Drawing.Point(250, 74)
+        Me.BT_5.Location = New System.Drawing.Point(250, 114)
         Me.BT_5.Name = "BT_5"
         Me.BT_5.Size = New System.Drawing.Size(45, 45)
         Me.BT_5.TabIndex = 1087
@@ -389,7 +282,7 @@ Partial Class Sudoku
         'BT_6
         '
         Me.BT_6.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_6.Location = New System.Drawing.Point(300, 74)
+        Me.BT_6.Location = New System.Drawing.Point(300, 114)
         Me.BT_6.Name = "BT_6"
         Me.BT_6.Size = New System.Drawing.Size(45, 45)
         Me.BT_6.TabIndex = 1088
@@ -399,7 +292,7 @@ Partial Class Sudoku
         'BT_7
         '
         Me.BT_7.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_7.Location = New System.Drawing.Point(350, 74)
+        Me.BT_7.Location = New System.Drawing.Point(350, 114)
         Me.BT_7.Name = "BT_7"
         Me.BT_7.Size = New System.Drawing.Size(45, 45)
         Me.BT_7.TabIndex = 1089
@@ -409,7 +302,7 @@ Partial Class Sudoku
         'BT_8
         '
         Me.BT_8.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_8.Location = New System.Drawing.Point(400, 74)
+        Me.BT_8.Location = New System.Drawing.Point(400, 114)
         Me.BT_8.Name = "BT_8"
         Me.BT_8.Size = New System.Drawing.Size(45, 45)
         Me.BT_8.TabIndex = 1090
@@ -419,7 +312,7 @@ Partial Class Sudoku
         'BT_9
         '
         Me.BT_9.BackColor = System.Drawing.Color.LightSkyBlue
-        Me.BT_9.Location = New System.Drawing.Point(450, 74)
+        Me.BT_9.Location = New System.Drawing.Point(450, 114)
         Me.BT_9.Name = "BT_9"
         Me.BT_9.Size = New System.Drawing.Size(45, 45)
         Me.BT_9.TabIndex = 1091
@@ -430,7 +323,7 @@ Partial Class Sudoku
         '
         Me.BT_Clear.BackColor = System.Drawing.Color.LightSkyBlue
         Me.BT_Clear.Font = New System.Drawing.Font("Courier New", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT_Clear.Location = New System.Drawing.Point(500, 74)
+        Me.BT_Clear.Location = New System.Drawing.Point(500, 114)
         Me.BT_Clear.Name = "BT_Clear"
         Me.BT_Clear.Size = New System.Drawing.Size(45, 45)
         Me.BT_Clear.TabIndex = 1092
@@ -441,7 +334,7 @@ Partial Class Sudoku
         '
         Me.BT00.BackColor = System.Drawing.Color.Azure
         Me.BT00.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT00.Location = New System.Drawing.Point(350, 150)
+        Me.BT00.Location = New System.Drawing.Point(350, 190)
         Me.BT00.Name = "BT00"
         Me.BT00.Size = New System.Drawing.Size(57, 57)
         Me.BT00.TabIndex = 100
@@ -452,7 +345,7 @@ Partial Class Sudoku
         '
         Me.BT01.BackColor = System.Drawing.Color.Azure
         Me.BT01.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT01.Location = New System.Drawing.Point(410, 150)
+        Me.BT01.Location = New System.Drawing.Point(410, 190)
         Me.BT01.Name = "BT01"
         Me.BT01.Size = New System.Drawing.Size(57, 57)
         Me.BT01.TabIndex = 101
@@ -463,7 +356,7 @@ Partial Class Sudoku
         '
         Me.BT02.BackColor = System.Drawing.Color.Azure
         Me.BT02.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT02.Location = New System.Drawing.Point(470, 150)
+        Me.BT02.Location = New System.Drawing.Point(470, 190)
         Me.BT02.Name = "BT02"
         Me.BT02.Size = New System.Drawing.Size(57, 57)
         Me.BT02.TabIndex = 102
@@ -474,7 +367,7 @@ Partial Class Sudoku
         '
         Me.BT03.BackColor = System.Drawing.Color.LightCyan
         Me.BT03.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT03.Location = New System.Drawing.Point(530, 150)
+        Me.BT03.Location = New System.Drawing.Point(530, 190)
         Me.BT03.Name = "BT03"
         Me.BT03.Size = New System.Drawing.Size(57, 57)
         Me.BT03.TabIndex = 103
@@ -485,7 +378,7 @@ Partial Class Sudoku
         '
         Me.BT04.BackColor = System.Drawing.Color.LightCyan
         Me.BT04.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT04.Location = New System.Drawing.Point(590, 150)
+        Me.BT04.Location = New System.Drawing.Point(590, 190)
         Me.BT04.Name = "BT04"
         Me.BT04.Size = New System.Drawing.Size(57, 57)
         Me.BT04.TabIndex = 104
@@ -496,7 +389,7 @@ Partial Class Sudoku
         '
         Me.BT05.BackColor = System.Drawing.Color.LightCyan
         Me.BT05.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT05.Location = New System.Drawing.Point(650, 150)
+        Me.BT05.Location = New System.Drawing.Point(650, 190)
         Me.BT05.Name = "BT05"
         Me.BT05.Size = New System.Drawing.Size(57, 57)
         Me.BT05.TabIndex = 105
@@ -507,7 +400,7 @@ Partial Class Sudoku
         '
         Me.BT08.BackColor = System.Drawing.Color.Azure
         Me.BT08.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT08.Location = New System.Drawing.Point(830, 150)
+        Me.BT08.Location = New System.Drawing.Point(830, 190)
         Me.BT08.Name = "BT08"
         Me.BT08.Size = New System.Drawing.Size(57, 57)
         Me.BT08.TabIndex = 108
@@ -518,7 +411,7 @@ Partial Class Sudoku
         '
         Me.BT07.BackColor = System.Drawing.Color.Azure
         Me.BT07.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT07.Location = New System.Drawing.Point(770, 150)
+        Me.BT07.Location = New System.Drawing.Point(770, 190)
         Me.BT07.Name = "BT07"
         Me.BT07.Size = New System.Drawing.Size(57, 57)
         Me.BT07.TabIndex = 107
@@ -529,7 +422,7 @@ Partial Class Sudoku
         '
         Me.BT06.BackColor = System.Drawing.Color.Azure
         Me.BT06.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT06.Location = New System.Drawing.Point(710, 150)
+        Me.BT06.Location = New System.Drawing.Point(710, 190)
         Me.BT06.Name = "BT06"
         Me.BT06.Size = New System.Drawing.Size(57, 57)
         Me.BT06.TabIndex = 106
@@ -540,7 +433,7 @@ Partial Class Sudoku
         '
         Me.BT17.BackColor = System.Drawing.Color.Azure
         Me.BT17.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT17.Location = New System.Drawing.Point(830, 210)
+        Me.BT17.Location = New System.Drawing.Point(830, 250)
         Me.BT17.Name = "BT17"
         Me.BT17.Size = New System.Drawing.Size(57, 57)
         Me.BT17.TabIndex = 117
@@ -551,7 +444,7 @@ Partial Class Sudoku
         '
         Me.BT16.BackColor = System.Drawing.Color.Azure
         Me.BT16.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT16.Location = New System.Drawing.Point(770, 210)
+        Me.BT16.Location = New System.Drawing.Point(770, 250)
         Me.BT16.Name = "BT16"
         Me.BT16.Size = New System.Drawing.Size(57, 57)
         Me.BT16.TabIndex = 116
@@ -562,7 +455,7 @@ Partial Class Sudoku
         '
         Me.BT15.BackColor = System.Drawing.Color.Azure
         Me.BT15.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT15.Location = New System.Drawing.Point(710, 210)
+        Me.BT15.Location = New System.Drawing.Point(710, 250)
         Me.BT15.Name = "BT15"
         Me.BT15.Size = New System.Drawing.Size(57, 57)
         Me.BT15.TabIndex = 115
@@ -573,7 +466,7 @@ Partial Class Sudoku
         '
         Me.BT14.BackColor = System.Drawing.Color.LightCyan
         Me.BT14.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT14.Location = New System.Drawing.Point(650, 210)
+        Me.BT14.Location = New System.Drawing.Point(650, 250)
         Me.BT14.Name = "BT14"
         Me.BT14.Size = New System.Drawing.Size(57, 57)
         Me.BT14.TabIndex = 114
@@ -584,7 +477,7 @@ Partial Class Sudoku
         '
         Me.BT13.BackColor = System.Drawing.Color.LightCyan
         Me.BT13.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT13.Location = New System.Drawing.Point(590, 210)
+        Me.BT13.Location = New System.Drawing.Point(590, 250)
         Me.BT13.Name = "BT13"
         Me.BT13.Size = New System.Drawing.Size(57, 57)
         Me.BT13.TabIndex = 113
@@ -595,7 +488,7 @@ Partial Class Sudoku
         '
         Me.BT12.BackColor = System.Drawing.Color.LightCyan
         Me.BT12.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT12.Location = New System.Drawing.Point(530, 210)
+        Me.BT12.Location = New System.Drawing.Point(530, 250)
         Me.BT12.Name = "BT12"
         Me.BT12.Size = New System.Drawing.Size(57, 57)
         Me.BT12.TabIndex = 112
@@ -606,7 +499,7 @@ Partial Class Sudoku
         '
         Me.BT11.BackColor = System.Drawing.Color.Azure
         Me.BT11.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT11.Location = New System.Drawing.Point(470, 210)
+        Me.BT11.Location = New System.Drawing.Point(470, 250)
         Me.BT11.Name = "BT11"
         Me.BT11.Size = New System.Drawing.Size(57, 57)
         Me.BT11.TabIndex = 111
@@ -617,7 +510,7 @@ Partial Class Sudoku
         '
         Me.BT10.BackColor = System.Drawing.Color.Azure
         Me.BT10.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT10.Location = New System.Drawing.Point(410, 210)
+        Me.BT10.Location = New System.Drawing.Point(410, 250)
         Me.BT10.Name = "BT10"
         Me.BT10.Size = New System.Drawing.Size(57, 57)
         Me.BT10.TabIndex = 110
@@ -628,7 +521,7 @@ Partial Class Sudoku
         '
         Me.BT09.BackColor = System.Drawing.Color.Azure
         Me.BT09.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT09.Location = New System.Drawing.Point(350, 210)
+        Me.BT09.Location = New System.Drawing.Point(350, 250)
         Me.BT09.Name = "BT09"
         Me.BT09.Size = New System.Drawing.Size(57, 57)
         Me.BT09.TabIndex = 109
@@ -639,7 +532,7 @@ Partial Class Sudoku
         '
         Me.BT26.BackColor = System.Drawing.Color.Azure
         Me.BT26.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT26.Location = New System.Drawing.Point(830, 270)
+        Me.BT26.Location = New System.Drawing.Point(830, 310)
         Me.BT26.Name = "BT26"
         Me.BT26.Size = New System.Drawing.Size(57, 57)
         Me.BT26.TabIndex = 126
@@ -650,7 +543,7 @@ Partial Class Sudoku
         '
         Me.BT25.BackColor = System.Drawing.Color.Azure
         Me.BT25.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT25.Location = New System.Drawing.Point(770, 270)
+        Me.BT25.Location = New System.Drawing.Point(770, 310)
         Me.BT25.Name = "BT25"
         Me.BT25.Size = New System.Drawing.Size(57, 57)
         Me.BT25.TabIndex = 125
@@ -661,7 +554,7 @@ Partial Class Sudoku
         '
         Me.BT24.BackColor = System.Drawing.Color.Azure
         Me.BT24.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT24.Location = New System.Drawing.Point(710, 270)
+        Me.BT24.Location = New System.Drawing.Point(710, 310)
         Me.BT24.Name = "BT24"
         Me.BT24.Size = New System.Drawing.Size(57, 57)
         Me.BT24.TabIndex = 124
@@ -672,7 +565,7 @@ Partial Class Sudoku
         '
         Me.BT23.BackColor = System.Drawing.Color.LightCyan
         Me.BT23.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT23.Location = New System.Drawing.Point(650, 270)
+        Me.BT23.Location = New System.Drawing.Point(650, 310)
         Me.BT23.Name = "BT23"
         Me.BT23.Size = New System.Drawing.Size(57, 57)
         Me.BT23.TabIndex = 123
@@ -683,7 +576,7 @@ Partial Class Sudoku
         '
         Me.BT22.BackColor = System.Drawing.Color.LightCyan
         Me.BT22.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT22.Location = New System.Drawing.Point(590, 270)
+        Me.BT22.Location = New System.Drawing.Point(590, 310)
         Me.BT22.Name = "BT22"
         Me.BT22.Size = New System.Drawing.Size(57, 57)
         Me.BT22.TabIndex = 122
@@ -694,7 +587,7 @@ Partial Class Sudoku
         '
         Me.BT21.BackColor = System.Drawing.Color.LightCyan
         Me.BT21.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT21.Location = New System.Drawing.Point(530, 270)
+        Me.BT21.Location = New System.Drawing.Point(530, 310)
         Me.BT21.Name = "BT21"
         Me.BT21.Size = New System.Drawing.Size(57, 57)
         Me.BT21.TabIndex = 121
@@ -705,7 +598,7 @@ Partial Class Sudoku
         '
         Me.BT20.BackColor = System.Drawing.Color.Azure
         Me.BT20.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT20.Location = New System.Drawing.Point(470, 270)
+        Me.BT20.Location = New System.Drawing.Point(470, 310)
         Me.BT20.Name = "BT20"
         Me.BT20.Size = New System.Drawing.Size(57, 57)
         Me.BT20.TabIndex = 120
@@ -716,7 +609,7 @@ Partial Class Sudoku
         '
         Me.BT19.BackColor = System.Drawing.Color.Azure
         Me.BT19.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT19.Location = New System.Drawing.Point(410, 270)
+        Me.BT19.Location = New System.Drawing.Point(410, 310)
         Me.BT19.Name = "BT19"
         Me.BT19.Size = New System.Drawing.Size(57, 57)
         Me.BT19.TabIndex = 119
@@ -727,7 +620,7 @@ Partial Class Sudoku
         '
         Me.BT18.BackColor = System.Drawing.Color.Azure
         Me.BT18.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT18.Location = New System.Drawing.Point(350, 270)
+        Me.BT18.Location = New System.Drawing.Point(350, 310)
         Me.BT18.Name = "BT18"
         Me.BT18.Size = New System.Drawing.Size(57, 57)
         Me.BT18.TabIndex = 118
@@ -738,7 +631,7 @@ Partial Class Sudoku
         '
         Me.BT32.BackColor = System.Drawing.Color.Azure
         Me.BT32.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT32.Location = New System.Drawing.Point(650, 330)
+        Me.BT32.Location = New System.Drawing.Point(650, 370)
         Me.BT32.Name = "BT32"
         Me.BT32.Size = New System.Drawing.Size(57, 57)
         Me.BT32.TabIndex = 132
@@ -749,7 +642,7 @@ Partial Class Sudoku
         '
         Me.BT31.BackColor = System.Drawing.Color.Azure
         Me.BT31.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT31.Location = New System.Drawing.Point(590, 330)
+        Me.BT31.Location = New System.Drawing.Point(590, 370)
         Me.BT31.Name = "BT31"
         Me.BT31.Size = New System.Drawing.Size(57, 57)
         Me.BT31.TabIndex = 131
@@ -760,7 +653,7 @@ Partial Class Sudoku
         '
         Me.BT30.BackColor = System.Drawing.Color.Azure
         Me.BT30.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT30.Location = New System.Drawing.Point(530, 330)
+        Me.BT30.Location = New System.Drawing.Point(530, 370)
         Me.BT30.Name = "BT30"
         Me.BT30.Size = New System.Drawing.Size(57, 57)
         Me.BT30.TabIndex = 130
@@ -771,7 +664,7 @@ Partial Class Sudoku
         '
         Me.BT29.BackColor = System.Drawing.Color.LightCyan
         Me.BT29.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT29.Location = New System.Drawing.Point(470, 330)
+        Me.BT29.Location = New System.Drawing.Point(470, 370)
         Me.BT29.Name = "BT29"
         Me.BT29.Size = New System.Drawing.Size(57, 57)
         Me.BT29.TabIndex = 129
@@ -782,7 +675,7 @@ Partial Class Sudoku
         '
         Me.BT28.BackColor = System.Drawing.Color.LightCyan
         Me.BT28.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT28.Location = New System.Drawing.Point(410, 330)
+        Me.BT28.Location = New System.Drawing.Point(410, 370)
         Me.BT28.Name = "BT28"
         Me.BT28.Size = New System.Drawing.Size(57, 57)
         Me.BT28.TabIndex = 128
@@ -793,7 +686,7 @@ Partial Class Sudoku
         '
         Me.BT27.BackColor = System.Drawing.Color.LightCyan
         Me.BT27.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT27.Location = New System.Drawing.Point(350, 330)
+        Me.BT27.Location = New System.Drawing.Point(350, 370)
         Me.BT27.Name = "BT27"
         Me.BT27.Size = New System.Drawing.Size(57, 57)
         Me.BT27.TabIndex = 127
@@ -804,7 +697,7 @@ Partial Class Sudoku
         '
         Me.BT35.BackColor = System.Drawing.Color.LightCyan
         Me.BT35.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT35.Location = New System.Drawing.Point(830, 330)
+        Me.BT35.Location = New System.Drawing.Point(830, 370)
         Me.BT35.Name = "BT35"
         Me.BT35.Size = New System.Drawing.Size(57, 57)
         Me.BT35.TabIndex = 135
@@ -815,7 +708,7 @@ Partial Class Sudoku
         '
         Me.BT34.BackColor = System.Drawing.Color.LightCyan
         Me.BT34.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT34.Location = New System.Drawing.Point(770, 330)
+        Me.BT34.Location = New System.Drawing.Point(770, 370)
         Me.BT34.Name = "BT34"
         Me.BT34.Size = New System.Drawing.Size(57, 57)
         Me.BT34.TabIndex = 134
@@ -826,7 +719,7 @@ Partial Class Sudoku
         '
         Me.BT33.BackColor = System.Drawing.Color.LightCyan
         Me.BT33.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT33.Location = New System.Drawing.Point(710, 330)
+        Me.BT33.Location = New System.Drawing.Point(710, 370)
         Me.BT33.Name = "BT33"
         Me.BT33.Size = New System.Drawing.Size(57, 57)
         Me.BT33.TabIndex = 133
@@ -837,7 +730,7 @@ Partial Class Sudoku
         '
         Me.BT44.BackColor = System.Drawing.Color.LightCyan
         Me.BT44.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT44.Location = New System.Drawing.Point(830, 390)
+        Me.BT44.Location = New System.Drawing.Point(830, 430)
         Me.BT44.Name = "BT44"
         Me.BT44.Size = New System.Drawing.Size(57, 57)
         Me.BT44.TabIndex = 144
@@ -848,7 +741,7 @@ Partial Class Sudoku
         '
         Me.BT43.BackColor = System.Drawing.Color.LightCyan
         Me.BT43.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT43.Location = New System.Drawing.Point(770, 390)
+        Me.BT43.Location = New System.Drawing.Point(770, 430)
         Me.BT43.Name = "BT43"
         Me.BT43.Size = New System.Drawing.Size(57, 57)
         Me.BT43.TabIndex = 143
@@ -859,7 +752,7 @@ Partial Class Sudoku
         '
         Me.BT42.BackColor = System.Drawing.Color.LightCyan
         Me.BT42.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT42.Location = New System.Drawing.Point(710, 390)
+        Me.BT42.Location = New System.Drawing.Point(710, 430)
         Me.BT42.Name = "BT42"
         Me.BT42.Size = New System.Drawing.Size(57, 57)
         Me.BT42.TabIndex = 142
@@ -870,7 +763,7 @@ Partial Class Sudoku
         '
         Me.BT41.BackColor = System.Drawing.Color.Azure
         Me.BT41.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT41.Location = New System.Drawing.Point(650, 390)
+        Me.BT41.Location = New System.Drawing.Point(650, 430)
         Me.BT41.Name = "BT41"
         Me.BT41.Size = New System.Drawing.Size(57, 57)
         Me.BT41.TabIndex = 141
@@ -881,7 +774,7 @@ Partial Class Sudoku
         '
         Me.BT40.BackColor = System.Drawing.Color.Azure
         Me.BT40.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT40.Location = New System.Drawing.Point(590, 390)
+        Me.BT40.Location = New System.Drawing.Point(590, 430)
         Me.BT40.Name = "BT40"
         Me.BT40.Size = New System.Drawing.Size(57, 57)
         Me.BT40.TabIndex = 140
@@ -892,7 +785,7 @@ Partial Class Sudoku
         '
         Me.BT39.BackColor = System.Drawing.Color.Azure
         Me.BT39.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT39.Location = New System.Drawing.Point(530, 390)
+        Me.BT39.Location = New System.Drawing.Point(530, 430)
         Me.BT39.Name = "BT39"
         Me.BT39.Size = New System.Drawing.Size(57, 57)
         Me.BT39.TabIndex = 139
@@ -903,7 +796,7 @@ Partial Class Sudoku
         '
         Me.BT38.BackColor = System.Drawing.Color.LightCyan
         Me.BT38.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT38.Location = New System.Drawing.Point(470, 390)
+        Me.BT38.Location = New System.Drawing.Point(470, 430)
         Me.BT38.Name = "BT38"
         Me.BT38.Size = New System.Drawing.Size(57, 57)
         Me.BT38.TabIndex = 138
@@ -914,7 +807,7 @@ Partial Class Sudoku
         '
         Me.BT37.BackColor = System.Drawing.Color.LightCyan
         Me.BT37.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT37.Location = New System.Drawing.Point(410, 390)
+        Me.BT37.Location = New System.Drawing.Point(410, 430)
         Me.BT37.Name = "BT37"
         Me.BT37.Size = New System.Drawing.Size(57, 57)
         Me.BT37.TabIndex = 137
@@ -925,7 +818,7 @@ Partial Class Sudoku
         '
         Me.Bt36.BackColor = System.Drawing.Color.LightCyan
         Me.Bt36.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Bt36.Location = New System.Drawing.Point(350, 390)
+        Me.Bt36.Location = New System.Drawing.Point(350, 430)
         Me.Bt36.Name = "Bt36"
         Me.Bt36.Size = New System.Drawing.Size(57, 57)
         Me.Bt36.TabIndex = 136
@@ -936,7 +829,7 @@ Partial Class Sudoku
         '
         Me.BT53.BackColor = System.Drawing.Color.LightCyan
         Me.BT53.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT53.Location = New System.Drawing.Point(830, 450)
+        Me.BT53.Location = New System.Drawing.Point(830, 490)
         Me.BT53.Name = "BT53"
         Me.BT53.Size = New System.Drawing.Size(57, 57)
         Me.BT53.TabIndex = 153
@@ -947,7 +840,7 @@ Partial Class Sudoku
         '
         Me.BT52.BackColor = System.Drawing.Color.LightCyan
         Me.BT52.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT52.Location = New System.Drawing.Point(770, 450)
+        Me.BT52.Location = New System.Drawing.Point(770, 490)
         Me.BT52.Name = "BT52"
         Me.BT52.Size = New System.Drawing.Size(57, 57)
         Me.BT52.TabIndex = 152
@@ -958,7 +851,7 @@ Partial Class Sudoku
         '
         Me.BT51.BackColor = System.Drawing.Color.LightCyan
         Me.BT51.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT51.Location = New System.Drawing.Point(713, 450)
+        Me.BT51.Location = New System.Drawing.Point(713, 490)
         Me.BT51.Name = "BT51"
         Me.BT51.Size = New System.Drawing.Size(57, 57)
         Me.BT51.TabIndex = 151
@@ -969,7 +862,7 @@ Partial Class Sudoku
         '
         Me.BT50.BackColor = System.Drawing.Color.Azure
         Me.BT50.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT50.Location = New System.Drawing.Point(650, 450)
+        Me.BT50.Location = New System.Drawing.Point(650, 490)
         Me.BT50.Name = "BT50"
         Me.BT50.Size = New System.Drawing.Size(57, 57)
         Me.BT50.TabIndex = 150
@@ -980,7 +873,7 @@ Partial Class Sudoku
         '
         Me.BT49.BackColor = System.Drawing.Color.Azure
         Me.BT49.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT49.Location = New System.Drawing.Point(590, 450)
+        Me.BT49.Location = New System.Drawing.Point(590, 490)
         Me.BT49.Name = "BT49"
         Me.BT49.Size = New System.Drawing.Size(57, 57)
         Me.BT49.TabIndex = 149
@@ -991,7 +884,7 @@ Partial Class Sudoku
         '
         Me.BT48.BackColor = System.Drawing.Color.Azure
         Me.BT48.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT48.Location = New System.Drawing.Point(530, 450)
+        Me.BT48.Location = New System.Drawing.Point(530, 490)
         Me.BT48.Name = "BT48"
         Me.BT48.Size = New System.Drawing.Size(57, 57)
         Me.BT48.TabIndex = 148
@@ -1002,7 +895,7 @@ Partial Class Sudoku
         '
         Me.BT47.BackColor = System.Drawing.Color.LightCyan
         Me.BT47.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT47.Location = New System.Drawing.Point(470, 450)
+        Me.BT47.Location = New System.Drawing.Point(470, 490)
         Me.BT47.Name = "BT47"
         Me.BT47.Size = New System.Drawing.Size(57, 57)
         Me.BT47.TabIndex = 147
@@ -1013,7 +906,7 @@ Partial Class Sudoku
         '
         Me.BT46.BackColor = System.Drawing.Color.LightCyan
         Me.BT46.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT46.Location = New System.Drawing.Point(410, 450)
+        Me.BT46.Location = New System.Drawing.Point(410, 490)
         Me.BT46.Name = "BT46"
         Me.BT46.Size = New System.Drawing.Size(57, 57)
         Me.BT46.TabIndex = 146
@@ -1024,7 +917,7 @@ Partial Class Sudoku
         '
         Me.BT45.BackColor = System.Drawing.Color.LightCyan
         Me.BT45.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT45.Location = New System.Drawing.Point(350, 450)
+        Me.BT45.Location = New System.Drawing.Point(350, 490)
         Me.BT45.Name = "BT45"
         Me.BT45.Size = New System.Drawing.Size(57, 57)
         Me.BT45.TabIndex = 145
@@ -1035,7 +928,7 @@ Partial Class Sudoku
         '
         Me.BT80.BackColor = System.Drawing.Color.Azure
         Me.BT80.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT80.Location = New System.Drawing.Point(830, 630)
+        Me.BT80.Location = New System.Drawing.Point(830, 670)
         Me.BT80.Name = "BT80"
         Me.BT80.Size = New System.Drawing.Size(57, 57)
         Me.BT80.TabIndex = 180
@@ -1046,7 +939,7 @@ Partial Class Sudoku
         '
         Me.BT79.BackColor = System.Drawing.Color.Azure
         Me.BT79.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT79.Location = New System.Drawing.Point(770, 630)
+        Me.BT79.Location = New System.Drawing.Point(770, 670)
         Me.BT79.Name = "BT79"
         Me.BT79.Size = New System.Drawing.Size(57, 57)
         Me.BT79.TabIndex = 179
@@ -1057,7 +950,7 @@ Partial Class Sudoku
         '
         Me.BT78.BackColor = System.Drawing.Color.Azure
         Me.BT78.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT78.Location = New System.Drawing.Point(710, 630)
+        Me.BT78.Location = New System.Drawing.Point(710, 670)
         Me.BT78.Name = "BT78"
         Me.BT78.Size = New System.Drawing.Size(57, 57)
         Me.BT78.TabIndex = 178
@@ -1068,7 +961,7 @@ Partial Class Sudoku
         '
         Me.BT77.BackColor = System.Drawing.Color.LightCyan
         Me.BT77.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT77.Location = New System.Drawing.Point(650, 630)
+        Me.BT77.Location = New System.Drawing.Point(650, 670)
         Me.BT77.Name = "BT77"
         Me.BT77.Size = New System.Drawing.Size(57, 57)
         Me.BT77.TabIndex = 177
@@ -1079,7 +972,7 @@ Partial Class Sudoku
         '
         Me.BT76.BackColor = System.Drawing.Color.LightCyan
         Me.BT76.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT76.Location = New System.Drawing.Point(590, 630)
+        Me.BT76.Location = New System.Drawing.Point(590, 670)
         Me.BT76.Name = "BT76"
         Me.BT76.Size = New System.Drawing.Size(57, 57)
         Me.BT76.TabIndex = 176
@@ -1090,7 +983,7 @@ Partial Class Sudoku
         '
         Me.BT75.BackColor = System.Drawing.Color.LightCyan
         Me.BT75.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT75.Location = New System.Drawing.Point(530, 630)
+        Me.BT75.Location = New System.Drawing.Point(530, 670)
         Me.BT75.Name = "BT75"
         Me.BT75.Size = New System.Drawing.Size(57, 57)
         Me.BT75.TabIndex = 175
@@ -1101,7 +994,7 @@ Partial Class Sudoku
         '
         Me.BT74.BackColor = System.Drawing.Color.Azure
         Me.BT74.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT74.Location = New System.Drawing.Point(470, 630)
+        Me.BT74.Location = New System.Drawing.Point(470, 670)
         Me.BT74.Name = "BT74"
         Me.BT74.Size = New System.Drawing.Size(57, 57)
         Me.BT74.TabIndex = 174
@@ -1112,7 +1005,7 @@ Partial Class Sudoku
         '
         Me.BT73.BackColor = System.Drawing.Color.Azure
         Me.BT73.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT73.Location = New System.Drawing.Point(410, 630)
+        Me.BT73.Location = New System.Drawing.Point(410, 670)
         Me.BT73.Name = "BT73"
         Me.BT73.Size = New System.Drawing.Size(57, 57)
         Me.BT73.TabIndex = 173
@@ -1123,7 +1016,7 @@ Partial Class Sudoku
         '
         Me.BT72.BackColor = System.Drawing.Color.Azure
         Me.BT72.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT72.Location = New System.Drawing.Point(350, 630)
+        Me.BT72.Location = New System.Drawing.Point(350, 670)
         Me.BT72.Name = "BT72"
         Me.BT72.Size = New System.Drawing.Size(57, 57)
         Me.BT72.TabIndex = 172
@@ -1134,7 +1027,7 @@ Partial Class Sudoku
         '
         Me.BT71.BackColor = System.Drawing.Color.Azure
         Me.BT71.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT71.Location = New System.Drawing.Point(830, 570)
+        Me.BT71.Location = New System.Drawing.Point(830, 610)
         Me.BT71.Name = "BT71"
         Me.BT71.Size = New System.Drawing.Size(57, 57)
         Me.BT71.TabIndex = 171
@@ -1145,7 +1038,7 @@ Partial Class Sudoku
         '
         Me.BT70.BackColor = System.Drawing.Color.Azure
         Me.BT70.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT70.Location = New System.Drawing.Point(770, 570)
+        Me.BT70.Location = New System.Drawing.Point(770, 610)
         Me.BT70.Name = "BT70"
         Me.BT70.Size = New System.Drawing.Size(57, 57)
         Me.BT70.TabIndex = 170
@@ -1156,7 +1049,7 @@ Partial Class Sudoku
         '
         Me.BT69.BackColor = System.Drawing.Color.Azure
         Me.BT69.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT69.Location = New System.Drawing.Point(710, 570)
+        Me.BT69.Location = New System.Drawing.Point(710, 610)
         Me.BT69.Name = "BT69"
         Me.BT69.Size = New System.Drawing.Size(57, 57)
         Me.BT69.TabIndex = 169
@@ -1167,7 +1060,7 @@ Partial Class Sudoku
         '
         Me.BT68.BackColor = System.Drawing.Color.LightCyan
         Me.BT68.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT68.Location = New System.Drawing.Point(650, 570)
+        Me.BT68.Location = New System.Drawing.Point(650, 610)
         Me.BT68.Name = "BT68"
         Me.BT68.Size = New System.Drawing.Size(57, 57)
         Me.BT68.TabIndex = 168
@@ -1178,7 +1071,7 @@ Partial Class Sudoku
         '
         Me.BT67.BackColor = System.Drawing.Color.LightCyan
         Me.BT67.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT67.Location = New System.Drawing.Point(590, 570)
+        Me.BT67.Location = New System.Drawing.Point(590, 610)
         Me.BT67.Name = "BT67"
         Me.BT67.Size = New System.Drawing.Size(57, 57)
         Me.BT67.TabIndex = 167
@@ -1189,7 +1082,7 @@ Partial Class Sudoku
         '
         Me.BT66.BackColor = System.Drawing.Color.LightCyan
         Me.BT66.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT66.Location = New System.Drawing.Point(530, 570)
+        Me.BT66.Location = New System.Drawing.Point(530, 610)
         Me.BT66.Name = "BT66"
         Me.BT66.Size = New System.Drawing.Size(57, 57)
         Me.BT66.TabIndex = 166
@@ -1200,7 +1093,7 @@ Partial Class Sudoku
         '
         Me.BT65.BackColor = System.Drawing.Color.Azure
         Me.BT65.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT65.Location = New System.Drawing.Point(470, 570)
+        Me.BT65.Location = New System.Drawing.Point(470, 610)
         Me.BT65.Name = "BT65"
         Me.BT65.Size = New System.Drawing.Size(57, 57)
         Me.BT65.TabIndex = 165
@@ -1211,7 +1104,7 @@ Partial Class Sudoku
         '
         Me.BT64.BackColor = System.Drawing.Color.Azure
         Me.BT64.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT64.Location = New System.Drawing.Point(410, 570)
+        Me.BT64.Location = New System.Drawing.Point(410, 610)
         Me.BT64.Name = "BT64"
         Me.BT64.Size = New System.Drawing.Size(57, 57)
         Me.BT64.TabIndex = 164
@@ -1222,7 +1115,7 @@ Partial Class Sudoku
         '
         Me.BT63.BackColor = System.Drawing.Color.Azure
         Me.BT63.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT63.Location = New System.Drawing.Point(350, 570)
+        Me.BT63.Location = New System.Drawing.Point(350, 610)
         Me.BT63.Name = "BT63"
         Me.BT63.Size = New System.Drawing.Size(57, 57)
         Me.BT63.TabIndex = 163
@@ -1233,7 +1126,7 @@ Partial Class Sudoku
         '
         Me.BT62.BackColor = System.Drawing.Color.Azure
         Me.BT62.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT62.Location = New System.Drawing.Point(830, 510)
+        Me.BT62.Location = New System.Drawing.Point(830, 550)
         Me.BT62.Name = "BT62"
         Me.BT62.Size = New System.Drawing.Size(57, 57)
         Me.BT62.TabIndex = 162
@@ -1244,7 +1137,7 @@ Partial Class Sudoku
         '
         Me.BT61.BackColor = System.Drawing.Color.Azure
         Me.BT61.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT61.Location = New System.Drawing.Point(770, 510)
+        Me.BT61.Location = New System.Drawing.Point(770, 550)
         Me.BT61.Name = "BT61"
         Me.BT61.Size = New System.Drawing.Size(57, 57)
         Me.BT61.TabIndex = 161
@@ -1255,29 +1148,29 @@ Partial Class Sudoku
         '
         Me.BT60.BackColor = System.Drawing.Color.Azure
         Me.BT60.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT60.Location = New System.Drawing.Point(710, 510)
+        Me.BT60.Location = New System.Drawing.Point(710, 550)
         Me.BT60.Name = "BT60"
         Me.BT60.Size = New System.Drawing.Size(57, 57)
         Me.BT60.TabIndex = 160
         Me.BT60.Text = "1"
         Me.BT60.UseVisualStyleBackColor = False
         '
-        'Bt59
+        'BT59
         '
-        Me.Bt59.BackColor = System.Drawing.Color.LightCyan
-        Me.Bt59.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Bt59.Location = New System.Drawing.Point(650, 510)
-        Me.Bt59.Name = "Bt59"
-        Me.Bt59.Size = New System.Drawing.Size(57, 57)
-        Me.Bt59.TabIndex = 159
-        Me.Bt59.Text = "1"
-        Me.Bt59.UseVisualStyleBackColor = False
+        Me.BT59.BackColor = System.Drawing.Color.LightCyan
+        Me.BT59.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BT59.Location = New System.Drawing.Point(650, 550)
+        Me.BT59.Name = "BT59"
+        Me.BT59.Size = New System.Drawing.Size(57, 57)
+        Me.BT59.TabIndex = 159
+        Me.BT59.Text = "1"
+        Me.BT59.UseVisualStyleBackColor = False
         '
         'BT58
         '
         Me.BT58.BackColor = System.Drawing.Color.LightCyan
         Me.BT58.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT58.Location = New System.Drawing.Point(590, 510)
+        Me.BT58.Location = New System.Drawing.Point(590, 550)
         Me.BT58.Name = "BT58"
         Me.BT58.Size = New System.Drawing.Size(57, 57)
         Me.BT58.TabIndex = 158
@@ -1288,7 +1181,7 @@ Partial Class Sudoku
         '
         Me.BT57.BackColor = System.Drawing.Color.LightCyan
         Me.BT57.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT57.Location = New System.Drawing.Point(530, 510)
+        Me.BT57.Location = New System.Drawing.Point(530, 550)
         Me.BT57.Name = "BT57"
         Me.BT57.Size = New System.Drawing.Size(57, 57)
         Me.BT57.TabIndex = 157
@@ -1299,7 +1192,7 @@ Partial Class Sudoku
         '
         Me.BT56.BackColor = System.Drawing.Color.Azure
         Me.BT56.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT56.Location = New System.Drawing.Point(470, 510)
+        Me.BT56.Location = New System.Drawing.Point(470, 550)
         Me.BT56.Name = "BT56"
         Me.BT56.Size = New System.Drawing.Size(57, 57)
         Me.BT56.TabIndex = 156
@@ -1310,7 +1203,7 @@ Partial Class Sudoku
         '
         Me.BT55.BackColor = System.Drawing.Color.Azure
         Me.BT55.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT55.Location = New System.Drawing.Point(410, 510)
+        Me.BT55.Location = New System.Drawing.Point(410, 550)
         Me.BT55.Name = "BT55"
         Me.BT55.Size = New System.Drawing.Size(57, 57)
         Me.BT55.TabIndex = 155
@@ -1321,60 +1214,23 @@ Partial Class Sudoku
         '
         Me.BT54.BackColor = System.Drawing.Color.Azure
         Me.BT54.Font = New System.Drawing.Font("Microsoft Sans Serif", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.BT54.Location = New System.Drawing.Point(350, 510)
+        Me.BT54.Location = New System.Drawing.Point(350, 550)
         Me.BT54.Name = "BT54"
         Me.BT54.Size = New System.Drawing.Size(57, 57)
         Me.BT54.TabIndex = 154
         Me.BT54.Text = "1"
         Me.BT54.UseVisualStyleBackColor = False
         '
-        'BTSolution
-        '
-        Me.BTSolution.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
-        Me.BTSolution.ForeColor = System.Drawing.Color.Black
-        Me.BTSolution.Location = New System.Drawing.Point(830, 74)
-        Me.BTSolution.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.BTSolution.Name = "BTSolution"
-        Me.BTSolution.Size = New System.Drawing.Size(117, 45)
-        Me.BTSolution.TabIndex = 1093
-        Me.BTSolution.Text = "Solution"
-        Me.BTSolution.UseVisualStyleBackColor = False
-        '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.GénérerToolStripButton, Me.OuvrirToolStripButton1, Me.EnregistrerToolStripButton, Me.SaisirToolStripButton, Me.JouerToolStripButton1, Me.RecommencerToolStripButton})
+        Me.ToolStrip1.AutoSize = False
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaisirToolStripButton, Me.GénérerToolStripButton, Me.OuvrirToolStripButton, Me.BTEnregistrer, Me.JouerToolStripButton1, Me.toolStripSeparator, Me.BTRecommencer, Me.BTPrécédent, Me.BTSuivant, Me.BTTerminé})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 24)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1184, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1184, 46)
+        Me.ToolStrip1.Stretch = True
         Me.ToolStrip1.TabIndex = 1094
         Me.ToolStrip1.Text = "ToolStrip1"
-        '
-        'GénérerToolStripButton
-        '
-        Me.GénérerToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.GénérerToolStripButton.Image = CType(resources.GetObject("GénérerToolStripButton.Image"), System.Drawing.Image)
-        Me.GénérerToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.GénérerToolStripButton.Name = "GénérerToolStripButton"
-        Me.GénérerToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.GénérerToolStripButton.Text = "Générer"
-        '
-        'OuvrirToolStripButton1
-        '
-        Me.OuvrirToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.OuvrirToolStripButton1.Image = CType(resources.GetObject("OuvrirToolStripButton1.Image"), System.Drawing.Image)
-        Me.OuvrirToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.OuvrirToolStripButton1.Name = "OuvrirToolStripButton1"
-        Me.OuvrirToolStripButton1.Size = New System.Drawing.Size(23, 22)
-        Me.OuvrirToolStripButton1.Text = "Ouvrir"
-        '
-        'EnregistrerToolStripButton
-        '
-        Me.EnregistrerToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.EnregistrerToolStripButton.Image = CType(resources.GetObject("EnregistrerToolStripButton.Image"), System.Drawing.Image)
-        Me.EnregistrerToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.EnregistrerToolStripButton.Name = "EnregistrerToolStripButton"
-        Me.EnregistrerToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.EnregistrerToolStripButton.Text = "Enregistrer"
         '
         'SaisirToolStripButton
         '
@@ -1382,8 +1238,36 @@ Partial Class Sudoku
         Me.SaisirToolStripButton.Image = CType(resources.GetObject("SaisirToolStripButton.Image"), System.Drawing.Image)
         Me.SaisirToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.SaisirToolStripButton.Name = "SaisirToolStripButton"
-        Me.SaisirToolStripButton.Size = New System.Drawing.Size(23, 22)
+        Me.SaisirToolStripButton.Size = New System.Drawing.Size(23, 43)
         Me.SaisirToolStripButton.Text = "Saisir"
+        '
+        'GénérerToolStripButton
+        '
+        Me.GénérerToolStripButton.AutoSize = False
+        Me.GénérerToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.GénérerToolStripButton.Image = CType(resources.GetObject("GénérerToolStripButton.Image"), System.Drawing.Image)
+        Me.GénérerToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.GénérerToolStripButton.Name = "GénérerToolStripButton"
+        Me.GénérerToolStripButton.Size = New System.Drawing.Size(23, 43)
+        Me.GénérerToolStripButton.Text = "Générer"
+        '
+        'OuvrirToolStripButton
+        '
+        Me.OuvrirToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.OuvrirToolStripButton.Image = CType(resources.GetObject("OuvrirToolStripButton.Image"), System.Drawing.Image)
+        Me.OuvrirToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.OuvrirToolStripButton.Name = "OuvrirToolStripButton"
+        Me.OuvrirToolStripButton.Size = New System.Drawing.Size(23, 43)
+        Me.OuvrirToolStripButton.Text = "&Ouvrir"
+        '
+        'BTEnregistrer
+        '
+        Me.BTEnregistrer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.BTEnregistrer.Image = CType(resources.GetObject("BTEnregistrer.Image"), System.Drawing.Image)
+        Me.BTEnregistrer.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.BTEnregistrer.Name = "BTEnregistrer"
+        Me.BTEnregistrer.Size = New System.Drawing.Size(23, 43)
+        Me.BTEnregistrer.Text = "&Enregistrer"
         '
         'JouerToolStripButton1
         '
@@ -1391,24 +1275,56 @@ Partial Class Sudoku
         Me.JouerToolStripButton1.Image = CType(resources.GetObject("JouerToolStripButton1.Image"), System.Drawing.Image)
         Me.JouerToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.JouerToolStripButton1.Name = "JouerToolStripButton1"
-        Me.JouerToolStripButton1.Size = New System.Drawing.Size(23, 22)
+        Me.JouerToolStripButton1.Size = New System.Drawing.Size(23, 43)
         Me.JouerToolStripButton1.Text = "Jouer"
         '
-        'RecommencerToolStripButton
+        'toolStripSeparator
         '
-        Me.RecommencerToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.RecommencerToolStripButton.Enabled = False
-        Me.RecommencerToolStripButton.Image = CType(resources.GetObject("RecommencerToolStripButton.Image"), System.Drawing.Image)
-        Me.RecommencerToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.RecommencerToolStripButton.Name = "RecommencerToolStripButton"
-        Me.RecommencerToolStripButton.Size = New System.Drawing.Size(23, 22)
-        Me.RecommencerToolStripButton.Text = "Recommencer"
+        Me.toolStripSeparator.Name = "toolStripSeparator"
+        Me.toolStripSeparator.Size = New System.Drawing.Size(6, 46)
+        '
+        'BTRecommencer
+        '
+        Me.BTRecommencer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.BTRecommencer.Enabled = False
+        Me.BTRecommencer.Image = CType(resources.GetObject("BTRecommencer.Image"), System.Drawing.Image)
+        Me.BTRecommencer.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.BTRecommencer.Name = "BTRecommencer"
+        Me.BTRecommencer.Size = New System.Drawing.Size(23, 43)
+        Me.BTRecommencer.Text = "Recommencer"
+        '
+        'BTPrécédent
+        '
+        Me.BTPrécédent.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.BTPrécédent.Image = CType(resources.GetObject("BTPrécédent.Image"), System.Drawing.Image)
+        Me.BTPrécédent.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.BTPrécédent.Name = "BTPrécédent"
+        Me.BTPrécédent.Size = New System.Drawing.Size(23, 43)
+        Me.BTPrécédent.Text = "Précédent"
+        '
+        'BTSuivant
+        '
+        Me.BTSuivant.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.BTSuivant.Image = CType(resources.GetObject("BTSuivant.Image"), System.Drawing.Image)
+        Me.BTSuivant.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.BTSuivant.Name = "BTSuivant"
+        Me.BTSuivant.Size = New System.Drawing.Size(23, 43)
+        Me.BTSuivant.Text = "Suivant"
+        '
+        'BTTerminé
+        '
+        Me.BTTerminé.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.BTTerminé.Image = CType(resources.GetObject("BTTerminé.Image"), System.Drawing.Image)
+        Me.BTTerminé.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.BTTerminé.Name = "BTTerminé"
+        Me.BTTerminé.Size = New System.Drawing.Size(23, 43)
+        Me.BTTerminé.Text = "Grille Terminée"
         '
         'BTStepByStep
         '
         Me.BTStepByStep.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
         Me.BTStepByStep.ForeColor = System.Drawing.Color.Black
-        Me.BTStepByStep.Location = New System.Drawing.Point(650, 73)
+        Me.BTStepByStep.Location = New System.Drawing.Point(590, 114)
         Me.BTStepByStep.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.BTStepByStep.Name = "BTStepByStep"
         Me.BTStepByStep.Size = New System.Drawing.Size(117, 45)
@@ -1429,7 +1345,7 @@ Partial Class Sudoku
         '
         Me.nomFichierOuvert.AutoSize = True
         Me.nomFichierOuvert.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.nomFichierOuvert.Location = New System.Drawing.Point(350, 761)
+        Me.nomFichierOuvert.Location = New System.Drawing.Point(350, 803)
         Me.nomFichierOuvert.Name = "nomFichierOuvert"
         Me.nomFichierOuvert.Size = New System.Drawing.Size(77, 25)
         Me.nomFichierOuvert.TabIndex = 1097
@@ -1439,26 +1355,38 @@ Partial Class Sudoku
         '
         Me.BTForceBrute.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
         Me.BTForceBrute.ForeColor = System.Drawing.Color.Black
-        Me.BTForceBrute.Location = New System.Drawing.Point(1000, 74)
+        Me.BTForceBrute.Location = New System.Drawing.Point(770, 114)
         Me.BTForceBrute.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.BTForceBrute.Name = "BTForceBrute"
         Me.BTForceBrute.Size = New System.Drawing.Size(117, 45)
         Me.BTForceBrute.TabIndex = 1098
-        Me.BTForceBrute.Text = "Force Brute"
+        Me.BTForceBrute.Text = "Solution"
         Me.BTForceBrute.UseVisualStyleBackColor = False
+        '
+        'BTPossibilités
+        '
+        Me.BTPossibilités.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.BTPossibilités.ForeColor = System.Drawing.Color.Black
+        Me.BTPossibilités.Location = New System.Drawing.Point(50, 190)
+        Me.BTPossibilités.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.BTPossibilités.Name = "BTPossibilités"
+        Me.BTPossibilités.Size = New System.Drawing.Size(145, 45)
+        Me.BTPossibilités.TabIndex = 1099
+        Me.BTPossibilités.Text = "Possibilités"
+        Me.BTPossibilités.UseVisualStyleBackColor = False
         '
         'Sudoku
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ClientSize = New System.Drawing.Size(1184, 810)
+        Me.ClientSize = New System.Drawing.Size(1184, 861)
+        Me.Controls.Add(Me.BTPossibilités)
         Me.Controls.Add(Me.BTForceBrute)
         Me.Controls.Add(Me.nomFichierOuvert)
         Me.Controls.Add(Me.LBL_nbVal)
         Me.Controls.Add(Me.BTStepByStep)
         Me.Controls.Add(Me.ToolStrip1)
-        Me.Controls.Add(Me.BTSolution)
         Me.Controls.Add(Me.BT80)
         Me.Controls.Add(Me.BT79)
         Me.Controls.Add(Me.BT78)
@@ -1480,7 +1408,7 @@ Partial Class Sudoku
         Me.Controls.Add(Me.BT62)
         Me.Controls.Add(Me.BT61)
         Me.Controls.Add(Me.BT60)
-        Me.Controls.Add(Me.Bt59)
+        Me.Controls.Add(Me.BT59)
         Me.Controls.Add(Me.BT58)
         Me.Controls.Add(Me.BT57)
         Me.Controls.Add(Me.BT56)
@@ -1550,8 +1478,6 @@ Partial Class Sudoku
         Me.Controls.Add(Me.BT_3)
         Me.Controls.Add(Me.BT_2)
         Me.Controls.Add(Me.BT_1)
-        Me.Controls.Add(Me.BT_Smp)
-        Me.Controls.Add(Me.BT_Solutions)
         Me.Controls.Add(Me.LBL_Conseil)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Font = New System.Drawing.Font("Courier New", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -1573,11 +1499,7 @@ Partial Class Sudoku
     Friend WithEvents MenuStrip1 As MenuStrip
     Friend WithEvents PartieToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents LBL_Conseil As Label
-    Friend WithEvents BT_Solutions As Button
-    Friend WithEvents BT_Smp As Button
-    Friend WithEvents TestToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents GénérerToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents QuitterToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SaisieToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents BT_1 As Button
     Friend WithEvents BT_2 As Button
@@ -1664,21 +1586,14 @@ Partial Class Sudoku
     Friend WithEvents BT62 As Button
     Friend WithEvents BT61 As Button
     Friend WithEvents BT60 As Button
-    Friend WithEvents Bt59 As Button
+    Friend WithEvents BT59 As Button
     Friend WithEvents BT58 As Button
     Friend WithEvents BT57 As Button
     Friend WithEvents BT56 As Button
     Friend WithEvents BT55 As Button
     Friend WithEvents BT54 As Button
-    Friend WithEvents PaireNueToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents PaireNueEnLigneToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents PaireNueEnColonneToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents EnRégionToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents BTSolution As Button
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents GénérerToolStripButton As ToolStripButton
-    Friend WithEvents OuvrirToolStripButton1 As ToolStripButton
-    Friend WithEvents EnregistrerToolStripButton As ToolStripButton
     Friend WithEvents JouerToolStripButton1 As ToolStripButton
     Friend WithEvents SaisirToolStripButton As ToolStripButton
     Friend WithEvents GrilleToolStripMenuItem As ToolStripMenuItem
@@ -1686,17 +1601,18 @@ Partial Class Sudoku
     Friend WithEvents EffacerLesCandidatsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BTStepByStep As Button
     Friend WithEvents LBL_nbVal As Label
-    Friend WithEvents XYwingToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents XYWingEnLigneToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents XWingToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents XWingEnColonneToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents XWingEnLigneToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents TripletNuToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents TripletNuEnLigneToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents FichierToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ChToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SauvegarderUneGrilleToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents nomFichierOuvert As Label
-    Friend WithEvents RecommencerToolStripButton As ToolStripButton
+    Friend WithEvents BTRecommencer As ToolStripButton
     Friend WithEvents BTForceBrute As Button
+    Friend WithEvents BTPossibilités As Button
+    Friend WithEvents OuvrirToolStripButton As ToolStripButton
+    Friend WithEvents BTEnregistrer As ToolStripButton
+    Friend WithEvents toolStripSeparator As ToolStripSeparator
+    Friend WithEvents QuitterToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BTPrécédent As ToolStripButton
+    Friend WithEvents BTSuivant As ToolStripButton
+    Friend WithEvents BTTerminé As ToolStripButton
 End Class

@@ -1,4 +1,5 @@
-﻿Module ForceBrute
+﻿Imports System.IO
+Module ForceBrute
     Sub ForceBrute(ByRef Grille(,) As String, ByRef nbSol As Integer)
 
         Dim Erreur As Boolean
@@ -15,6 +16,9 @@
         Dim nbrc(80) As Integer
         Dim GrilleFinale(8, 8) As String
         Dim nbrloop As Integer
+
+        nbSol = 0
+
         For i = 0 To 8
             For j = 0 To 8
                 For k = 0 To 8
@@ -46,71 +50,78 @@
         s = 0
 
         c(0) = 0
+        If smax < 0 Then ' au cas où on charge une grille pleine
+            nbSol = 1
+        Else
+            While nbSol < 2
 
-        While nbSol < 2
+                nbrloop += 1
+                i = seqi(s)
+                j = seqj(s)
+                Grille(i, j) = seqCandidats(s, c(s))
 
-            nbrloop += 1
-            i = seqi(s)
-            j = seqj(s)
-            Grille(i, j) = seqCandidats(s, c(s))
+                Erreur = False
+                '  Recherche d'erreurs sur les colonnes
+                ControleLigneBF(Erreur, Grille, i)
+                If Not Erreur Then
+                    ' Recherche d'erreurs sur les colonnes
+                    ControleColonneBF(Erreur, Grille, j)
+                End If
+                If Not Erreur Then
+                    ' Recherche d'erreurs sur les régions
+                    r = ((i \ 3) * 3) + (j \ 3)  ' calcule la région d'après i et j
+                    ControleRégionBF(Erreur, Grille, r)
+                End If
 
-            Erreur = False
-            '  Recherche d'erreurs sur les colonnes
-            ControleLigneBF(Erreur, Grille, i)
-            If Not Erreur Then
-                ' Recherche d'erreurs sur les colonnes
-                ControleColonneBF(Erreur, Grille, j)
-            End If
-            If Not Erreur Then
-                ' Recherche d'erreurs sur les régions
-                r = ((i \ 3) * 3) + (j \ 3)  ' calcule la région d'après i et j
-                ControleRégionBF(Erreur, Grille, r)
-            End If
+                If Not Erreur Then
+                    If s = smax Then
+                        ' Grille Complète
+                        nbSol += 1
+                        '             EcrireSolution(Grille, nbSol)
 
-            If Not Erreur Then
-                If s = smax Then
-                    ' Grille Complète
-                    nbSol += 1
-                    If nbSol > 1 Then
-                        Exit While
+                        If nbSol > 1 Then
+                            Exit While
+                        End If
+                        Array.Copy(Grille, GrilleFinale, 81)
+                        'On recule d'une ou plusieurs cases pour chercher s'il y a plusieurs solutions
+                        While c(s) = nbrc(s) And s > 0
+                            c(s) = 0
+                            Grille(i, j) = "0"
+                            s -= 1
+                            i = seqi(s)
+                            j = seqj(s)
+                        End While
+                        ' Candidat suivant dans la case précédente
+                        c(s) += 1
+                    Else
+                        ' On vient de placer un candidat, on va à la case libre suivante
+                        s += 1
+                        c(s) = 0
                     End If
-                    Array.Copy(Grille, GrilleFinale, 81)
-                    'On recule d'une ou plusieurs cases pour chercher s'il y a plusieurs solutions
-                    While c(s) = nbrc(s) And s > 0
-                        c(s) = 0
-                        Grille(i, j) = "0"
-                        s -= 1
-                        i = seqi(s)
-                        j = seqj(s)
-                    End While
-                    ' Candidat suivant dans la case précédente
-                    c(s) += 1
                 Else
-                    ' On vient de placer un candidat, on va à la case libre suivante
-                    s += 1
-                    c(s) = 0
+                    If c(s) < nbrc(s) Then
+                        ' Candidat suivant dans la même case
+                        c(s) += 1
+                    Else
+                        'On recule jusqu'à une case où il y a encore un candidat à essayer
+                        While c(s) = nbrc(s) And s > 0
+                            c(s) = 0
+                            Grille(i, j) = "0"
+                            s -= 1
+                            i = seqi(s)
+                            j = seqj(s)
+                        End While
+                        ' Candidat suivant dans la case précédente
+                        c(s) += 1
+                    End If
                 End If
-            Else
-                If c(s) < nbrc(s) Then
-                    ' Candidat suivant dans la même case
-                    c(s) += 1
-                Else
-                    'On recule jusqu'à une case où il y a encore un candidat à essayer
-                    While c(s) = nbrc(s) And s > 0
-                        c(s) = 0
-                        Grille(i, j) = "0"
-                        s -= 1
-                        i = seqi(s)
-                        j = seqj(s)
-                    End While
-                    ' Candidat suivant dans la case précédente
-                    c(s) += 1
+
+                If c(0) > nbrc(0) Then
+                    Exit While
                 End If
-            End If
-            If c(0) > nbrc(0) Then
-                Exit While
-            End If
-        End While
+
+            End While
+        End If
 
         Array.Copy(GrilleFinale, Grille, 81)
 
@@ -178,6 +189,38 @@
                 Next
             Next
         Next
+
+    End Sub
+
+    Sub EcrireSolution(ByRef grille(,) As String, ByVal nbSol As Integer)
+
+        Dim TextSudoku As String = ""
+        Dim myFileNname As String
+        Dim myFileNname1 As String = "E:\Sudoku3D\FoceBrute"
+        Dim myFileNname2 As String = ".sud"
+        Dim fichierCorrrect As Boolean
+
+
+        myFileNname = myFileNname1 & nbSol & myFileNname2
+
+        For i = 0 To 8
+            For j = 0 To 8
+                If grille(i, j) = "0" Then
+                    TextSudoku &= "."
+                Else
+                    TextSudoku &= grille(i, j)
+                End If
+            Next
+            TextSudoku &= vbCrLf
+        Next
+
+        Try
+            File.WriteAllText(myFileNname, TextSudoku)
+        Catch ex As Exception
+            fichierCorrrect = False
+        Finally
+            fichierCorrrect = True
+        End Try
 
     End Sub
 End Module

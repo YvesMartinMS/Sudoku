@@ -347,17 +347,22 @@
             PaireNueLig(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             PaireNueCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             PaireNueReg(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+
             CandidatVérouilléLig(_Candidats, _AnlLig, _AnlReg, _NbrSmp, _TSmp, _opk)
             CandidatVérouilléCol(_Candidats, _AnlCol, _AnlReg, _NbrSmp, _TSmp, _opk)
-            PaireCachéeLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _opk, _NbVal)
-            PaireCachéeCol(_Candidats, _NbrSmp, _TSmp, _AnlCol, _opk, _NbVal)
-            PaireCachéeReg(_Candidats, _NbrSmp, _TSmp, _AnlReg, _opk)
+
             AnalyseTrpLig(_Candidats, _NbrSmp, _TSmp, _opk)
             AnalyseTrpCol(_Candidats, _NbrSmp, _TSmp, _opk)
             AnalyseTrpReg(_Candidats, _NbrSmp, _TSmp, _opk)
-            XYWingLigCol(_NbrSmp, _TSmp, _opk, _nuplet)
+
+            PaireCachéeLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _opk, _NbVal)
+            PaireCachéeCol(_Candidats, _NbrSmp, _TSmp, _AnlCol, _opk, _NbVal)
+            PaireCachéeReg(_Candidats, _NbrSmp, _TSmp, _AnlReg, _opk)
+
+            XYWingLigCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             XYWingRegLig(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             XYWingRegCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
+
             XWingLig(_Candidats, _NbrSmp, _TSmp, _AnlLig, _Grille, _NbVal)
             XWingCol(_Candidats, _NbrSmp, _TSmp, _AnlCol, _Grille, _NbVal)
 
@@ -507,7 +512,7 @@
                             _New_Solution.i = _i
                             _New_Solution.j = _j
                             _New_Solution.v = Sudoku.Val(_k)
-                            _New_Solution.m = "seul candidat dans cette case : [" & _New_Solution.v & "]"
+                            _New_Solution.m = "Ligne " & _New_Solution.i + 1 & " Colonne " & _New_Solution.j + 1 & " : " & "seul candidat dans cette case : [" & _New_Solution.v & "]"
                             _New_Solution.b = Sudoku.BarèmeSeulDansUneCase
                             EnqueueSol(_New_Solution, _Qsol)
                         End If
@@ -536,7 +541,7 @@
                     _New_Solution.i = _AnlLig(_i, _k).i
                     _New_Solution.j = _AnlLig(_i, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlLig(_i, _k).k)
-                    _New_Solution.m = "seul [" & _New_Solution.v & "] candidat dans cette ligne"
+                    _New_Solution.m = "Ligne " & _New_Solution.i + 1 & " Colonne " & _New_Solution.j + 1 & " : " & "seul [" & _New_Solution.v & "] candidat dans cette ligne"
                     _New_Solution.b = Sudoku.BarèmeSeulDansUneLigne
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
@@ -563,7 +568,7 @@
                     _New_Solution.i = _AnlCol(_j, _k).i
                     _New_Solution.j = _AnlCol(_j, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlCol(_j, _k).k)
-                    _New_Solution.m = "seul [" & _New_Solution.v & "] candidat dans cette colonne"
+                    _New_Solution.m = "Ligne " & _New_Solution.i + 1 & " Colonne " & _New_Solution.j + 1 & " : " & "seul [" & _New_Solution.v & "] candidat dans cette colonne"
                     _New_Solution.b = Sudoku.BarèmeSeulDansUneColonne
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
@@ -590,7 +595,7 @@
                     _New_Solution.i = _AnlReg(_r, _k).i
                     _New_Solution.j = _AnlReg(_r, _k).j
                     _New_Solution.v = Sudoku.Val(_AnlReg(_r, _k).k)
-                    _New_Solution.m = "seul [" & _New_Solution.v & "] candidat dans cette région"
+                    _New_Solution.m = "Ligne " & _New_Solution.i + 1 & " Colonne " & _New_Solution.j + 1 & " : " & "seul [" & _New_Solution.v & "] candidat dans cette région"
                     _New_Solution.b = Sudoku.BarèmeSeulDansUneRégion
                     EnqueueSol(_New_Solution, _Qsol)
                 End If
@@ -1160,7 +1165,7 @@
                             Next
                         Next
 
-                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Colonne " & _j + 1 & " CR"
+                        _Smp.motif = "Candidat vérouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Colonne " & _j + 1 & " CR"
 
                         If _Smp.ne > 0 Then
                             _TSmp(_NbrSmp) = _Smp
@@ -1827,109 +1832,108 @@
     ' XY-Wing Ligne - Colonne
     '============================================================================================================================================================
 
-    Sub XYWingLigCol(ByRef _NbrSmp As Integer,
+    Sub XYWingLigCol(ByRef _Candidats(,,) As String,
+                     ByRef _NbrSmp As Integer,
                      ByRef _TSmp() As Sudoku.StrSmp,
                      ByRef _opk(,) As Integer,
                      ByRef _nuplet(,) As String)
 
-        Dim _isup As Integer ' indice i ligne supérieure 
-        Dim _iinf As Integer ' indice i ligne inférieure 
-        Dim _jgau As Integer ' indice j colonne gauche
-        Dim _jdrt As Integer ' indice j colonne droite
-        Dim _idep As Integer 'ligne de départ région en dessous
-        Dim _jdep As Integer 'colonne de départ région à droite
-
-        Dim _aile_g As String
-        Dim _aile_g_i As Integer
-        Dim _aile_g_j As Integer
+        Dim _aile_hor As String
+        Dim _aile_hor_i As Integer
+        Dim _aile_hor_j As Integer
         Dim _sommet As String
         Dim _sommet_i As Integer
         Dim _sommet_j As Integer
-        Dim _aile_d As String
-        Dim _aile_d_i As Integer
-        Dim _aile_d_j As Integer
+        Dim _aile_ver As String
+        Dim _aile_ver_i As Integer
+        Dim _aile_ver_j As Integer
         Dim _exclu As String
         Dim _exclu_i As Integer
         Dim _exclu_j As Integer
+        Dim _exclu_k As Integer
         Dim _completed As Boolean
-        Dim _Cv(3) As String 'carré
-        Dim _Ci(3) As Integer 'carré
-        Dim _Cj(3) As Integer 'carré
-        Dim _ic As Integer ' pour la rotation du carré
-
+        Dim _commun As Boolean
         Dim _Smp As Sudoku.StrSmp
 
         _Smp = NewSmp()
 
-        For _isup = 0 To 5
-            For _jgau = 0 To 5
-                If _opk(_isup, _jgau) = 2 Then
-                    _jdep = ((_jgau \ 3) + 1) * 3 'debut de région à droite
-                    For _jdrt = _jdep To 8
-                        If _opk(_isup, _jdrt) = 2 Then
-                            _idep = ((_isup \ 3) + 1) * 3 'debut de région en dessous
-                            For _iinf = _idep To 8
-                                If _opk(_iinf, _jdrt) = 2 Then
-                                    If _opk(_iinf, _jgau) = 2 Then ' on tient un carré de paires dans des régions différentes
-                                        _Cv(0) = _nuplet(_isup, _jgau)
-                                        _Ci(0) = _isup
-                                        _Cj(0) = _jgau
-                                        _Cv(1) = _nuplet(_isup, _jdrt)
-                                        _Ci(1) = _isup
-                                        _Cj(1) = _jdrt
-                                        _Cv(2) = _nuplet(_iinf, _jdrt)
-                                        _Ci(2) = _iinf
-                                        _Cj(2) = _jdrt
-                                        _Cv(2) = _nuplet(_iinf, _jdrt)
-                                        _Ci(2) = _iinf
-                                        _Cj(2) = _jdrt
-                                        _Cv(3) = _nuplet(_iinf, _jgau)
-                                        _Ci(3) = _iinf
-                                        _Cj(3) = _jgau
+        For _i = 0 To 8
+            For _j = 0 To 7
+                If _opk(_i, _j) = 2 Then
+                    For _jbis = _j + 1 To 8
+                        If _opk(_i, _jbis) = 2 Then
+                            CommunIni(_nuplet(_i, _j), _nuplet(_i, _jbis), _commun)
+                            If _commun Then
+                                For _ibis = 0 To 8
+                                    If _i <> _ibis Then
+                                        _exclu = Nothing
                                         _completed = False
-                                        _exclu = " "
-                                        For _ic = 0 To 3
-                                            RotationCarré(_Cv, _Ci, _Cj)
-                                            If Not _completed Then
-                                                _aile_g = _Cv(0)
-                                                _aile_g_i = _Ci(0)
-                                                _aile_g_j = _Cj(0)
-                                                _sommet = _Cv(1)
-                                                _sommet_i = _Ci(1)
-                                                _sommet_j = _Cj(1)
-                                                _aile_d = _Cv(2)
-                                                _aile_d_i = _Ci(2)
-                                                _aile_d_j = _Cj(2)
-                                                _exclu = _Cv(3)
-                                                _exclu_i = _Ci(3)
-                                                _exclu_j = _Cj(3)
-                                                XYWing(_completed, _aile_g, _sommet, _aile_d, _exclu)
-                                            End If
-                                        Next
+                                        _aile_ver = Nothing
+                                        _aile_hor = Nothing
+                                        _sommet = Nothing
+
+                                        If _opk(_ibis, _j) = 2 Then
+                                            _sommet = _nuplet(_i, _j)
+                                            _sommet_i = _i
+                                            _sommet_j = _j
+                                            _aile_ver = _nuplet(_ibis, _j)
+                                            _aile_ver_i = _ibis
+                                            _aile_ver_j = _j
+                                            _aile_hor = _nuplet(_i, _jbis)
+                                            _aile_hor_i = _i
+                                            _aile_hor_j = _jbis
+                                            _exclu_i = _ibis
+                                            _exclu_j = _jbis
+                                            CommunIni(_aile_ver, _sommet, _commun)
+                                            CommunSuite(_sommet, _aile_hor, _commun)
+                                            XYWing(_completed, _aile_ver, _sommet, _aile_hor, _exclu)
+                                            _exclu_k = VTok(_exclu)
+                                        End If
+
+                                        If _opk(_ibis, _jbis) = 2 Then
+                                            _sommet = _nuplet(_i, _jbis)
+                                            _sommet_i = _i
+                                            _sommet_j = _jbis
+                                            _aile_ver = _nuplet(_ibis, _jbis)
+                                            _aile_ver_i = _ibis
+                                            _aile_ver_j = _jbis
+                                            _aile_hor = _nuplet(_i, _j)
+                                            _aile_hor_i = _i
+                                            _aile_hor_j = _j
+                                            _exclu_i = _ibis
+                                            _exclu_j = _j
+                                            CommunIni(_aile_ver, _sommet, _commun)
+                                            CommunSuite(_sommet, _aile_hor, _commun)
+                                            XYWing(_completed, _aile_ver, _sommet, _aile_hor, _exclu)
+                                            _exclu_k = VTok(_exclu)
+                                        End If
+
                                         If _completed Then
-
                                             _Smp.nr = 3
-                                            _Smp.CR.i(0) = _Ci(0)
-                                            _Smp.CR.j(0) = _aile_g_j
-                                            _Smp.CR.k(0) = CInt(_Cv(3)) - 1
-                                            _Smp.CR.v(0) = _Cv(3)
-                                            _Smp.CR.i(1) = _Ci(1)
-                                            _Smp.CR.j(1) = _Cj(1)
-                                            _Smp.CR.k(1) = CInt(_Cv(3)) - 1
-                                            _Smp.CR.v(1) = _Cv(3)
-                                            _Smp.CR.i(2) = _Ci(2)
-                                            _Smp.CR.j(2) = _Cj(2)
-                                            _Smp.CR.k(2) = CInt(_Cv(3)) - 1
-                                            _Smp.CR.v(2) = _Cv(3)
+                                            _Smp.CR.i(0) = _aile_ver_i
+                                            _Smp.CR.j(0) = _aile_ver_j
+                                            _Smp.CR.k(0) = _exclu_k
+                                            _Smp.CR.v(0) = _aile_ver
+                                            _Smp.CR.i(1) = _sommet_i
+                                            _Smp.CR.j(1) = _sommet_j
+                                            _Smp.CR.k(1) = _exclu_k
+                                            _Smp.CR.v(1) = _sommet
+                                            _Smp.CR.i(2) = _aile_hor_i
+                                            _Smp.CR.j(2) = _aile_hor_j
+                                            _Smp.CR.k(2) = _exclu_k
+                                            _Smp.CR.v(2) = _aile_hor
 
-                                            _Smp.motif = "XY-Wing [" & _exclu & "] dans les cases L" & _aile_g_i + 1 & "C" & _aile_g_j + 1 & "-L" & _sommet_i + 1 & "C" & _sommet_j + 1 & "-L" & _aile_d_i + 1 & "C" & _aile_d_j + 1
+                                            _Smp.motif = "XY-Wing [" & _exclu & "] dans les cases L" & _aile_ver_i + 1 & "C" & _aile_ver_i + 1 & "-L" & _sommet_i + 1 & "C" & _sommet_j + 1 & "-L" & _aile_hor_i + 1 & "C" & _aile_hor_j + 1
 
-                                            _Smp.CE.i(_Smp.ne) = _exclu_i
-                                            _Smp.CE.j(_Smp.ne) = _exclu_j
-                                            _Smp.CE.k(_Smp.ne) = CInt(_exclu) - 1
-                                            _Smp.CE.v(_Smp.ne) = _exclu
-                                            _Smp.ne += 1
-
+                                            For k = 0 To 8
+                                                If _Candidats(_exclu_i, _exclu_j, _exclu_k) = _exclu Then
+                                                    _Smp.CE.i(_Smp.ne) = _exclu_i
+                                                    _Smp.CE.j(_Smp.ne) = _exclu_j
+                                                    _Smp.CE.k(_Smp.ne) = _exclu_k
+                                                    _Smp.CE.v(_Smp.ne) = _exclu
+                                                    _Smp.ne += 1
+                                                End If
+                                            Next
                                             If _Smp.ne > 0 Then
                                                 _TSmp(_NbrSmp) = _Smp
                                                 _NbrSmp += 1
@@ -1938,8 +1942,8 @@
 
                                         End If
                                     End If
-                                End If
-                            Next
+                                Next
+                            End If
                         End If
                     Next
                 End If
@@ -1967,20 +1971,21 @@
         Dim _ibis As Integer
         Dim _jbis As Integer
         Dim _jter As Integer
-        Dim _aile_i As String    'aile intérieure à la région
-        Dim _aile_i_i As Integer 'aile intérieure à la région
-        Dim _aile_i_j As Integer 'aile intérieure à la région
+        Dim _aile_int As String    'aile intérieure à la région
+        Dim _aile_int_i As Integer 'aile intérieure à la région
+        Dim _aile_int_j As Integer 'aile intérieure à la région
         Dim _sommet As String
         Dim _sommet_i As Integer
         Dim _sommet_j As Integer
-        Dim _aile_e As String    'aile extérieure à la région
-        Dim _aile_e_i As Integer 'aile extérieure à la région
-        Dim _aile_e_j As Integer 'aile extérieure à la région
+        Dim _aile_ext As String    'aile extérieure à la région
+        Dim _aile_ext_i As Integer 'aile extérieure à la région
+        Dim _aile_ext_j As Integer 'aile extérieure à la région
         Dim _aej As Integer      'calcul départ j aile extérieure à la région
         Dim _exclu As String
         Dim _exclu_k As Integer
         Dim _completed As Boolean
         Dim _Smp As Sudoku.StrSmp
+        Dim _commun As Boolean
 
         _Smp = NewSmp()
 
@@ -1998,37 +2003,38 @@
                             If _ibis <> _i Then
                                 For _jbis = _csgj To _csgj + 2
                                     If _opk(_ibis, _jbis) = 2 Then
-                                        _aile_i = _nuplet(_ibis, _jbis)
-                                        _aile_i_i = _ibis
-                                        _aile_i_j = _jbis
-                                        If Commun(_sommet, _aile_i) Then
+                                        _aile_int = _nuplet(_ibis, _jbis)
+                                        _aile_int_i = _ibis
+                                        _aile_int_j = _jbis
+                                        CommunIni(_aile_int, _sommet, _commun)
+                                        If _commun Then
                                             For _jter = 0 To 8
                                                 If _jter < _csgj Or _jter > _csgj + 2 Then
                                                     If _opk(_i, _jter) = 2 Then
-                                                        _aile_e = _nuplet(_i, _jter)
-                                                        _aile_e_i = _i
-                                                        _aile_e_j = _jter
-                                                        If Commun(_sommet, _aile_e) Then
+                                                        _aile_ext = _nuplet(_i, _jter)
+                                                        _aile_ext_i = _i
+                                                        _aile_ext_j = _jter
+                                                        CommunSuite(_sommet, _aile_ext, _commun)
+                                                        If _commun Then
                                                             _exclu = " "
-                                                            _completed = False
-                                                            XYWing(_completed, _aile_i, _sommet, _aile_e, _exclu)
+                                                            XYWing(_completed, _aile_int, _sommet, _aile_ext, _exclu)
 
                                                             If _completed Then
                                                                 _exclu_k = VTok(_exclu)
                                                                 _Smp.nr = 3
-                                                                _Smp.CR.i(0) = _aile_i_i
-                                                                _Smp.CR.j(0) = _aile_i_j
+                                                                _Smp.CR.i(0) = _aile_int_i
+                                                                _Smp.CR.j(0) = _aile_int_j
                                                                 _Smp.CR.k(0) = _exclu_k
                                                                 _Smp.CR.v(0) = _exclu
                                                                 _Smp.CR.i(1) = _sommet_i
                                                                 _Smp.CR.j(1) = _sommet_j
                                                                 _Smp.CR.k(1) = _exclu_k
                                                                 _Smp.CR.v(1) = _exclu
-                                                                _Smp.CR.i(2) = _aile_e_i
-                                                                _Smp.CR.j(2) = _aile_e_j
+                                                                _Smp.CR.i(2) = _aile_ext_i
+                                                                _Smp.CR.j(2) = _aile_ext_j
                                                                 _Smp.CR.k(2) = _exclu_k
                                                                 _Smp.CR.v(2) = _exclu
-                                                                _Smp.motif = "XY-Wing [" & _exclu & "] dans les cases L" & _aile_i_i + 1 & "C" & _aile_i_j + 1 & "-L" & _sommet_i + 1 & "C" & _sommet_j + 1 & "-L" & _aile_e_i + 1 & "C" & _aile_e_j + 1
+                                                                _Smp.motif = "XY-Wing [" & _exclu & "] dans les cases L" & _aile_int_i + 1 & "C" & _aile_int_j + 1 & "-L" & _sommet_i + 1 & "C" & _sommet_j + 1 & "-L" & _aile_ext_i + 1 & "C" & _aile_ext_j + 1
 
                                                                 ' Intersection à l'intérieur de la région 
                                                                 For _ej = _csgj To _csgj + 2
@@ -2044,11 +2050,11 @@
                                                                 Next
 
                                                                 ' Intersection à l'extérieur de la région
-                                                                _aej = (_aile_e_j \ 3) * 3 'calcul du départ de _j de l'aile exérieure
+                                                                _aej = (_aile_ext_j \ 3) * 3 'calcul du départ de _j de l'aile exérieure
 
                                                                 For _ej = _aej To _aej + 2
-                                                                    If _Candidats(_aile_i_i, _ej, _exclu_k) = _exclu Then
-                                                                        _Smp.CE.i(_Smp.ne) = _aile_i_i
+                                                                    If _Candidats(_aile_int_i, _ej, _exclu_k) = _exclu Then
+                                                                        _Smp.CE.i(_Smp.ne) = _aile_int_i
                                                                         _Smp.CE.j(_Smp.ne) = _ej
                                                                         _Smp.CE.k(_Smp.ne) = _exclu_k
                                                                         _Smp.CE.v(_Smp.ne) = _exclu
@@ -2098,20 +2104,21 @@
         Dim _ibis As Integer
         Dim _iter As Integer
         Dim _jbis As Integer
-        Dim _aile_i As String    'aile intérieure à la région
-        Dim _aile_i_i As Integer 'aile intérieure à la région
-        Dim _aile_i_j As Integer 'aile intérieure à la région
+        Dim _aile_int As String    'aile intérieure à la région
+        Dim _aile_int_i As Integer 'aile intérieure à la région
+        Dim _aile_int_j As Integer 'aile intérieure à la région
         Dim _sommet As String
         Dim _sommet_i As Integer
         Dim _sommet_j As Integer
-        Dim _aile_e As String    'aile extérieure à la région
-        Dim _aile_e_i As Integer 'aile extérieure à la région
-        Dim _aile_e_j As Integer 'aile extérieure à la région
+        Dim _aile_ext As String    'aile extérieure à la région
+        Dim _aile_ext_i As Integer 'aile extérieure à la région
+        Dim _aile_ext_j As Integer 'aile extérieure à la région
         Dim _aei As Integer      'calcul départ i aile extérieure à la région
         Dim _exclu As String
         Dim _exclu_k As Integer
         Dim _completed As Boolean
         Dim _Smp As Sudoku.StrSmp
+        Dim _commun As Integer
 
         _Smp = NewSmp()
 
@@ -2129,37 +2136,39 @@
                             If _jbis <> _j Then
                                 For _ibis = _csgi To _csgi + 2
                                     If _opk(_ibis, _jbis) = 2 Then
-                                        _aile_i = _nuplet(_ibis, _jbis)
-                                        _aile_i_i = _ibis
-                                        _aile_i_j = _jbis
-                                        If Commun(_sommet, _aile_i) Then
+                                        _aile_int = _nuplet(_ibis, _jbis)
+                                        _aile_int_i = _ibis
+                                        _aile_int_j = _jbis
+                                        CommunIni(_aile_int, _sommet, _commun)
+                                        If _commun Then
                                             For _iter = 0 To 8
                                                 If _iter < _csgi Or _iter > _csgi + 2 Then
                                                     If _opk(_iter, _j) = 2 Then
-                                                        _aile_e = _nuplet(_iter, _j)
-                                                        _aile_e_i = _iter
-                                                        _aile_e_j = _j
-                                                        If Commun(_sommet, _aile_e) Then
+                                                        _aile_ext = _nuplet(_iter, _j)
+                                                        _aile_ext_i = _iter
+                                                        _aile_ext_j = _j
+                                                        CommunSuite(_sommet, _aile_ext, _commun)
+                                                        If _commun Then
                                                             _exclu = " "
                                                             _completed = False
-                                                            XYWing(_completed, _aile_i, _sommet, _aile_e, _exclu)
+                                                            XYWing(_completed, _aile_int, _sommet, _aile_ext, _exclu)
 
                                                             If _completed Then
                                                                 _exclu_k = VTok(_exclu)
                                                                 _Smp.nr = 3
-                                                                _Smp.CR.i(0) = _aile_i_i
-                                                                _Smp.CR.j(0) = _aile_i_j
+                                                                _Smp.CR.i(0) = _aile_int_i
+                                                                _Smp.CR.j(0) = _aile_int_j
                                                                 _Smp.CR.k(0) = _exclu_k
                                                                 _Smp.CR.v(0) = _exclu
                                                                 _Smp.CR.i(1) = _sommet_i
                                                                 _Smp.CR.j(1) = _sommet_j
                                                                 _Smp.CR.k(1) = _exclu_k
                                                                 _Smp.CR.v(1) = _exclu
-                                                                _Smp.CR.i(2) = _aile_e_i
-                                                                _Smp.CR.j(2) = _aile_e_j
+                                                                _Smp.CR.i(2) = _aile_ext_i
+                                                                _Smp.CR.j(2) = _aile_ext_j
                                                                 _Smp.CR.k(2) = _exclu_k
                                                                 _Smp.CR.v(2) = _exclu
-                                                                _Smp.motif = "XY-Wing [" & _exclu & "] dans les cases L" & _aile_i_i + 1 & "C" & _aile_i_j + 1 & "-L" & _sommet_i + 1 & "C" & _sommet_j + 1 & "-L" & _aile_e_i + 1 & "C" & _aile_e_j + 1
+                                                                _Smp.motif = "XY-Wing [" & _exclu & "] dans les cases L" & _aile_int_i + 1 & "C" & _aile_int_j + 1 & "-L" & _sommet_i + 1 & "C" & _sommet_j + 1 & "-L" & _aile_ext_i + 1 & "C" & _aile_ext_j + 1
 
                                                                 ' Intersection à l'intérieur de la région 
                                                                 For _ei = _csgi To _csgi + 2
@@ -2175,12 +2184,12 @@
                                                                 Next
 
                                                                 ' Intersection à l'extérieur de la région
-                                                                _aei = (_aile_e_i \ 3) * 3 'calcul du départ de _i de l'aile exérieure
+                                                                _aei = (_aile_ext_i \ 3) * 3 'calcul du départ de _i de l'aile exérieure
 
                                                                 For _ei = _aei To _aei + 2
-                                                                    If _Candidats(_ei, _aile_i_j, _exclu_k) = _exclu Then
+                                                                    If _Candidats(_ei, _aile_int_j, _exclu_k) = _exclu Then
                                                                         _Smp.CE.i(_Smp.ne) = _ei
-                                                                        _Smp.CE.j(_Smp.ne) = _aile_i_j
+                                                                        _Smp.CE.j(_Smp.ne) = _aile_int_j
                                                                         _Smp.CE.k(_Smp.ne) = _exclu_k
                                                                         _Smp.CE.v(_Smp.ne) = _exclu
                                                                         _Smp.ne += 1
@@ -2217,33 +2226,13 @@
 
     Sub XYWing(ByRef _completed As Boolean, ByVal _aile_g As String, ByVal _sommet As String, ByVal _aile_d As String, ByRef _exclu As String)
 
-        If Mid(_sommet, 1, 1) = Mid(_aile_g, 1, 1) _
-            And Mid(_sommet, 2, 1) = Mid(_aile_d, 2, 1) _
-            And Mid(_aile_g, 2, 1) = Mid(_aile_d, 1, 1) Then
-            _exclu = Mid(_aile_d, 1, 1)
+        _completed = False
+
+        If Mid(_aile_g, 1, 1) = Mid(_aile_d, 2, 1) Then
             _completed = True
+            _exclu = Mid(_aile_g, 1, 1)
         End If
 
-        If Mid(_sommet, 1, 1) = Mid(_aile_g, 1, 1) _
-            And Mid(_sommet, 2, 1) = Mid(_aile_d, 1, 1) _
-            And Mid(_aile_g, 2, 1) = Mid(_aile_d, 2, 1) Then
-            _exclu = Mid(_aile_d, 2, 1)
-            _completed = True
-        End If
-
-        If Mid(_sommet, 1, 1) = Mid(_aile_g, 2, 1) _
-            And Mid(_sommet, 2, 1) = Mid(_aile_d, 1, 1) _
-            And Mid(_aile_g, 1, 1) = Mid(_aile_d, 2, 1) Then
-            _exclu = Mid(_aile_d, 2, 1)
-            _completed = True
-        End If
-
-        If Mid(_sommet, 1, 1) = Mid(_aile_g, 2, 1) _
-            And Mid(_sommet, 2, 1) = Mid(_aile_d, 2, 1) _
-            And Mid(_aile_g, 1, 1) = Mid(_aile_d, 1, 1) Then
-            _exclu = Mid(_aile_d, 1, 1)
-            _completed = True
-        End If
 
     End Sub
 
@@ -2718,7 +2707,8 @@
                             ByRef _Candidats(,,) As String,
                             ByRef _i As Integer,
                             ByRef _j As Integer,
-                            ByRef _v As String)
+                            ByRef _v As String,
+                            ByRef _NbVal As Integer)
 
         Dim _Solution As Sudoku.StrSolution
 
@@ -2728,64 +2718,16 @@
         _v = _Solution.v
         _Grille(_i, _j) = _v
 
+        Sudoku.Historique(_NbVal).i = _Solution.i
+        Sudoku.Historique(_NbVal).j = _Solution.j
+        Sudoku.Historique(_NbVal).v = _Solution.v
+        _NbVal += 1
+
         RecalculCandidats(_i, _j, _Grille, _Candidats) ' Efface les candidats éliminés par la solution appliquée 
 
     End Sub
 
-    '============================================================================================================================================================
-    ' Recherche de la solution complète
-    '============================================================================================================================================================
 
-    Sub SolutionGrille(ByRef _Grille(,) As String,
-                       ByRef _NbVal As Integer,
-                       ByRef _Qsol As Queue(Of Sudoku.StrSolution),
-                       ByRef _NbrSmp As Integer,
-                       ByRef _TSmp() As Sudoku.StrSmp,
-                       ByRef _SolutionExiste As Boolean)
-
-
-        Dim _Erreur As Boolean
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _v As String
-        Dim _Candidats(8, 8, 8) As String
-        Dim _ErreurGrille(8, 8) As String
-
-        _Qsol.Clear()
-        TsmpClear(_NbrSmp, _TSmp)
-        _SolutionExiste = True
-
-        For i = 0 To 8
-            For j = 0 To 8
-                For k = 0 To 8
-                    _Candidats(i, j, k) = " "
-                Next
-            Next
-        Next
-
-        CalculCandidats(_Grille, _Candidats) 'Calcul candidat initial
-
-        While _NbVal < 81 And Not _Erreur And _SolutionExiste
-
-            RechercheSolution(_Grille, _Candidats, _Qsol, _NbrSmp, _TSmp, _NbVal) 'Recherche de toutes les solutions possibles
-            If _Qsol.Count = 0 And _NbrSmp = 0 Then
-                _SolutionExiste = False
-            Else
-                While _Qsol.Count > 0  'Tant que la queue des solutions n'est pas vide
-                    AppliqueUneSolution(_Qsol, _Grille, _Candidats, _i, _j, _v) 'Contient le calcul candidat suivant
-                    ControleSaisie(_Erreur, _ErreurGrille, _Grille, _Candidats)
-                    If _Erreur Then
-                        _SolutionExiste = False
-                    End If
-                    _NbVal += 1
-                End While
-            End If
-            While _NbrSmp > 0
-                AppliqueUneSimplification(_NbrSmp, _TSmp, _Candidats)
-            End While
-        End While
-
-    End Sub
 
     '============================================================================================================================================================
     '============================================================================================================================================================
@@ -2871,23 +2813,66 @@
     End Sub
 
     '============================================================================================================================================================
-    ' Détermine si 2 paires ont une valeur en commun 
+    ' Détermine si 2 paires ont une valeur en commun et Oriente les paires 1 & 2
     '============================================================================================================================================================
 
-    Function Commun(ByVal _sommet As String,
-                    ByVal _aile As String)
+    Sub CommunIni(ByRef _paire1 As String,
+               ByRef _paire2 As String,
+               ByRef _commun As Boolean)
 
-        Dim _commun As Boolean = False
+        Dim _permut As String
 
-        If Mid(_sommet, 1, 1) = Mid(_aile, 1, 1) _
-            Or Mid(_sommet, 1, 1) = Mid(_aile, 2, 1) _
-            Or Mid(_sommet, 2, 1) = Mid(_aile, 1, 1) _
-            Or Mid(_sommet, 2, 1) = Mid(_aile, 2, 1) Then
+        _commun = False
+
+        If Mid(_paire1, 1, 1) = Mid(_paire2, 1, 1) Then
+            _permut = Mid(_paire1, 2, 1) & Mid(_paire1, 1, 1)
+            _paire1 = _permut
             _commun = True
+        Else
+            If Mid(_paire1, 1, 1) = Mid(_paire2, 2, 1) Then
+                _permut = Mid(_paire1, 2, 1) & Mid(_paire1, 1, 1)
+                _paire1 = _permut
+                _permut = Mid(_paire2, 2, 1) & Mid(_paire2, 1, 1)
+                _paire2 = _permut
+                _commun = True
+            Else
+                If Mid(_paire1, 2, 1) = Mid(_paire2, 1, 1) Then
+                    _commun = True
+                Else
+                    If Mid(_paire1, 2, 1) = Mid(_paire2, 2, 1) Then
+                        _permut = Mid(_paire2, 2, 1) & Mid(_paire2, 1, 1)
+                        _paire2 = _permut
+                        _commun = True
+                    End If
+                End If
+            End If
         End If
-        Return _commun
 
-    End Function
+    End Sub
+
+    '============================================================================================================================================================
+    ' Détermine si 2 paires ont une valeur en commun et Oriente la paire 2
+    '============================================================================================================================================================
+
+    Sub CommunSuite(ByVal _paire1 As String,
+               ByRef _paire2 As String,
+               ByRef _commun As Boolean)
+
+        Dim _permut As String
+
+        _commun = False
+
+        If Mid(_paire1, 2, 1) = Mid(_paire2, 1, 1) Then
+            _commun = True
+        Else
+            If Mid(_paire1, 2, 1) = Mid(_paire2, 2, 1) Then
+                _permut = Mid(_paire2, 2, 1) & Mid(_paire2, 1, 1)
+                _paire2 = _permut
+                _commun = True
+            End If
+        End If
+
+    End Sub
 
     '============================================================================================================================================================
     ' Convertit la valeur v d'une case en indice k
