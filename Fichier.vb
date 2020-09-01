@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Module Fichier
 
-    Sub LectureGrille(ByRef grille(,) As String,
+    Sub LectureGrille(ByRef grille(,) As Integer,
                       ByRef fichierCorrrect As Boolean)
 
         Dim Enreg As String = ""
@@ -36,7 +36,7 @@ Module Fichier
                         grille(i, j) = "0"
                     Else
                         If IsNumeric(TextSudoku(g)) And TextSudoku(g) <> "0" Then
-                            grille(i, j) = TextSudoku(g)
+                            grille(i, j) = CInt(TextSudoku(g).ToString)
                         Else
                             fichierCorrrect = False
                             Exit Sub
@@ -50,18 +50,17 @@ Module Fichier
     End Sub
 
 
-    Sub EcritureGrille(ByRef grille(,) As String, ByRef fichierCorrrect As Boolean)
+    Sub EcritureGrille(ByRef grille(,) As Integer, ByRef fichierCorrrect As Boolean)
 
         Dim filename As String
         Dim TextSudoku As String = ""
-        Dim g As Integer
 
         For i = 0 To 8
             For j = 0 To 8
                 If grille(i, j) = "0" Then
                     TextSudoku &= "."
                 Else
-                    TextSudoku &= grille(i, j)
+                    TextSudoku &= grille(i, j).ToString
                 End If
             Next
             TextSudoku &= vbCrLf

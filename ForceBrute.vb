@@ -1,6 +1,8 @@
 ﻿Imports System.IO
 Module ForceBrute
-    Sub ForceBrute(ByRef Grille(,) As String, ByRef nbSol As Integer)
+    Sub ForceBrute(ByRef Grille(,) As Integer,
+                   ByRef nbSol As Integer,
+                   ByRef nbrLoop As Integer)
 
         Dim Erreur As Boolean
         Dim i As Integer
@@ -9,20 +11,19 @@ Module ForceBrute
         Dim s As Integer
         Dim smax As Integer
         Dim c(80) As Integer
-        Dim Candidats(8, 8, 8) As String
-        Dim seqCandidats(80, 8) As String
+        Dim Candidats(8, 8, 8) As Integer
+        Dim seqCandidats(80, 8) As Integer
         Dim seqi(80) As Integer
         Dim seqj(80) As Integer
         Dim nbrc(80) As Integer
-        Dim GrilleFinale(8, 8) As String
-        Dim nbrloop As Integer
+        Dim GrilleFinale(8, 8) As Integer
 
         nbSol = 0
 
         For i = 0 To 8
             For j = 0 To 8
                 For k = 0 To 8
-                    Candidats(i, j, k) = " "
+                    Candidats(i, j, k) = 0
                 Next
             Next
         Next
@@ -36,7 +37,7 @@ Module ForceBrute
                     seqj(s) = j
                     c(s) = 0
                     For k = 0 To 8
-                        If Candidats(i, j, k) <> " " Then
+                        If Candidats(i, j, k) <> 0 Then
                             seqCandidats(s, c(s)) = Candidats(i, j, k)
                             nbrc(s) = c(s)
                             c(s) += 1
@@ -55,7 +56,7 @@ Module ForceBrute
         Else
             While nbSol < 2
 
-                nbrloop += 1
+                nbrLoop += 1
                 i = seqi(s)
                 j = seqj(s)
                 Grille(i, j) = seqCandidats(s, c(s))
@@ -132,12 +133,12 @@ Module ForceBrute
     '============================================================================================================================================================
 
     Sub ControleLigneBF(ByRef _Erreur As Boolean,
-                      ByRef _Grille(,) As String,
+                      ByRef _Grille(,) As Integer,
                       ByVal _i As Integer)
 
         For _j = 0 To 7
             For _jbis = _j + 1 To 8
-                If _Grille(_i, _j) = _Grille(_i, _jbis) And _Grille(_i, _j) <> "0" Then
+                If _Grille(_i, _j) = _Grille(_i, _jbis) And _Grille(_i, _j) <> 0 Then
                     _Erreur = True
                 End If
             Next
@@ -150,12 +151,12 @@ Module ForceBrute
     '============================================================================================================================================================
 
     Sub ControleColonneBF(ByRef _Erreur As Boolean,
-                        ByRef _Grille(,) As String,
+                        ByRef _Grille(,) As Integer,
                         ByVal _j As Integer)
 
         For _i = 0 To 7
             For _ibis = _i + 1 To 8
-                If _Grille(_i, _j) = _Grille(_ibis, _j) And _Grille(_i, _j) <> "0" Then
+                If _Grille(_i, _j) = _Grille(_ibis, _j) And _Grille(_i, _j) <> 0 Then
                     _Erreur = True
                 End If
             Next
@@ -168,7 +169,7 @@ Module ForceBrute
     '============================================================================================================================================================
 
     Sub ControleRégionBF(ByRef _Erreur As Boolean,
-                       ByRef _Grille(,) As String,
+                       ByRef _Grille(,) As Integer,
                        ByVal _r As Integer)
 
         Dim _csgi As Integer 'Coin supérieur gauche région
@@ -181,7 +182,7 @@ Module ForceBrute
                 For _ibis = _csgi To _csgi + 2
                     For _jbis = _csgj To _csgj + 2
                         If _i <> _ibis And _j <> _jbis Then
-                            If _Grille(_i, _j) = _Grille(_ibis, _jbis) And _Grille(_i, _j) <> "0" Then
+                            If _Grille(_i, _j) = _Grille(_ibis, _jbis) And _Grille(_i, _j) <> 0 Then
                                 _Erreur = True
                             End If
                         End If

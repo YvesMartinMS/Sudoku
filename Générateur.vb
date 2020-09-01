@@ -1,19 +1,19 @@
 ﻿Imports System.IO
 Module Générateur
 
-    Sub Générateur(ByRef Grille(,) As String)
+    Sub Générateur(ByRef Grille(,) As Integer,
+                   ByRef NbrLoop As Integer)
 
         Dim i As Integer = 0
         Dim j As Integer = 0
-        Dim g As Integer
 
         Dim nbVal As Integer = 0
-        Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
+        Dim Candidats(8, 8, 8) As Integer ' La grille des candidats ( Valeurs au crayon)
 
         Dim NbTentatives As Integer
         Dim NbRéussi As Integer
-        Dim TentativeGrille(8, 8) As String ' La grille de Sudoku
-        Dim TentativeCandidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
+        Dim TentativeGrille(8, 8) As Integer ' La grille de Sudoku
+        Dim TentativeCandidats(8, 8, 8) As Integer ' La grille des candidats ( Valeurs au crayon)
 
         Dim Erreur As Boolean
 
@@ -21,18 +21,12 @@ Module Générateur
 
         Dim Réussi As Boolean
 
-        Dim TSIni As String = "                                                                                 "
-        Dim TS As String
-
         Dim SW As New Stopwatch
         Dim T1SW As String
         Dim T2SW As String
         Dim NbSol As Integer
-        Dim GrilleFinale(8, 8) As String ' La grille en fin de partie
+        Dim GrilleFinale(8, 8) As Integer ' La grille en fin de partie
 
-        Dim Grillemodèle As String = "002700000008509630005060080980000040030000010050000023060080400027306900000005100"
-        Dim Grillemodtle As String = "012345678012345678012345678012345678012345678012345678012345678012345678012345678"
-        Dim Grillemorrre As String = "0        1        2        3        4        5        6        7        8        "
         '============================================================================================================================================================
         '  Procédure principale
         '============================================================================================================================================================
@@ -84,7 +78,7 @@ Module Générateur
             'CalculCandidats(Grille, Candidats)
 
             Array.Copy(Grille, GrilleFinale, 81)
-            ForceBrute.ForceBrute(GrilleFinale, NbSol)
+            ForceBrute.ForceBrute(GrilleFinale, NbSol, NbrLoop)
 
             If NbSol > 0 Then
                 ' If NbSol = 1 Then
@@ -103,7 +97,7 @@ Module Générateur
     '  Choisit une case libre dahs la grille
     '============================================================================================================================================================
 
-    Sub ChoisitCase(ByRef Grille(,) As String,
+    Sub ChoisitCase(ByRef Grille(,) As Integer,
                     ByVal NbVal As Integer,
                     ByRef i As Integer,
                     ByRef j As Integer)
@@ -131,13 +125,12 @@ Module Générateur
     '  Choisit un candidat dans une case libre de la grille
     '============================================================================================================================================================
 
-    Sub GénéCase(ByRef Grille(,) As String,
-                 ByRef Candidats(,,) As String,
+    Sub GénéCase(ByRef Grille(,) As Integer,
+                 ByRef Candidats(,,) As Integer,
                  ByVal i As Integer,
                  ByVal j As Integer, ByRef NbVal As Integer)
 
         Dim k As Integer
-        Dim g As Integer
 
         Dim iRandom As Integer
         Dim NombreCandidats As Integer
@@ -146,7 +139,7 @@ Module Générateur
 
         NombreCandidats = 0
         For k = 0 To 8
-            If Candidats(i, j, k) <> " " Then
+            If Candidats(i, j, k) <> 0 Then
                 NombreCandidats += 1
             End If
         Next
@@ -156,7 +149,7 @@ Module Générateur
         CompteurCandidat = 0
 
         For k = 0 To 8
-            If Candidats(i, j, k) <> " " Then
+            If Candidats(i, j, k) <> 0 Then
                 If CompteurCandidat = iRandom Then
                     Grille(i, j) = Candidats(i, j, k) 'affecte à la grille le candidat choisi aléatoirement
                     NbVal += 1

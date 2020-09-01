@@ -2,13 +2,12 @@
 Module Problème
     Sub Problème(ByVal typeGrille As String,
                  ByRef NbVal As Integer,
-                 ByRef Grille(,) As String,
-                 ByRef Candidats(,,) As String)
+                 ByRef Grille(,) As Integer,
+                 ByRef Candidats(,,) As Integer,
+                 ByRef NbrLoop As Integer)
 
         Dim i As Integer
         Dim j As Integer
-        Dim v As String
-        Dim g As Integer
         Dim NbSol As Integer
 
         Dim QSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
@@ -21,25 +20,24 @@ Module Problème
         Dim Eval As Integer
         Dim EvalMin As Integer = 1
         Dim EvalMax As Integer = 999
-        Dim GrilleFinale(8, 8) As String
-        Dim GrilleTentative(8, 8) As String
-        Dim GrilleFB(8, 8) As String
+        Dim GrilleFinale(8, 8) As Integer
+        Dim GrilleTentative(8, 8) As Integer
+        Dim GrilleFB(8, 8) As Integer
         Dim TentativeOk As Boolean
         Dim TbNbrSmp(80) As Integer
         Dim Tbi(80) As Integer
         Dim Tbj(80) As Integer
-        Dim Tbv(80) As String
+        Dim Tbv(80) As Integer
         Dim TbQSolCount(80) As Integer
-        Dim previousCase As String
+        Dim previousCase As Integer
         Dim ok As Boolean = True
-        Dim Grillemodèle As String = "578314296136298475294675381653149728721863954849527613367981542412756839985432167"
         Dim wMsgBox As String
 
         NbVal = 81
         For i = 0 To 8
             For j = 0 To 8
                 For k = 0 To 8
-                    Candidats(i, j, k) = " "
+                    Candidats(i, j, k) = 0
                 Next
                 '          g = (i * 9) + j
                 '           Grille(i, j) = Mid(Grillemodèle, g + 1, 1)
@@ -48,7 +46,7 @@ Module Problème
 
         Array.Copy(Grille, GrilleFinale, 81)
 
-        While NbVal > 30 ' And ok
+        While NbVal > 25 ' And ok
             '     While (Eval < EvalMin Or Eval > EvalMax) And nbVal > 60
 
             Array.Copy(Grille, GrilleTentative, 81)
@@ -56,21 +54,21 @@ Module Problème
             While TentativeOk = False
                 ChoisitCase(GrilleTentative, NbVal, i, j)
                 previousCase = Grille(i, j)
-                Grille(i, j) = "0"
+                Grille(i, j) = 0
 
                 Array.Copy(Grille, GrilleFB, 81)
-                ForceBrute.ForceBrute(GrilleFB, NbSol)
+                ForceBrute.ForceBrute(GrilleFB, NbSol, NbrLoop)
 
                 If NbSol = 0 Then
                     wMsgBox = "Pas de Solution !"
                     Grille(i, j) = previousCase
-                    GrilleTentative(i, j) = "X"
+                    GrilleTentative(i, j) = 10
                 End If
 
                 If NbSol > 1 Then
                     wMsgBox = "Solution multiple !"
                     Grille(i, j) = previousCase
-                    GrilleTentative(i, j) = "X"
+                    GrilleTentative(i, j) = 10
                 End If
 
                 If NbSol = 1 Then
@@ -90,16 +88,12 @@ Module Problème
                     End If
                 End If
 
-                'If Not ok Then
-                '    MsgBox(NbVal & " enlevé un " & previousCase & " en " & i & ";" & j & " nb Solutions : ;" & QSol.Count)
-                'End If
-
             End While
         End While
 
     End Sub
 
-    Sub ChoisitCase(ByRef Grille(,) As String,
+    Sub ChoisitCase(ByRef Grille(,) As Integer,
                     ByVal nbVal As Integer,
                     ByRef i As Integer,
                     ByRef j As Integer)
@@ -111,7 +105,7 @@ Module Problème
 
         For i = 0 To 8
             For j = 0 To 8
-                If Grille(i, j) <> "0" Then
+                If Grille(i, j) <> 0 Then
                     If g = h Then
                         Exit Sub
                     End If
@@ -121,29 +115,4 @@ Module Problème
         Next
     End Sub
 
-
-
-
-    Sub EnpileGrille(ByRef Grille(,) As String,
-                     ByVal nbVal As Integer)
-
-        For i = 0 To 8
-            For j = 0 To 8
-                Sudoku.pileGrilles(nbVal, i, j) = Grille(i, j)
-            Next
-        Next
-
-    End Sub
-
-    Sub ViderPileGrille()
-
-        For h = 0 To 80
-            For i = 0 To 8
-                For j = 0 To 8
-                    Sudoku.pileGrilles(h, i, j) = " "
-                Next
-            Next
-        Next
-
-    End Sub
 End Module

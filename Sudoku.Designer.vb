@@ -142,8 +142,11 @@ Partial Class Sudoku
         Me.nomFichierOuvert = New System.Windows.Forms.Label()
         Me.BTForceBrute = New System.Windows.Forms.Button()
         Me.BTPossibilités = New System.Windows.Forms.Button()
+        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.Boucles = New System.Windows.Forms.Label()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MenuStrip1
@@ -1336,7 +1339,7 @@ Partial Class Sudoku
         '
         Me.LBL_nbVal.AutoSize = True
         Me.LBL_nbVal.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LBL_nbVal.Location = New System.Drawing.Point(50, 715)
+        Me.LBL_nbVal.Location = New System.Drawing.Point(50, 757)
         Me.LBL_nbVal.Name = "LBL_nbVal"
         Me.LBL_nbVal.Size = New System.Drawing.Size(0, 25)
         Me.LBL_nbVal.TabIndex = 1096
@@ -1375,12 +1378,32 @@ Partial Class Sudoku
         Me.BTPossibilités.Text = "Possibilités"
         Me.BTPossibilités.UseVisualStyleBackColor = False
         '
+        'PictureBox1
+        '
+        Me.PictureBox1.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.PictureBox1.Location = New System.Drawing.Point(55, 359)
+        Me.PictureBox1.Name = "PictureBox1"
+        Me.PictureBox1.Size = New System.Drawing.Size(57, 57)
+        Me.PictureBox1.TabIndex = 1100
+        Me.PictureBox1.TabStop = False
+        '
+        'Boucles
+        '
+        Me.Boucles.AutoSize = True
+        Me.Boucles.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Boucles.Location = New System.Drawing.Point(50, 803)
+        Me.Boucles.Name = "Boucles"
+        Me.Boucles.Size = New System.Drawing.Size(0, 25)
+        Me.Boucles.TabIndex = 1101
+        '
         'Sudoku
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(1184, 861)
+        Me.Controls.Add(Me.Boucles)
+        Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.BTPossibilités)
         Me.Controls.Add(Me.BTForceBrute)
         Me.Controls.Add(Me.nomFichierOuvert)
@@ -1491,6 +1514,7 @@ Partial Class Sudoku
         Me.MenuStrip1.PerformLayout()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1615,4 +1639,6 @@ Partial Class Sudoku
     Friend WithEvents BTPrécédent As ToolStripButton
     Friend WithEvents BTSuivant As ToolStripButton
     Friend WithEvents BTTerminé As ToolStripButton
+    Friend WithEvents PictureBox1 As PictureBox
+    Friend WithEvents Boucles As Label
 End Class

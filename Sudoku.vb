@@ -16,23 +16,23 @@ Public Class Sudoku
     Dim iBT As Integer
     Dim jBT As Integer
     Dim BTC(9) As Button
-    Dim valSaisie As String
+    Dim valSaisie As Integer
     Dim iValSaisie As Integer = 0
 
     Dim i As Integer = 0
     Dim j As Integer = 0
-    Dim v As String
+    Dim v As Integer
     Dim k As Integer = 0
     Dim g As Integer = 0
 
-    Dim Grille(8, 8) As String ' La grille de Sudoku
-    Dim GrilleInitiale(8, 8) As String ' La grille en début de partie
-    Public GrilleFinale(8, 8) As String ' La grille en fin de partie
+    Dim Grille(8, 8) As Integer ' La grille de Sudoku
+    Dim GrilleInitiale(8, 8) As Integer ' La grille en début de partie
+    Public GrilleFinale(8, 8) As Integer ' La grille en fin de partie
     Dim SolutionExiste As Boolean
     Dim opk(8, 8) As Integer ' Nombre de candidats de k par case
     Dim nuplet(8, 8) As String 'Candidats agrégés
 
-    Dim Candidats(8, 8, 8) As String ' La grille des candidats ( Valeurs au crayon)
+    Dim Candidats(8, 8, 8) As Integer ' La grille des candidats ( Valeurs au crayon)
     Dim NbVal As Integer = 0
     Dim NbValInitial As Integer = 0
     Dim NbvalMax As Integer = 0
@@ -40,7 +40,7 @@ Public Class Sudoku
     Structure StrHistorique
         Dim i As Integer
         Dim j As Integer
-        Dim v As String
+        Dim v As Integer
     End Structure
 
     Public Historique(80) As StrHistorique
@@ -50,13 +50,13 @@ Public Class Sudoku
         Dim i As Integer
         Dim j As Integer
         Dim k As Integer
-        Dim v As String
+        Dim v As Integer
     End Structure
 
     Structure StrSolution
         Dim i As Integer
         Dim j As Integer
-        Dim v As String 'Valeur
+        Dim v As Integer 'Valeur
         Dim m As String 'Motif
         Dim b As Integer 'Barème
     End Structure
@@ -68,20 +68,20 @@ Public Class Sudoku
         Dim i() As Integer
         Dim j() As Integer
         Dim k() As Integer
-        Dim v() As String
+        Dim v() As Integer
     End Structure
 
     Structure CandidatsEliminés
         Dim i() As Integer
         Dim j() As Integer
         Dim k() As Integer
-        Dim v() As String
+        Dim v() As Integer
     End Structure
 
     Structure StrSmp ' Simplification 
         Dim motif As String 'Motif
         Dim act As Boolean
-        'candidats retenus (ReDim 3) 
+        'candidats retenus (ReDim 20) 
         Dim nr As Integer 'nombre de candidats retenus
         Dim CR As CandidatsRetenus
         'candidats éliminés (ReDim 20)
@@ -97,7 +97,7 @@ Public Class Sudoku
     Structure AnlTrp 'Analyse triplet
         Dim i As Integer
         Dim j As Integer
-        Dim v() As String
+        Dim v() As Integer
     End Structure
 
     Dim Libel As String
@@ -106,9 +106,10 @@ Public Class Sudoku
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
     Dim NbSol As Integer
+    Dim NbrLoop As Integer
 
-    Public pileGrilles(81, 8, 8) As String ' La grille de Sudoku à chaque tour
-    Public Val As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
+    Public pileGrilles(81, 8, 8) As Integer ' La grille de Sudoku à chaque tour
+
     Public mode As String
     Public modeCandidat As Boolean
     Dim stepByStepApply As Boolean
@@ -126,7 +127,7 @@ Public Class Sudoku
     Dim colorIni(8, 8) As Color
 
     Dim typeGrille As String = "Sym"
-
+    Dim CaseCandidats As String
     Dim TextSudoku As String = "                                                                                 "
 
     Public Generator As System.Random = New System.Random()
@@ -323,7 +324,7 @@ Public Class Sudoku
                 End With
                 If ErreurGrille(i, j) = "X" Or ErreurGrille(i, j) = "Y" Then
                     With Me.BT(i, j)
-                        .Text = Grille(i, j)
+                        .Text = Grille(i, j).ToString
                         .Font = grandeFont
                         .ForeColor = Color.Black
                         .BackColor = Color.Red
@@ -332,10 +333,12 @@ Public Class Sudoku
                     If Grille(i, j) = "0" Then
                         If modeCandidat Then
                             With Me.BT(i, j)
-                                .Text =
-                            Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
-                            Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
-                            Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+                                CaseCandidats =
+                            Candidats(i, j, 0).ToString & " " & Candidats(i, j, 1).ToString & " " & Candidats(i, j, 2).ToString & Environment.NewLine &
+                            Candidats(i, j, 3).ToString & " " & Candidats(i, j, 4).ToString & " " & Candidats(i, j, 5).ToString & Environment.NewLine &
+                            Candidats(i, j, 6).ToString & " " & Candidats(i, j, 7).ToString & " " & Candidats(i, j, 8).ToString
+                                CaseCandidats = CaseCandidats.Replace("0", " ")
+                                .Text = CaseCandidats
                                 .Font = petiteFont
                                 .ForeColor = Color.Black
                                 .BackColor = colorIni(i, j)
@@ -352,11 +355,11 @@ Public Class Sudoku
                         End If
                     Else
                         With Me.BT(i, j)
-                            .Text = Grille(i, j)
+                            .Text = Grille(i, j).ToString
                             .Font = grandeFont
                             .ForeColor = Color.Black
                             .BackColor = colorIni(i, j)
-                            If GrilleInitiale(i, j) = "0" Then
+                            If GrilleInitiale(i, j) = 0 Or mode = "Saisie" Then
                                 .Enabled = True
                             Else
                                 .Enabled = False
@@ -368,6 +371,7 @@ Public Class Sudoku
         Next
 
         LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
+        Boucles.Text = "Nombre de boucles : " & NbrLoop.ToString
 
     End Sub
 
@@ -379,7 +383,7 @@ Public Class Sudoku
 
         For i = 0 To 8
             For j = 0 To 8
-                If Grille(i, j) = "0" Then
+                If Grille(i, j) = 0 Then
                     AfficheCandidats(i, j)
                 End If
             Next
@@ -390,10 +394,12 @@ Public Class Sudoku
     Sub AfficheCandidats(i, j)
 
         With Me.BT(i, j)
-            .Text =
-                            Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
-                            Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
-                            Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+            CaseCandidats =
+                            Candidats(i, j, 0).ToString & " " & Candidats(i, j, 1).ToString & " " & Candidats(i, j, 2).ToString & Environment.NewLine &
+                            Candidats(i, j, 3).ToString & " " & Candidats(i, j, 4).ToString & " " & Candidats(i, j, 5).ToString & Environment.NewLine &
+                            Candidats(i, j, 6).ToString & " " & Candidats(i, j, 7).ToString & " " & Candidats(i, j, 8).ToString
+            CaseCandidats = CaseCandidats.Replace("0", " ")
+            .Text = CaseCandidats
             .Font = petiteFont
             .ForeColor = Color.Black
             .BackColor = colorIni(i, j)
@@ -508,9 +514,9 @@ Public Class Sudoku
                     .BackColor = colorIni(i, j)
                     .Enabled = True
                 End With
-                Grille(i, j) = "0"
+                Grille(i, j) = 0
                 For k = 0 To 8
-                    Candidats(i, j, k) = " "
+                    Candidats(i, j, k) = 0
                 Next
             Next
         Next
@@ -533,14 +539,10 @@ Public Class Sudoku
     Sub FonctionGénérer()
 
         mode = "Générer"
+        NbrLoop = 0
+        Générateur.Générateur(Grille, NbrLoop)
+        '    Problème.Problème(typeGrille, NbVal, Grille, Candidats, NbrLoop)
 
-        Générateur.Générateur(Grille)
-        'ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
-
-        'ViderPileGrille()
-        'EnpileGrille(Grille, NbVal)
-        Problème.Problème(typeGrille, NbVal, Grille, Candidats)
-        'ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
         Affichage()
         FonctionJouer()
 
@@ -583,7 +585,7 @@ Public Class Sudoku
         NbVal = 0
         For i = 0 To 8
             For j = 0 To 8
-                If Grille(i, j) = "0" Then
+                If Grille(i, j) = 0 Then
                     With Me.BT(i, j)
                         .Text = ""
                         .Font = grandeFont
@@ -627,7 +629,7 @@ Public Class Sudoku
     Sub FonctionSauvegarderFichier()
 
         Array.Copy(Grille, GrilleFinale, 81)
-        ForceBrute.ForceBrute(GrilleFinale, NbSol)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, nbrLoop)
 
         If NbSol = 1 Then
             ' Grille valide
@@ -680,7 +682,7 @@ Public Class Sudoku
 
         For i = 0 To 8
             For j = 0 To 8
-                If Grille(i, j) <> "0" Then
+                If Grille(i, j) <> 0 Then
                     With Me.BT(i, j)
                         .Enabled = False
                     End With
@@ -691,14 +693,15 @@ Public Class Sudoku
         For i = 0 To 80
             Historique(i).i = iBT
             Historique(i).j = jBT
-            Historique(i).v = "0"
+            Historique(i).v = 0
         Next
 
         Array.Copy(Grille, GrilleInitiale, 81)
         NbValInitial = NbVal
 
+        NbrLoop = 0
         Array.Copy(Grille, GrilleFinale, 81)
-        ForceBrute.ForceBrute(GrilleFinale, NbSol)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbrLoop)
 
         If NbSol = 1 Then
             BTForceBrute.Enabled = True
@@ -709,6 +712,7 @@ Public Class Sudoku
             BTPrécédent.Enabled = True
             BTSuivant.Enabled = True
             BTTerminé.Enabled = True
+            CalculCandidats(Grille, Candidats)
             Affichage()
         Else
             If NbSol = 0 Then
@@ -761,7 +765,7 @@ Public Class Sudoku
         If NbVal > NbValInitial Then
             i = Historique(NbVal).i
             j = Historique(NbVal).j
-            Grille(i, j) = "0"
+            Grille(i, j) = 0
             CalculCandidats(Grille, Candidats)
             NbVal -= 1
             Affichage()
@@ -803,7 +807,7 @@ Public Class Sudoku
         End If
 
         Array.Copy(Grille, GrilleFinale, 81)
-        ForceBrute.ForceBrute(GrilleFinale, NbSol)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbrLoop)
 
         If NbSol = 1 Then
             Array.Copy(GrilleFinale, Grille, 81)
@@ -886,19 +890,21 @@ Public Class Sudoku
                     End If
                     BTPrécédent.Enabled = True
                     With Me.BT(i, j)
-                            .Text = v
-                            .Font = grandeFont
-                            .BackColor = Color.Plum
-                            .Enabled = True
-                        End With
+                        .Text = v
+                        .Font = grandeFont
+                        .BackColor = Color.Plum
+                        .Enabled = True
+                    End With
 
-                        LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
-                    Else
-                        With Me.BT(i, j)
-                        .Text =
-                            Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
-                            Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
-                            Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+                    LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
+                Else
+                    With Me.BT(i, j)
+                        CaseCandidats =
+                            Candidats(i, j, 0).ToString & " " & Candidats(i, j, 1).ToString & " " & Candidats(i, j, 2).ToString & Environment.NewLine &
+                            Candidats(i, j, 3).ToString & " " & Candidats(i, j, 4).ToString & " " & Candidats(i, j, 5).ToString & Environment.NewLine &
+                            Candidats(i, j, 6).ToString & " " & Candidats(i, j, 7).ToString & " " & Candidats(i, j, 8).ToString
+                        CaseCandidats = CaseCandidats.Replace("0", " ")
+                        .Text = CaseCandidats
                         .Font = petiteFont
                         .BackColor = Color.Plum
                         .Enabled = True
@@ -944,13 +950,15 @@ Public Class Sudoku
 
         For i = 0 To 8
             For j = 0 To 8
-                If Grille(i, j) = "0" Then
+                If Grille(i, j) = 0 Then
                     If modeCandidat Then
                         With Me.BT(i, j)
-                            .Text =
-                                Candidats(i, j, 0) & " " & Candidats(i, j, 1) & " " & Candidats(i, j, 2) & Environment.NewLine &
-                                Candidats(i, j, 3) & " " & Candidats(i, j, 4) & " " & Candidats(i, j, 5) & Environment.NewLine &
-                                Candidats(i, j, 6) & " " & Candidats(i, j, 7) & " " & Candidats(i, j, 8)
+                            CaseCandidats =
+                            Candidats(i, j, 0).ToString & " " & Candidats(i, j, 1).ToString & " " & Candidats(i, j, 2).ToString & Environment.NewLine &
+                            Candidats(i, j, 3).ToString & " " & Candidats(i, j, 4).ToString & " " & Candidats(i, j, 5).ToString & Environment.NewLine &
+                            Candidats(i, j, 6).ToString & " " & Candidats(i, j, 7).ToString & " " & Candidats(i, j, 8).ToString
+                            CaseCandidats = CaseCandidats.Replace("0", " ")
+                            .Text = CaseCandidats
                             .Font = petiteFont
                             .Enabled = True
                         End With
@@ -982,7 +990,7 @@ Public Class Sudoku
     Private Sub BTForceBrute_Click(sender As Object, e As EventArgs) Handles BTForceBrute.Click
 
         Array.Copy(Grille, GrilleFinale, 81)
-        ForceBrute.ForceBrute(GrilleFinale, NbSol)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbrLoop)
 
         If NbSol = 1 Then
             Array.Copy(GrilleFinale, Grille, 81)
@@ -1026,13 +1034,13 @@ Public Class Sudoku
 
     Private Sub BT_1_Click(sender As Object, e As EventArgs) Handles BT_1.Click
 
-        If iValSaisie = 0 Then
+        If iValSaisie = 0 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 0
-            valSaisie = "1"
+            valSaisie = 1
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
@@ -1040,13 +1048,13 @@ Public Class Sudoku
 
     Private Sub BT_2_Click(sender As Object, e As EventArgs) Handles BT_2.Click
 
-        If iValSaisie = 1 Then
+        If iValSaisie = 1 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 1
-            valSaisie = "2"
+            valSaisie = 2
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
@@ -1054,13 +1062,13 @@ Public Class Sudoku
 
     Private Sub BT_3_Click(sender As Object, e As EventArgs) Handles BT_3.Click
 
-        If iValSaisie = 2 Then
+        If iValSaisie = 2 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 2
-            valSaisie = "3"
+            valSaisie = 3
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
@@ -1068,26 +1076,26 @@ Public Class Sudoku
 
     Private Sub BT_4_Click(sender As Object, e As EventArgs) Handles BT_4.Click
 
-        If iValSaisie = 3 Then
+        If iValSaisie = 3 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 3
-            valSaisie = "4"
+            valSaisie = 4
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
     End Sub
 
     Private Sub BT_5_Click(sender As Object, e As EventArgs) Handles BT_5.Click
 
-        If iValSaisie = 4 Then
+        If iValSaisie = 4 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 4
-            valSaisie = "5"
+            valSaisie = 5
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
@@ -1095,13 +1103,13 @@ Public Class Sudoku
 
     Private Sub BT_6_Click(sender As Object, e As EventArgs) Handles BT_6.Click
 
-        If iValSaisie = 5 Then
+        If iValSaisie = 5 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 5
-            valSaisie = "6"
+            valSaisie = 6
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
@@ -1109,13 +1117,13 @@ Public Class Sudoku
 
     Private Sub BT_7_Click(sender As Object, e As EventArgs) Handles BT_7.Click
 
-        If iValSaisie = 6 Then
+        If iValSaisie = 6 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 6
-            valSaisie = "7"
+            valSaisie = 7
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
@@ -1123,13 +1131,13 @@ Public Class Sudoku
 
     Private Sub BT_8_Click(sender As Object, e As EventArgs) Handles BT_8.Click
 
-        If iValSaisie = 7 Then
+        If iValSaisie = 7 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 7
-            valSaisie = "8"
+            valSaisie = 8
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
@@ -1137,13 +1145,13 @@ Public Class Sudoku
 
     Private Sub BT_9_Click(sender As Object, e As EventArgs) Handles BT_9.Click
 
-        If iValSaisie = 8 Then
+        If iValSaisie = 8 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 8
-            valSaisie = "9"
+            valSaisie = 9
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
@@ -1151,22 +1159,24 @@ Public Class Sudoku
 
     Private Sub BT_Clear_Click(sender As Object, e As EventArgs) Handles BT_Clear.Click
 
-        If iValSaisie = 9 Then
+        If iValSaisie = 9 And valSaisie <> 0 Then
             BTC(iValSaisie).BackColor = ChiffreOffColor
-            valSaisie = Nothing
+            valSaisie = 0
         Else
             BTC(iValSaisie).BackColor = ChiffreOffColor
             iValSaisie = 9
-            valSaisie = " "
+            valSaisie = 0
             BTC(iValSaisie).BackColor = ChiffreOnColor
         End If
 
     End Sub
 
     '============================================================================================================================================================
+    '============================================================================================================================================================
     '
-    '                                        B O U T O N S   D E   L A   G R I L L E
+    '                                        B O U T O N S   D E   L A   G R I L L E   &   S O U R I S
     '
+    '============================================================================================================================================================
     '============================================================================================================================================================
 
     Private Sub BT00_Click(sender As Object, e As EventArgs) Handles BT00.Click
@@ -1174,541 +1184,6 @@ Public Class Sudoku
         jBT = 0
         CtlBT()
     End Sub
-
-    Private Sub BT01_Click(sender As Object, e As EventArgs) Handles BT01.Click
-        iBT = 0
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT02_Click(sender As Object, e As EventArgs) Handles BT02.Click
-        iBT = 0
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT03_Click(sender As Object, e As EventArgs) Handles BT03.Click
-        iBT = 0
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT04_Click(sender As Object, e As EventArgs) Handles BT04.Click
-        iBT = 0
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub BT05_Click(sender As Object, e As EventArgs) Handles BT05.Click
-        iBT = 0
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT06_Click(sender As Object, e As EventArgs) Handles BT06.Click
-        iBT = 0
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT07_Click(sender As Object, e As EventArgs) Handles BT07.Click
-        iBT = 0
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT08_Click(sender As Object, e As EventArgs) Handles BT08.Click
-        iBT = 0
-        jBT = 8
-        CtlBT()
-    End Sub
-
-    Private Sub BT09_Click(sender As Object, e As EventArgs) Handles BT09.Click
-        iBT = 1
-        jBT = 0
-        CtlBT()
-    End Sub
-
-    Private Sub BT10_Click(sender As Object, e As EventArgs) Handles BT10.Click
-        iBT = 1
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT11_Click(sender As Object, e As EventArgs) Handles BT11.Click
-        iBT = 1
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT12_Click(sender As Object, e As EventArgs) Handles BT12.Click
-        iBT = 1
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT13_Click(sender As Object, e As EventArgs) Handles BT13.Click
-        iBT = 1
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub BT14_Click(sender As Object, e As EventArgs) Handles BT14.Click
-        iBT = 1
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT15_Click(sender As Object, e As EventArgs) Handles BT15.Click
-        iBT = 1
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT16_Click(sender As Object, e As EventArgs) Handles BT16.Click
-        iBT = 1
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT17_Click(sender As Object, e As EventArgs) Handles BT17.Click
-        iBT = 1
-        jBT = 8
-        CtlBT()
-    End Sub
-
-    Private Sub BT18_Click(sender As Object, e As EventArgs) Handles BT18.Click
-        iBT = 2
-        jBT = 0
-        CtlBT()
-    End Sub
-
-    Private Sub BT19_Click(sender As Object, e As EventArgs) Handles BT19.Click
-        iBT = 2
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT20_Click(sender As Object, e As EventArgs) Handles BT20.Click
-        iBT = 2
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT21_Click(sender As Object, e As EventArgs) Handles BT21.Click
-        iBT = 2
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT22_Click(sender As Object, e As EventArgs) Handles BT22.Click
-        iBT = 2
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub BT23_Click(sender As Object, e As EventArgs) Handles BT23.Click
-        iBT = 2
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT24_Click(sender As Object, e As EventArgs) Handles BT24.Click
-        iBT = 2
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT25_Click(sender As Object, e As EventArgs) Handles BT25.Click
-        iBT = 2
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT26_Click(sender As Object, e As EventArgs) Handles BT26.Click
-        iBT = 2
-        jBT = 8
-        CtlBT()
-    End Sub
-
-    Private Sub BT27_Click(sender As Object, e As EventArgs) Handles BT27.Click
-        iBT = 3
-        jBT = 0
-        CtlBT()
-    End Sub
-
-    Private Sub BT28_Click(sender As Object, e As EventArgs) Handles BT28.Click
-        iBT = 3
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT29_Click(sender As Object, e As EventArgs) Handles BT29.Click
-        iBT = 3
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT30_Click(sender As Object, e As EventArgs) Handles BT30.Click
-        iBT = 3
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT31_Click(sender As Object, e As EventArgs) Handles BT31.Click
-        iBT = 3
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub BT32_Click(sender As Object, e As EventArgs) Handles BT32.Click
-        iBT = 3
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT33_Click(sender As Object, e As EventArgs) Handles BT33.Click
-        iBT = 3
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT34_Click(sender As Object, e As EventArgs) Handles BT34.Click
-        iBT = 3
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT35_Click(sender As Object, e As EventArgs) Handles BT35.Click
-        iBT = 3
-        jBT = 8
-        CtlBT()
-    End Sub
-
-    Private Sub Bt36_Click(sender As Object, e As EventArgs) Handles Bt36.Click
-        iBT = 4
-        jBT = 0
-        CtlBT()
-    End Sub
-
-    Private Sub BT37_Click(sender As Object, e As EventArgs) Handles BT37.Click
-        iBT = 4
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT38_Click(sender As Object, e As EventArgs) Handles BT38.Click
-        iBT = 4
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT39_Click(sender As Object, e As EventArgs) Handles BT39.Click
-        iBT = 4
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT40_Click(sender As Object, e As EventArgs) Handles BT40.Click
-        iBT = 4
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub BT41_Click(sender As Object, e As EventArgs) Handles BT41.Click
-        iBT = 4
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT42_Click(sender As Object, e As EventArgs) Handles BT42.Click
-        iBT = 4
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT43_Click(sender As Object, e As EventArgs) Handles BT43.Click
-        iBT = 4
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT44_Click(sender As Object, e As EventArgs) Handles BT44.Click
-        iBT = 4
-        jBT = 8
-        CtlBT()
-    End Sub
-
-    Private Sub BT45_Click(sender As Object, e As EventArgs) Handles BT45.Click
-        iBT = 5
-        jBT = 0
-        CtlBT()
-    End Sub
-
-    Private Sub BT46_Click(sender As Object, e As EventArgs) Handles BT46.Click
-        iBT = 5
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT47_Click(sender As Object, e As EventArgs) Handles BT47.Click
-        iBT = 5
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT48_Click(sender As Object, e As EventArgs) Handles BT48.Click
-        iBT = 5
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT49_Click(sender As Object, e As EventArgs) Handles BT49.Click
-        iBT = 5
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub BT50_Click(sender As Object, e As EventArgs) Handles BT50.Click
-        iBT = 5
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT51_Click(sender As Object, e As EventArgs) Handles BT51.Click
-        iBT = 5
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT52_Click(sender As Object, e As EventArgs) Handles BT52.Click
-        iBT = 5
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT53_Click(sender As Object, e As EventArgs) Handles BT53.Click
-        iBT = 5
-        jBT = 8
-        CtlBT()
-    End Sub
-
-    Private Sub BT54_Click(sender As Object, e As EventArgs) Handles BT54.Click
-        iBT = 6
-        jBT = 0
-        CtlBT()
-    End Sub
-
-    Private Sub BT55_Click(sender As Object, e As EventArgs) Handles BT55.Click
-        iBT = 6
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT56_Click(sender As Object, e As EventArgs) Handles BT56.Click
-        iBT = 6
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT57_Click(sender As Object, e As EventArgs) Handles BT57.Click
-        iBT = 6
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT58_Click(sender As Object, e As EventArgs) Handles BT58.Click
-        iBT = 6
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub Bt59_Click(sender As Object, e As EventArgs) Handles BT59.Click
-        iBT = 6
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT60_Click(sender As Object, e As EventArgs) Handles BT60.Click
-        iBT = 6
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT61_Click(sender As Object, e As EventArgs) Handles BT61.Click
-        iBT = 6
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT62_Click(sender As Object, e As EventArgs) Handles BT62.Click
-        iBT = 6
-        jBT = 8
-        CtlBT()
-    End Sub
-
-    Private Sub BT63_Click(sender As Object, e As EventArgs) Handles BT63.Click
-        iBT = 7
-        jBT = 0
-        CtlBT()
-    End Sub
-
-    Private Sub BT64_Click(sender As Object, e As EventArgs) Handles BT64.Click
-        iBT = 7
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT65_Click(sender As Object, e As EventArgs) Handles BT65.Click
-        iBT = 7
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT66_Click(sender As Object, e As EventArgs) Handles BT66.Click
-        iBT = 7
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT67_Click(sender As Object, e As EventArgs) Handles BT67.Click
-        iBT = 7
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub BT68_Click(sender As Object, e As EventArgs) Handles BT68.Click
-        iBT = 7
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT69_Click(sender As Object, e As EventArgs) Handles BT69.Click
-        iBT = 7
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT70_Click(sender As Object, e As EventArgs) Handles BT70.Click
-        iBT = 7
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT71_Click(sender As Object, e As EventArgs) Handles BT71.Click
-        iBT = 7
-        jBT = 8
-        CtlBT()
-    End Sub
-
-    Private Sub BT72_Click(sender As Object, e As EventArgs) Handles BT72.Click
-        iBT = 8
-        jBT = 0
-        CtlBT()
-    End Sub
-
-    Private Sub BT73_Click(sender As Object, e As EventArgs) Handles BT73.Click
-        iBT = 8
-        jBT = 1
-        CtlBT()
-    End Sub
-
-    Private Sub BT74_Click(sender As Object, e As EventArgs) Handles BT74.Click
-        iBT = 8
-        jBT = 2
-        CtlBT()
-    End Sub
-
-    Private Sub BT75_Click(sender As Object, e As EventArgs) Handles BT75.Click
-        iBT = 8
-        jBT = 3
-        CtlBT()
-    End Sub
-
-    Private Sub BT76_Click(sender As Object, e As EventArgs) Handles BT76.Click
-        iBT = 8
-        jBT = 4
-        CtlBT()
-    End Sub
-
-    Private Sub BT77_Click(sender As Object, e As EventArgs) Handles BT77.Click
-        iBT = 8
-        jBT = 5
-        CtlBT()
-    End Sub
-
-    Private Sub BT78_Click(sender As Object, e As EventArgs) Handles BT78.Click
-        iBT = 8
-        jBT = 6
-        CtlBT()
-    End Sub
-
-    Private Sub BT79_Click(sender As Object, e As EventArgs) Handles BT79.Click
-        iBT = 8
-        jBT = 7
-        CtlBT()
-    End Sub
-
-    Private Sub BT80_Click(sender As Object, e As EventArgs) Handles BT80.Click
-        iBT = 8
-        jBT = 8
-        CtlBT()
-    End Sub
-
-
-    Private Sub CtlBT()
-
-        If valSaisie <> Nothing Then
-            If mode = "Saisie" Or mode = "Jouer" Then
-                For i = 0 To 8
-                    For j = 0 To 8
-                        BT(i, j).BackColor = colorIni(i, j)
-                    Next
-                Next
-
-                If valSaisie = " " Then 'On efface une case
-                    If Grille(iBT, jBT) <> "0" Then
-                        Historique(NbVal).i = 0
-                        Historique(NbVal).j = 0
-                        Historique(NbVal).v = " "
-                        NbVal -= 1
-                    End If
-                    Grille(iBT, jBT) = "0"
-                Else
-                    If Grille(iBT, jBT) = "0" Then ''On remplit une case
-                        Historique(NbVal).i = iBT
-                        Historique(NbVal).j = jBT
-                        Historique(NbVal).v = Grille(iBT, jBT)
-                        NbVal += 1
-                    End If
-                    Grille(iBT, jBT) = valSaisie
-                    With Me.BT(iBT, jBT)
-                        .Text = valSaisie
-                        .Font = grandeFont
-                        .ForeColor = Color.Black
-                        .BackColor = colorIni(iBT, jBT)
-                        .Enabled = True
-                    End With
-                End If
-
-                ControleSaisie(Erreur, ErreurGrille, Grille, Candidats)
-                RecalculCandidats(iBT, jBT, Grille, Candidats) ' Efface les candidats éliminés par la solution appliquée 
-                Affichage()
-
-                If NbVal > NbvalMax Then
-                    NbvalMax = NbVal
-                End If
-
-            End If
-        End If
-
-    End Sub
-
-    '============================================================================================================================================================
-    '
-    '                                                                     S O U R I S
-    '
-    '============================================================================================================================================================
 
     Private Sub BT00_MouseEnter(sender As Object, e As EventArgs) Handles BT00.MouseEnter
         iBT = 0
@@ -1720,6 +1195,12 @@ Public Class Sudoku
         iBT = 0
         jBT = 0
         SortieSouris()
+    End Sub
+
+    Private Sub BT01_Click(sender As Object, e As EventArgs) Handles BT01.Click
+        iBT = 0
+        jBT = 1
+        CtlBT()
     End Sub
 
     Private Sub BT01_MouseEnter(sender As Object, e As EventArgs) Handles BT01.MouseEnter
@@ -1734,6 +1215,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT02_Click(sender As Object, e As EventArgs) Handles BT02.Click
+        iBT = 0
+        jBT = 2
+        CtlBT()
+    End Sub
+
     Private Sub BT02_MouseEnter(sender As Object, e As EventArgs) Handles BT02.MouseEnter
         iBT = 0
         jBT = 2
@@ -1744,6 +1231,12 @@ Public Class Sudoku
         iBT = 0
         jBT = 2
         SortieSouris()
+    End Sub
+
+    Private Sub BT03_Click(sender As Object, e As EventArgs) Handles BT03.Click
+        iBT = 0
+        jBT = 3
+        CtlBT()
     End Sub
 
     Private Sub BT03_MouseEnter(sender As Object, e As EventArgs) Handles BT03.MouseEnter
@@ -1757,6 +1250,13 @@ Public Class Sudoku
         jBT = 3
         SortieSouris()
     End Sub
+
+    Private Sub BT04_Click(sender As Object, e As EventArgs) Handles BT04.Click
+        iBT = 0
+        jBT = 4
+        CtlBT()
+    End Sub
+
     Private Sub BT04_MouseEnter(sender As Object, e As EventArgs) Handles BT04.MouseEnter
         iBT = 0
         jBT = 4
@@ -1768,6 +1268,13 @@ Public Class Sudoku
         jBT = 4
         SortieSouris()
     End Sub
+
+    Private Sub BT05_Click(sender As Object, e As EventArgs) Handles BT05.Click
+        iBT = 0
+        jBT = 5
+        CtlBT()
+    End Sub
+
     Private Sub BT05_MouseEnter(sender As Object, e As EventArgs) Handles BT05.MouseEnter
         iBT = 0
         jBT = 5
@@ -1779,6 +1286,7 @@ Public Class Sudoku
         jBT = 5
         SortieSouris()
     End Sub
+
     Private Sub BT06_MouseEnter(sender As Object, e As EventArgs) Handles BT06.MouseEnter
         iBT = 0
         jBT = 6
@@ -1789,6 +1297,12 @@ Public Class Sudoku
         iBT = 0
         jBT = 6
         SortieSouris()
+    End Sub
+
+    Private Sub BT06_Click(sender As Object, e As EventArgs) Handles BT06.Click
+        iBT = 0
+        jBT = 6
+        CtlBT()
     End Sub
 
     Private Sub BT07_MouseEnter(sender As Object, e As EventArgs) Handles BT07.MouseEnter
@@ -1803,6 +1317,18 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT07_Click(sender As Object, e As EventArgs) Handles BT07.Click
+        iBT = 0
+        jBT = 7
+        CtlBT()
+    End Sub
+
+    Private Sub BT08_Click(sender As Object, e As EventArgs) Handles BT08.Click
+        iBT = 0
+        jBT = 8
+        CtlBT()
+    End Sub
+
     Private Sub BT08_MouseEnter(sender As Object, e As EventArgs) Handles BT08.MouseEnter
         iBT = 0
         jBT = 8
@@ -1813,6 +1339,12 @@ Public Class Sudoku
         iBT = 0
         jBT = 8
         SortieSouris()
+    End Sub
+
+    Private Sub BT09_Click(sender As Object, e As EventArgs) Handles BT09.Click
+        iBT = 1
+        jBT = 0
+        CtlBT()
     End Sub
 
     Private Sub BT09_MouseEnter(sender As Object, e As EventArgs) Handles BT09.MouseEnter
@@ -1827,6 +1359,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT10_Click(sender As Object, e As EventArgs) Handles BT10.Click
+        iBT = 1
+        jBT = 1
+        CtlBT()
+    End Sub
+
     Private Sub BT10_MouseEnter(sender As Object, e As EventArgs) Handles BT10.MouseEnter
         iBT = 1
         jBT = 1
@@ -1837,6 +1375,12 @@ Public Class Sudoku
         iBT = 1
         jBT = 1
         SortieSouris()
+    End Sub
+
+    Private Sub BT11_Click(sender As Object, e As EventArgs) Handles BT11.Click
+        iBT = 1
+        jBT = 2
+        CtlBT()
     End Sub
 
     Private Sub BT11_MouseEnter(sender As Object, e As EventArgs) Handles BT11.MouseEnter
@@ -1851,6 +1395,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT12_Click(sender As Object, e As EventArgs) Handles BT12.Click
+        iBT = 1
+        jBT = 3
+        CtlBT()
+    End Sub
+
     Private Sub BT12_MouseEnter(sender As Object, e As EventArgs) Handles BT12.MouseEnter
         iBT = 1
         jBT = 3
@@ -1861,6 +1411,12 @@ Public Class Sudoku
         iBT = 1
         jBT = 3
         SortieSouris()
+    End Sub
+
+    Private Sub BT13_Click(sender As Object, e As EventArgs) Handles BT13.Click
+        iBT = 1
+        jBT = 4
+        CtlBT()
     End Sub
 
     Private Sub BT13_MouseEnter(sender As Object, e As EventArgs) Handles BT13.MouseEnter
@@ -1875,6 +1431,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT14_Click(sender As Object, e As EventArgs) Handles BT14.Click
+        iBT = 1
+        jBT = 5
+        CtlBT()
+    End Sub
+
     Private Sub BT14_MouseEnter(sender As Object, e As EventArgs) Handles BT14.MouseEnter
         iBT = 1
         jBT = 5
@@ -1887,6 +1449,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT15_Click(sender As Object, e As EventArgs) Handles BT15.Click
+        iBT = 1
+        jBT = 6
+        CtlBT()
+    End Sub
+
     Private Sub BT15_MouseEnter(sender As Object, e As EventArgs) Handles BT15.MouseEnter
         iBT = 1
         jBT = 6
@@ -1897,6 +1465,12 @@ Public Class Sudoku
         iBT = 1
         jBT = 6
         SortieSouris()
+    End Sub
+
+    Private Sub BT16_Click(sender As Object, e As EventArgs) Handles BT16.Click
+        iBT = 1
+        jBT = 7
+        CtlBT()
     End Sub
 
     Private Sub BT16_MouseEnter(sender As Object, e As EventArgs) Handles BT16.MouseEnter
@@ -1923,6 +1497,18 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT17_Click(sender As Object, e As EventArgs) Handles BT17.Click
+        iBT = 1
+        jBT = 8
+        CtlBT()
+    End Sub
+
+    Private Sub BT18_Click(sender As Object, e As EventArgs) Handles BT18.Click
+        iBT = 2
+        jBT = 0
+        CtlBT()
+    End Sub
+
     Private Sub BT18_MouseEnter(sender As Object, e As EventArgs) Handles BT18.MouseEnter
         iBT = 2
         jBT = 0
@@ -1933,6 +1519,12 @@ Public Class Sudoku
         iBT = 2
         jBT = 0
         SortieSouris()
+    End Sub
+
+    Private Sub BT19_Click(sender As Object, e As EventArgs) Handles BT19.Click
+        iBT = 2
+        jBT = 1
+        CtlBT()
     End Sub
 
     Private Sub BT19_MouseEnter(sender As Object, e As EventArgs) Handles BT19.MouseEnter
@@ -1947,6 +1539,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT20_Click(sender As Object, e As EventArgs) Handles BT20.Click
+        iBT = 2
+        jBT = 2
+        CtlBT()
+    End Sub
+
     Private Sub BT20_MouseEnter(sender As Object, e As EventArgs) Handles BT20.MouseEnter
         iBT = 2
         jBT = 2
@@ -1957,6 +1555,12 @@ Public Class Sudoku
         iBT = 2
         jBT = 2
         SortieSouris()
+    End Sub
+
+    Private Sub BT21_Click(sender As Object, e As EventArgs) Handles BT21.Click
+        iBT = 2
+        jBT = 3
+        CtlBT()
     End Sub
 
     Private Sub BT21_MouseEnter(sender As Object, e As EventArgs) Handles BT21.MouseEnter
@@ -1971,6 +1575,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT22_Click(sender As Object, e As EventArgs) Handles BT22.Click
+        iBT = 2
+        jBT = 4
+        CtlBT()
+    End Sub
+
     Private Sub BT22_MouseEnter(sender As Object, e As EventArgs) Handles BT22.MouseEnter
         iBT = 2
         jBT = 4
@@ -1981,6 +1591,12 @@ Public Class Sudoku
         iBT = 2
         jBT = 4
         SortieSouris()
+    End Sub
+
+    Private Sub BT23_Click(sender As Object, e As EventArgs) Handles BT23.Click
+        iBT = 2
+        jBT = 5
+        CtlBT()
     End Sub
 
     Private Sub BT23_MouseEnter(sender As Object, e As EventArgs) Handles BT23.MouseEnter
@@ -1995,6 +1611,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT24_Click(sender As Object, e As EventArgs) Handles BT24.Click
+        iBT = 2
+        jBT = 6
+        CtlBT()
+    End Sub
+
     Private Sub BT24_MouseEnter(sender As Object, e As EventArgs) Handles BT24.MouseEnter
         iBT = 2
         jBT = 6
@@ -2005,6 +1627,12 @@ Public Class Sudoku
         iBT = 2
         jBT = 6
         SortieSouris()
+    End Sub
+
+    Private Sub BT25_Click(sender As Object, e As EventArgs) Handles BT25.Click
+        iBT = 2
+        jBT = 7
+        CtlBT()
     End Sub
 
     Private Sub BT25_MouseEnter(sender As Object, e As EventArgs) Handles BT25.MouseEnter
@@ -2019,6 +1647,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT26_Click(sender As Object, e As EventArgs) Handles BT26.Click
+        iBT = 2
+        jBT = 8
+        CtlBT()
+    End Sub
+
     Private Sub BT26_MouseEnter(sender As Object, e As EventArgs) Handles BT26.MouseEnter
         iBT = 2
         jBT = 8
@@ -2029,6 +1663,12 @@ Public Class Sudoku
         iBT = 2
         jBT = 8
         SortieSouris()
+    End Sub
+
+    Private Sub BT27_Click(sender As Object, e As EventArgs) Handles BT27.Click
+        iBT = 3
+        jBT = 0
+        CtlBT()
     End Sub
 
     Private Sub BT27_MouseEnter(sender As Object, e As EventArgs) Handles BT27.MouseEnter
@@ -2043,6 +1683,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT28_Click(sender As Object, e As EventArgs) Handles BT28.Click
+        iBT = 3
+        jBT = 1
+        CtlBT()
+    End Sub
+
     Private Sub BT28_MouseEnter(sender As Object, e As EventArgs) Handles BT28.MouseEnter
         iBT = 3
         jBT = 1
@@ -2053,6 +1699,12 @@ Public Class Sudoku
         iBT = 3
         jBT = 1
         SortieSouris()
+    End Sub
+
+    Private Sub BT29_Click(sender As Object, e As EventArgs) Handles BT29.Click
+        iBT = 3
+        jBT = 2
+        CtlBT()
     End Sub
 
     Private Sub BT29_MouseEnter(sender As Object, e As EventArgs) Handles BT29.MouseEnter
@@ -2067,6 +1719,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT30_Click(sender As Object, e As EventArgs) Handles BT30.Click
+        iBT = 3
+        jBT = 3
+        CtlBT()
+    End Sub
+
     Private Sub BT30_MouseEnter(sender As Object, e As EventArgs) Handles BT30.MouseEnter
         iBT = 3
         jBT = 3
@@ -2077,6 +1735,12 @@ Public Class Sudoku
         iBT = 3
         jBT = 3
         SortieSouris()
+    End Sub
+
+    Private Sub BT31_Click(sender As Object, e As EventArgs) Handles BT31.Click
+        iBT = 3
+        jBT = 4
+        CtlBT()
     End Sub
 
     Private Sub BT31_MouseEnter(sender As Object, e As EventArgs) Handles BT31.MouseEnter
@@ -2091,6 +1755,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT32_Click(sender As Object, e As EventArgs) Handles BT32.Click
+        iBT = 3
+        jBT = 5
+        CtlBT()
+    End Sub
+
     Private Sub BT32_MouseEnter(sender As Object, e As EventArgs) Handles BT32.MouseEnter
         iBT = 3
         jBT = 5
@@ -2101,6 +1771,12 @@ Public Class Sudoku
         iBT = 3
         jBT = 5
         SortieSouris()
+    End Sub
+
+    Private Sub BT33_Click(sender As Object, e As EventArgs) Handles BT33.Click
+        iBT = 3
+        jBT = 6
+        CtlBT()
     End Sub
 
     Private Sub BT33_MouseEnter(sender As Object, e As EventArgs) Handles BT33.MouseEnter
@@ -2115,6 +1791,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT34_Click(sender As Object, e As EventArgs) Handles BT34.Click
+        iBT = 3
+        jBT = 7
+        CtlBT()
+    End Sub
+
     Private Sub BT34_MouseEnter(sender As Object, e As EventArgs) Handles BT34.MouseEnter
         iBT = 3
         jBT = 7
@@ -2125,6 +1807,12 @@ Public Class Sudoku
         iBT = 3
         jBT = 7
         SortieSouris()
+    End Sub
+
+    Private Sub BT35_Click(sender As Object, e As EventArgs) Handles BT35.Click
+        iBT = 3
+        jBT = 8
+        CtlBT()
     End Sub
 
     Private Sub BT35_MouseEnter(sender As Object, e As EventArgs) Handles BT35.MouseEnter
@@ -2139,6 +1827,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub Bt36_Click(sender As Object, e As EventArgs) Handles Bt36.Click
+        iBT = 4
+        jBT = 0
+        CtlBT()
+    End Sub
+
     Private Sub BT36_MouseEnter(sender As Object, e As EventArgs) Handles Bt36.MouseEnter
         iBT = 4
         jBT = 0
@@ -2149,6 +1843,12 @@ Public Class Sudoku
         iBT = 4
         jBT = 0
         SortieSouris()
+    End Sub
+
+    Private Sub BT37_Click(sender As Object, e As EventArgs) Handles BT37.Click
+        iBT = 4
+        jBT = 1
+        CtlBT()
     End Sub
 
     Private Sub BT37_MouseEnter(sender As Object, e As EventArgs) Handles BT37.MouseEnter
@@ -2163,6 +1863,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT38_Click(sender As Object, e As EventArgs) Handles BT38.Click
+        iBT = 4
+        jBT = 2
+        CtlBT()
+    End Sub
+
     Private Sub BT38_MouseEnter(sender As Object, e As EventArgs) Handles BT38.MouseEnter
         iBT = 4
         jBT = 2
@@ -2173,6 +1879,12 @@ Public Class Sudoku
         iBT = 4
         jBT = 2
         SortieSouris()
+    End Sub
+
+    Private Sub BT39_Click(sender As Object, e As EventArgs) Handles BT39.Click
+        iBT = 4
+        jBT = 3
+        CtlBT()
     End Sub
 
     Private Sub BT39_MouseEnter(sender As Object, e As EventArgs) Handles BT39.MouseEnter
@@ -2187,6 +1899,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT40_Click(sender As Object, e As EventArgs) Handles BT40.Click
+        iBT = 4
+        jBT = 4
+        CtlBT()
+    End Sub
+
     Private Sub BT40_MouseEnter(sender As Object, e As EventArgs) Handles BT40.MouseEnter
         iBT = 4
         jBT = 4
@@ -2197,6 +1915,12 @@ Public Class Sudoku
         iBT = 4
         jBT = 4
         SortieSouris()
+    End Sub
+
+    Private Sub BT41_Click(sender As Object, e As EventArgs) Handles BT41.Click
+        iBT = 4
+        jBT = 5
+        CtlBT()
     End Sub
 
     Private Sub BT41_MouseEnter(sender As Object, e As EventArgs) Handles BT41.MouseEnter
@@ -2211,6 +1935,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT42_Click(sender As Object, e As EventArgs) Handles BT42.Click
+        iBT = 4
+        jBT = 6
+        CtlBT()
+    End Sub
+
     Private Sub BT42_MouseEnter(sender As Object, e As EventArgs) Handles BT42.MouseEnter
         iBT = 4
         jBT = 6
@@ -2221,6 +1951,12 @@ Public Class Sudoku
         iBT = 4
         jBT = 6
         SortieSouris()
+    End Sub
+
+    Private Sub BT43_Click(sender As Object, e As EventArgs) Handles BT43.Click
+        iBT = 4
+        jBT = 7
+        CtlBT()
     End Sub
 
     Private Sub BT43_MouseEnter(sender As Object, e As EventArgs) Handles BT43.MouseEnter
@@ -2235,6 +1971,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT44_Click(sender As Object, e As EventArgs) Handles BT44.Click
+        iBT = 4
+        jBT = 8
+        CtlBT()
+    End Sub
+
     Private Sub BT44_MouseEnter(sender As Object, e As EventArgs) Handles BT44.MouseEnter
         iBT = 4
         jBT = 8
@@ -2245,6 +1987,12 @@ Public Class Sudoku
         iBT = 4
         jBT = 8
         SortieSouris()
+    End Sub
+
+    Private Sub BT45_Click(sender As Object, e As EventArgs) Handles BT45.Click
+        iBT = 5
+        jBT = 0
+        CtlBT()
     End Sub
 
     Private Sub BT45_MouseEnter(sender As Object, e As EventArgs) Handles BT45.MouseEnter
@@ -2259,6 +2007,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT46_Click(sender As Object, e As EventArgs) Handles BT46.Click
+        iBT = 5
+        jBT = 1
+        CtlBT()
+    End Sub
+
     Private Sub BT46_MouseEnter(sender As Object, e As EventArgs) Handles BT46.MouseEnter
         iBT = 5
         jBT = 1
@@ -2269,6 +2023,12 @@ Public Class Sudoku
         iBT = 5
         jBT = 1
         SortieSouris()
+    End Sub
+
+    Private Sub BT47_Click(sender As Object, e As EventArgs) Handles BT47.Click
+        iBT = 5
+        jBT = 2
+        CtlBT()
     End Sub
 
     Private Sub BT47_MouseEnter(sender As Object, e As EventArgs) Handles BT47.MouseEnter
@@ -2283,6 +2043,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT48_Click(sender As Object, e As EventArgs) Handles BT48.Click
+        iBT = 5
+        jBT = 3
+        CtlBT()
+    End Sub
+
     Private Sub BT48_MouseEnter(sender As Object, e As EventArgs) Handles BT48.MouseEnter
         iBT = 5
         jBT = 3
@@ -2293,6 +2059,12 @@ Public Class Sudoku
         iBT = 5
         jBT = 3
         SortieSouris()
+    End Sub
+
+    Private Sub BT49_Click(sender As Object, e As EventArgs) Handles BT49.Click
+        iBT = 5
+        jBT = 4
+        CtlBT()
     End Sub
 
     Private Sub BT49_MouseEnter(sender As Object, e As EventArgs) Handles BT49.MouseEnter
@@ -2307,6 +2079,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT50_Click(sender As Object, e As EventArgs) Handles BT50.Click
+        iBT = 5
+        jBT = 5
+        CtlBT()
+    End Sub
+
     Private Sub BT50_MouseEnter(sender As Object, e As EventArgs) Handles BT50.MouseEnter
         iBT = 5
         jBT = 5
@@ -2317,6 +2095,12 @@ Public Class Sudoku
         iBT = 5
         jBT = 5
         SortieSouris()
+    End Sub
+
+    Private Sub BT51_Click(sender As Object, e As EventArgs) Handles BT51.Click
+        iBT = 5
+        jBT = 6
+        CtlBT()
     End Sub
 
     Private Sub BT51_MouseEnter(sender As Object, e As EventArgs) Handles BT51.MouseEnter
@@ -2331,6 +2115,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT52_Click(sender As Object, e As EventArgs) Handles BT52.Click
+        iBT = 5
+        jBT = 7
+        CtlBT()
+    End Sub
+
     Private Sub BT52_MouseEnter(sender As Object, e As EventArgs) Handles BT52.MouseEnter
         iBT = 5
         jBT = 7
@@ -2341,6 +2131,12 @@ Public Class Sudoku
         iBT = 5
         jBT = 7
         SortieSouris()
+    End Sub
+
+    Private Sub BT53_Click(sender As Object, e As EventArgs) Handles BT53.Click
+        iBT = 5
+        jBT = 8
+        CtlBT()
     End Sub
 
     Private Sub BT53_MouseEnter(sender As Object, e As EventArgs) Handles BT53.MouseEnter
@@ -2355,6 +2151,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT54_Click(sender As Object, e As EventArgs) Handles BT54.Click
+        iBT = 6
+        jBT = 0
+        CtlBT()
+    End Sub
+
     Private Sub BT54_MouseEnter(sender As Object, e As EventArgs) Handles BT54.MouseEnter
         iBT = 6
         jBT = 0
@@ -2365,6 +2167,12 @@ Public Class Sudoku
         iBT = 6
         jBT = 0
         SortieSouris()
+    End Sub
+
+    Private Sub BT55_Click(sender As Object, e As EventArgs) Handles BT55.Click
+        iBT = 6
+        jBT = 1
+        CtlBT()
     End Sub
 
     Private Sub BT55_MouseEnter(sender As Object, e As EventArgs) Handles BT55.MouseEnter
@@ -2379,6 +2187,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT56_Click(sender As Object, e As EventArgs) Handles BT56.Click
+        iBT = 6
+        jBT = 2
+        CtlBT()
+    End Sub
+
     Private Sub BT56_MouseEnter(sender As Object, e As EventArgs) Handles BT56.MouseEnter
         iBT = 6
         jBT = 2
@@ -2389,6 +2203,12 @@ Public Class Sudoku
         iBT = 6
         jBT = 2
         SortieSouris()
+    End Sub
+
+    Private Sub BT57_Click(sender As Object, e As EventArgs) Handles BT57.Click
+        iBT = 6
+        jBT = 3
+        CtlBT()
     End Sub
 
     Private Sub BT57_MouseEnter(sender As Object, e As EventArgs) Handles BT57.MouseEnter
@@ -2403,6 +2223,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT58_Click(sender As Object, e As EventArgs) Handles BT58.Click
+        iBT = 6
+        jBT = 4
+        CtlBT()
+    End Sub
+
     Private Sub BT58_MouseEnter(sender As Object, e As EventArgs) Handles BT58.MouseEnter
         iBT = 6
         jBT = 4
@@ -2413,6 +2239,12 @@ Public Class Sudoku
         iBT = 6
         jBT = 4
         SortieSouris()
+    End Sub
+
+    Private Sub BT59_Click(sender As Object, e As EventArgs) Handles BT59.Click
+        iBT = 6
+        jBT = 5
+        CtlBT()
     End Sub
 
     Private Sub BT59_MouseEnter(sender As Object, e As EventArgs) Handles BT59.MouseEnter
@@ -2427,6 +2259,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT60_Click(sender As Object, e As EventArgs) Handles BT60.Click
+        iBT = 6
+        jBT = 6
+        CtlBT()
+    End Sub
+
     Private Sub BT60_MouseEnter(sender As Object, e As EventArgs) Handles BT60.MouseEnter
         iBT = 6
         jBT = 6
@@ -2437,6 +2275,12 @@ Public Class Sudoku
         iBT = 6
         jBT = 6
         SortieSouris()
+    End Sub
+
+    Private Sub BT61_Click(sender As Object, e As EventArgs) Handles BT61.Click
+        iBT = 6
+        jBT = 7
+        CtlBT()
     End Sub
 
     Private Sub BT61_MouseEnter(sender As Object, e As EventArgs) Handles BT61.MouseEnter
@@ -2451,6 +2295,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT62_Click(sender As Object, e As EventArgs) Handles BT62.Click
+        iBT = 6
+        jBT = 8
+        CtlBT()
+    End Sub
+
     Private Sub BT62_MouseEnter(sender As Object, e As EventArgs) Handles BT62.MouseEnter
         iBT = 6
         jBT = 8
@@ -2461,6 +2311,12 @@ Public Class Sudoku
         iBT = 6
         jBT = 8
         SortieSouris()
+    End Sub
+
+    Private Sub BT63_Click(sender As Object, e As EventArgs) Handles BT63.Click
+        iBT = 7
+        jBT = 0
+        CtlBT()
     End Sub
 
     Private Sub BT63_MouseEnter(sender As Object, e As EventArgs) Handles BT63.MouseEnter
@@ -2475,6 +2331,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT64_Click(sender As Object, e As EventArgs) Handles BT64.Click
+        iBT = 7
+        jBT = 1
+        CtlBT()
+    End Sub
+
     Private Sub BT64_MouseEnter(sender As Object, e As EventArgs) Handles BT64.MouseEnter
         iBT = 7
         jBT = 1
@@ -2487,6 +2349,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT65_Click(sender As Object, e As EventArgs) Handles BT65.Click
+        iBT = 7
+        jBT = 2
+        CtlBT()
+    End Sub
+
     Private Sub BT65_MouseEnter(sender As Object, e As EventArgs) Handles BT65.MouseEnter
         iBT = 7
         jBT = 2
@@ -2497,6 +2365,12 @@ Public Class Sudoku
         iBT = 7
         jBT = 2
         SortieSouris()
+    End Sub
+
+    Private Sub BT66_Click(sender As Object, e As EventArgs) Handles BT66.Click
+        iBT = 7
+        jBT = 3
+        CtlBT()
     End Sub
 
     Private Sub BT66_MouseEnter(sender As Object, e As EventArgs) Handles BT66.MouseEnter
@@ -2523,6 +2397,18 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT67_Click(sender As Object, e As EventArgs) Handles BT67.Click
+        iBT = 7
+        jBT = 4
+        CtlBT()
+    End Sub
+
+    Private Sub BT68_Click(sender As Object, e As EventArgs) Handles BT68.Click
+        iBT = 7
+        jBT = 5
+        CtlBT()
+    End Sub
+
     Private Sub BT68_MouseEnter(sender As Object, e As EventArgs) Handles BT68.MouseEnter
         iBT = 7
         jBT = 5
@@ -2533,6 +2419,12 @@ Public Class Sudoku
         iBT = 7
         jBT = 5
         SortieSouris()
+    End Sub
+
+    Private Sub BT69_Click(sender As Object, e As EventArgs) Handles BT69.Click
+        iBT = 7
+        jBT = 6
+        CtlBT()
     End Sub
 
     Private Sub BT69_MouseEnter(sender As Object, e As EventArgs) Handles BT69.MouseEnter
@@ -2547,6 +2439,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT70_Click(sender As Object, e As EventArgs) Handles BT70.Click
+        iBT = 7
+        jBT = 7
+        CtlBT()
+    End Sub
+
     Private Sub BT70_MouseEnter(sender As Object, e As EventArgs) Handles BT70.MouseEnter
         iBT = 7
         jBT = 7
@@ -2557,6 +2455,12 @@ Public Class Sudoku
         iBT = 7
         jBT = 7
         SortieSouris()
+    End Sub
+
+    Private Sub BT71_Click(sender As Object, e As EventArgs) Handles BT71.Click
+        iBT = 7
+        jBT = 8
+        CtlBT()
     End Sub
 
     Private Sub BT71_MouseEnter(sender As Object, e As EventArgs) Handles BT71.MouseEnter
@@ -2571,6 +2475,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT72_Click(sender As Object, e As EventArgs) Handles BT72.Click
+        iBT = 8
+        jBT = 0
+        CtlBT()
+    End Sub
+
     Private Sub BT72_MouseEnter(sender As Object, e As EventArgs) Handles BT72.MouseEnter
         iBT = 8
         jBT = 0
@@ -2581,6 +2491,12 @@ Public Class Sudoku
         iBT = 8
         jBT = 0
         SortieSouris()
+    End Sub
+
+    Private Sub BT73_Click(sender As Object, e As EventArgs) Handles BT73.Click
+        iBT = 8
+        jBT = 1
+        CtlBT()
     End Sub
 
     Private Sub BT73_MouseEnter(sender As Object, e As EventArgs) Handles BT73.MouseEnter
@@ -2595,6 +2511,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT74_Click(sender As Object, e As EventArgs) Handles BT74.Click
+        iBT = 8
+        jBT = 2
+        CtlBT()
+    End Sub
+
     Private Sub BT74_MouseEnter(sender As Object, e As EventArgs) Handles BT74.MouseEnter
         iBT = 8
         jBT = 2
@@ -2605,6 +2527,12 @@ Public Class Sudoku
         iBT = 8
         jBT = 2
         SortieSouris()
+    End Sub
+
+    Private Sub BT75_Click(sender As Object, e As EventArgs) Handles BT75.Click
+        iBT = 8
+        jBT = 3
+        CtlBT()
     End Sub
 
     Private Sub BT75_MouseEnter(sender As Object, e As EventArgs) Handles BT75.MouseEnter
@@ -2619,6 +2547,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT76_Click(sender As Object, e As EventArgs) Handles BT76.Click
+        iBT = 8
+        jBT = 4
+        CtlBT()
+    End Sub
+
     Private Sub BT76_MouseEnter(sender As Object, e As EventArgs) Handles BT76.MouseEnter
         iBT = 8
         jBT = 4
@@ -2629,6 +2563,12 @@ Public Class Sudoku
         iBT = 8
         jBT = 4
         SortieSouris()
+    End Sub
+
+    Private Sub BT77_Click(sender As Object, e As EventArgs) Handles BT77.Click
+        iBT = 8
+        jBT = 5
+        CtlBT()
     End Sub
 
     Private Sub BT77_MouseEnter(sender As Object, e As EventArgs) Handles BT77.MouseEnter
@@ -2643,6 +2583,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT78_Click(sender As Object, e As EventArgs) Handles BT78.Click
+        iBT = 8
+        jBT = 6
+        CtlBT()
+    End Sub
+
     Private Sub BT78_MouseEnter(sender As Object, e As EventArgs) Handles BT78.MouseEnter
         iBT = 8
         jBT = 6
@@ -2653,6 +2599,12 @@ Public Class Sudoku
         iBT = 8
         jBT = 6
         SortieSouris()
+    End Sub
+
+    Private Sub BT79_Click(sender As Object, e As EventArgs) Handles BT79.Click
+        iBT = 8
+        jBT = 7
+        CtlBT()
     End Sub
 
     Private Sub BT79_MouseEnter(sender As Object, e As EventArgs) Handles BT79.MouseEnter
@@ -2667,6 +2619,12 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub BT80_Click(sender As Object, e As EventArgs) Handles BT80.Click
+        iBT = 8
+        jBT = 8
+        CtlBT()
+    End Sub
+
     Private Sub BT80_MouseEnter(sender As Object, e As EventArgs) Handles BT80.MouseEnter
         iBT = 8
         jBT = 8
@@ -2679,16 +2637,57 @@ Public Class Sudoku
         SortieSouris()
     End Sub
 
+    Private Sub CtlBT()
+
+        '   If valSaisie <> Nothing Then
+        If mode = "Saisie" Or mode = "Jouer" Then
+                For i = 0 To 8
+                    For j = 0 To 8
+                        BT(i, j).BackColor = colorIni(i, j)
+                    Next
+                Next
+
+                If valSaisie = 0 Then 'On efface une case
+                    If Grille(iBT, jBT) <> 0 Then
+                        Historique(NbVal).i = 0
+                        Historique(NbVal).j = 0
+                        Historique(NbVal).v = 0
+                        NbVal -= 1
+                    End If
+                    Grille(iBT, jBT) = 0
+                Else
+                    If Grille(iBT, jBT) = 0 Then ''On remplit une case
+                        Historique(NbVal).i = iBT
+                        Historique(NbVal).j = jBT
+                        Historique(NbVal).v = Grille(iBT, jBT)
+                        NbVal += 1
+                    End If
+                    Grille(iBT, jBT) = valSaisie
+                End If
+
+                ControleSaisie(Erreur, ErreurGrille, Grille, Candidats)
+                RecalculCandidats(iBT, jBT, Grille, Candidats) ' Efface les candidats éliminés par la solution appliquée 
+                Affichage()
+
+                If NbVal > NbvalMax Then
+                    NbvalMax = NbVal
+                End If
+
+            End If
+        '  End If
+
+    End Sub
+
     Private Sub EntréeSouris()
 
         If mode = "Saisie" Or mode = "Jouer" Then
             If valSaisie <> Nothing Then
                 If Me.BT(iBT, jBT).Enabled Then
                     With Me.BT(iBT, jBT)
-                        If valSaisie <> " " Then
-                            .Text = valSaisie
+                        If valSaisie <> 0 Then
+                            .Text = valSaisie.ToString
                         Else
-                            If Grille(iBT, jBT) <> "0" Then
+                            If Grille(iBT, jBT) <> 0 Then
                                 .Text = " "
                             End If
                         End If
@@ -2698,7 +2697,7 @@ Public Class Sudoku
                     End With
                 End If
             End If
-            End If
+        End If
 
     End Sub
 
@@ -2707,12 +2706,14 @@ Public Class Sudoku
         If mode = "Saisie" Or mode = "Jouer" Then
             If Me.BT(iBT, jBT).Enabled Then
                 With Me.BT(iBT, jBT)
-                    If Grille(iBT, jBT) = "0" Then
+                    If Grille(iBT, jBT) = 0 Then
                         If modeCandidat Then
-                            .Text =
-                            Candidats(iBT, jBT, 0) & " " & Candidats(iBT, jBT, 1) & " " & Candidats(iBT, jBT, 2) & Environment.NewLine &
-                            Candidats(iBT, jBT, 3) & " " & Candidats(iBT, jBT, 4) & " " & Candidats(iBT, jBT, 5) & Environment.NewLine &
-                            Candidats(iBT, jBT, 6) & " " & Candidats(iBT, jBT, 7) & " " & Candidats(iBT, jBT, 8)
+                            CaseCandidats =
+                            Candidats(iBT, jBT, 0).ToString & " " & Candidats(iBT, jBT, 1).ToString & " " & Candidats(iBT, jBT, 2).ToString & Environment.NewLine &
+                            Candidats(iBT, jBT, 3).ToString & " " & Candidats(iBT, jBT, 4).ToString & " " & Candidats(iBT, jBT, 5).ToString & Environment.NewLine &
+                            Candidats(iBT, jBT, 6).ToString & " " & Candidats(iBT, jBT, 7).ToString & " " & Candidats(iBT, jBT, 8).ToString
+                            CaseCandidats = CaseCandidats.Replace("0", " ")
+                            .Text = CaseCandidats
                             .Font = petiteFont
                             .ForeColor = Color.Black
                             .BackColor = colorIni(iBT, jBT)
@@ -2724,7 +2725,7 @@ Public Class Sudoku
                             .BackColor = colorIni(iBT, jBT)
                         End If
                     Else
-                        .Text = Grille(iBT, jBT)
+                        .Text = Grille(iBT, jBT).ToString
                         .Font = grandeFont
                         .ForeColor = Color.Black
                         .BackColor = colorIni(iBT, jBT)
@@ -2734,7 +2735,6 @@ Public Class Sudoku
         End If
 
     End Sub
-
 
 
     Private Sub Form1_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -2752,6 +2752,14 @@ Public Class Sudoku
             Case 122 ' F11
             Case 123 ' F12
         End Select
+    End Sub
+
+    Private Sub PictureBox1_MouseEnter(sender As Object, e As EventArgs) Handles PictureBox1.MouseEnter
+        PictureBox1.BackColor = Color.Transparent
+    End Sub
+
+    Private Sub PictureBox1_MouseLeave(sender As Object, e As EventArgs) Handles PictureBox1.MouseLeave
+        PictureBox1.BackColor = Color.AntiqueWhite
     End Sub
 
 
