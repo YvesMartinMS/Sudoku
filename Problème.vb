@@ -13,11 +13,12 @@ Module Problème
         Dim QSol As Queue(Of Sudoku.StrSolution) = New Queue(Of Sudoku.StrSolution)
         Dim TSmp(80) As Sudoku.StrSmp
         Dim NbrSmp As Integer
+        Dim Chn As Sudoku.StrSmp
+        Dim NbrChn As Integer
 
         Dim opk(8, 8) As Integer ' Candidats par case
         Dim nuplet(8, 8) As String ' Candidats agrégés
 
-        Dim Eval As Integer
         Dim EvalMin As Integer = 1
         Dim EvalMax As Integer = 999
         Dim GrilleFinale(8, 8) As Integer
@@ -33,7 +34,11 @@ Module Problème
         Dim ok As Boolean = True
         Dim wMsgBox As String
 
+        Chn = NewSmp()
+
+        NbrChn = 0
         NbVal = 81
+
         For i = 0 To 8
             For j = 0 To 8
                 For k = 0 To 8

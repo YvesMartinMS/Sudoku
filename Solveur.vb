@@ -375,6 +375,10 @@
                 SwordFishCol(_Candidats, _NbrSmp, _TSmp, _AnlCol)
             End If
 
+            If _NbrSmp = 0 Then
+                ChaîneFortementLiée(_Candidats, _NbrSmp, _TSmp, _AnlLig, _AnlCol, _AnlReg)
+            End If
+
         End If
 
     End Sub
@@ -2581,12 +2585,6 @@
                        ByRef _AnlReg(,) As Sudoku.StrAnalyse,
                        ByRef _opk(,) As Integer)
 
-        'Dim _i As Integer
-        'Dim _j As Integer
-        'Dim _r As Integer
-        'Dim _ibis As Integer
-        'Dim _jbis As Integer
-
         Dim _k0 As Integer
         Dim _k1 As Integer
         Dim _kbis As Integer
@@ -3012,17 +3010,22 @@
 
     End Sub
 
+
+
     '============================================================================================================================================================
-    ' Applique Une solution de la grille des solutions
+    '============================================================================================================================================================
+    ' Applique Une solution & la grille de sudoku
+    '============================================================================================================================================================
     '============================================================================================================================================================
 
     Sub AppliqueUneSolution(ByRef _Qsol As Queue(Of Sudoku.StrSolution),
                             ByRef _Grille(,) As Integer,
                             ByRef _Candidats(,,) As Integer,
+                            ByRef _NbVal As Integer,
+                            ByRef _NbvalMax As Integer,
                             ByRef _i As Integer,
                             ByRef _j As Integer,
-                            ByRef _v As Integer,
-                            ByRef _NbVal As Integer)
+                            ByRef _v As Integer)
 
         Dim _Solution As Sudoku.StrSolution
 
@@ -3039,9 +3042,41 @@
 
         RecalculCandidats(_i, _j, _Grille, _Candidats) ' Efface les candidats éliminés par la solution appliquée 
 
+        If _NbVal > _NbvalMax Then
+            _NbvalMax = _NbVal
+        End If
+
     End Sub
 
+    '============================================================================================================================================================
+    '============================================================================================================================================================
+    ' Suppression de candidats dans la grille
+    ' Applique et retire une Maille de chaîne
+    '============================================================================================================================================================
+    '============================================================================================================================================================
 
+    Sub AppliqueUneMaille(ByRef _Grille(,) As Integer,
+                          ByRef _Candidats(,,) As Integer,
+                          ByRef _NbVal As Integer,
+                          ByRef _NbvalMax As Integer,
+                          ByVal _i As Integer,
+                          ByVal _j As Integer,
+                          ByVal _v As Integer)
+
+        _Grille(_i, _j) = _v
+
+        Sudoku.Historique(_NbVal).i = _i
+        Sudoku.Historique(_NbVal).j = _j
+        Sudoku.Historique(_NbVal).v = _v
+        _NbVal += 1
+
+        RecalculCandidats(_i, _j, _Grille, _Candidats) ' Efface les candidats éliminés par la solution appliquée 
+
+        If _NbVal > _NbvalMax Then
+            _NbvalMax = _NbVal
+        End If
+
+    End Sub
 
     '============================================================================================================================================================
     '============================================================================================================================================================
@@ -3095,6 +3130,7 @@
         _NbrSmp = 0
 
     End Sub
+
 
     '============================================================================================================================================================
     '  Fonctions & subroutines accessoires
@@ -3225,6 +3261,9 @@
             _Newsmp.CE.k(_t) = 0
             _Newsmp.CE.v(_t) = 0
         Next
+
+        _Newsmp.MultiSol = False
+
         Return _Newsmp
 
     End Function

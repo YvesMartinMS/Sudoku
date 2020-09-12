@@ -78,8 +78,6 @@ Module ForceBrute
                     If s = smax Then
                         ' Grille Complète
                         nbSol += 1
-                        '             EcrireSolution(Grille, nbSol)
-
                         If nbSol > 1 Then
                             Exit While
                         End If

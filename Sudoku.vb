@@ -87,17 +87,37 @@ Public Class Sudoku
         'candidats éliminés (ReDim 20)
         Dim ne As Integer 'nombre de candidats éliminés
         Dim CE As CandidatsEliminés
+        Dim MultiSol As Boolean
     End Structure
 
     Public TSmp(80) As Sudoku.StrSmp
     Public NbrSmp As Integer
     Dim Smp As Sudoku.StrSmp
 
-
     Structure AnlTrp 'Analyse triplet
         Dim i As Integer
         Dim j As Integer
         Dim v() As Integer
+    End Structure
+    Structure strLien
+        Dim nat As String 'Nature Ligne Colonne ou Région
+        Dim f As Boolean 'true = forte, false = faible
+        Dim i1 As Integer
+        Dim j1 As Integer
+        Dim r1 As Integer
+        Dim i2 As Integer
+        Dim j2 As Integer
+        Dim r2 As Integer
+    End Structure
+    Structure strChaîne
+        Dim nat As String 'Nature Ligne Colonne ou Région
+        Dim f As Boolean 'true = forte, false = faible
+        Dim i1 As Integer
+        Dim j1 As Integer
+        Dim r1 As Integer
+        Dim i2 As Integer
+        Dim j2 As Integer
+        Dim r2 As Integer
     End Structure
 
     Dim Libel As String
@@ -119,6 +139,7 @@ Public Class Sudoku
     Public BarèmeSeulDansUneLigne As Integer = 1
     Public BarèmeSeulDansUneColonne As Integer = 1
     Public BarèmeSeulDansUneRégion As Integer = 1
+    Public BarèmeContradiction As Integer = 400
 
     Public ChiffreOffColor As Color = Color.LightSkyBlue
     Public ChiffreOnColor As Color = Color.AliceBlue
@@ -130,6 +151,8 @@ Public Class Sudoku
     Dim CaseCandidats As String
     Dim TextSudoku As String = "                                                                                 "
 
+    Public MaxChn As Integer = 19
+    Public MaxLiens As Integer = 39
     Public Generator As System.Random = New System.Random()
 
 
@@ -142,6 +165,7 @@ Public Class Sudoku
     Private Sub Sudoku_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim c As Integer
 
+        mode = "Saisie"
         BTForceBrute.Enabled = False
         BTStepByStep.Enabled = False
         BTPossibilités.Enabled = False
@@ -371,7 +395,7 @@ Public Class Sudoku
         Next
 
         LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
-        Boucles.Text = "Nombre de boucles : " & NbrLoop.ToString
+        Boucles.Text = "Force brute : " & NbrLoop.ToString
 
     End Sub
 
@@ -680,16 +704,6 @@ Public Class Sudoku
         mode = "Jouer"
         modeCandidat = False
 
-        For i = 0 To 8
-            For j = 0 To 8
-                If Grille(i, j) <> 0 Then
-                    With Me.BT(i, j)
-                        .Enabled = False
-                    End With
-                End If
-            Next
-        Next
-
         For i = 0 To 80
             Historique(i).i = iBT
             Historique(i).j = jBT
@@ -704,6 +718,16 @@ Public Class Sudoku
         ForceBrute.ForceBrute(GrilleFinale, NbSol, NbrLoop)
 
         If NbSol = 1 Then
+
+            For i = 0 To 8
+                For j = 0 To 8
+                    If Grille(i, j) <> 0 Then
+                        With Me.BT(i, j)
+                            .Enabled = False
+                        End With
+                    End If
+                Next
+            Next
             BTForceBrute.Enabled = True
             BTStepByStep.Enabled = True
             BTPossibilités.Enabled = True
@@ -851,18 +875,13 @@ Public Class Sudoku
 
     Sub FonctionStepByStep()
 
-        QSol.Clear()
-        TsmpClear(NbrSmp, TSmp)
-        RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp, NbVal)
+        CouleurOrigine()
 
-        For i = 0 To 8
-            For j = 0 To 8
-                With Me.BT(i, j)
-                    .ForeColor = Color.Black
-                    .BackColor = colorIni(i, j)
-                End With
-            Next
-        Next
+        If Not stepByStepApply Then
+            QSol.Clear()
+            TsmpClear(NbrSmp, TSmp)
+            RechercheSolution(Grille, Candidats, QSol, NbrSmp, TSmp, NbVal)
+        End If
 
         If QSol.Count = 0 And NbrSmp = 0 Then
             If NbVal < 81 Then
@@ -870,84 +889,129 @@ Public Class Sudoku
             Else
                 MsgBox("Bravo ! ")
             End If
-        Else
-            If QSol.Count > 0 Then
+            Exit Sub
+        End If
 
-                Solution = QSol.Peek()
-                i = Solution.i
-                j = Solution.j
+        If QSol.Count > 0 Then
 
-                LBL_Conseil.Text = Solution.m
+            Solution = QSol.Peek()
+            i = Solution.i
+            j = Solution.j
 
+            LBL_Conseil.Text = Solution.m
+
+            With Me.BT(i, j)
+                .BackColor = Color.Plum
+                .Enabled = True
+            End With
+
+            If Not stepByStepApply Then
+                ' Annonce de la solution
                 With Me.BT(i, j)
-                    .BackColor = Color.Plum
-                End With
-
-                If stepByStepApply Then
-                    AppliqueUneSolution(QSol, Grille, Candidats, i, j, v, NbVal)
-                    If NbVal > NbvalMax Then
-                        NbvalMax = NbVal
-                    End If
-                    BTPrécédent.Enabled = True
-                    With Me.BT(i, j)
-                        .Text = v
-                        .Font = grandeFont
-                        .BackColor = Color.Plum
-                        .Enabled = True
-                    End With
-
-                    LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
-                Else
-                    With Me.BT(i, j)
-                        CaseCandidats =
+                    CaseCandidats =
                             Candidats(i, j, 0).ToString & " " & Candidats(i, j, 1).ToString & " " & Candidats(i, j, 2).ToString & Environment.NewLine &
                             Candidats(i, j, 3).ToString & " " & Candidats(i, j, 4).ToString & " " & Candidats(i, j, 5).ToString & Environment.NewLine &
                             Candidats(i, j, 6).ToString & " " & Candidats(i, j, 7).ToString & " " & Candidats(i, j, 8).ToString
-                        CaseCandidats = CaseCandidats.Replace("0", " ")
-                        .Text = CaseCandidats
-                        .Font = petiteFont
-                        .BackColor = Color.Plum
-                        .Enabled = True
-                    End With
-                End If
-
+                    CaseCandidats = CaseCandidats.Replace("0", " ")
+                    .Text = CaseCandidats
+                    .Font = petiteFont
+                End With
             Else
+                ' Application de la solution
+                AppliqueUneSolution(QSol, Grille, Candidats, NbVal, NbvalMax, i, j, v)
 
-                If NbrSmp > 0 Then
-                    Smp = TSmp(0)
-                    LBL_Conseil.Text = Smp.motif
-                    modeCandidat = True
+                BTPrécédent.Enabled = True
+                With Me.BT(i, j)
+                    .Text = v
+                    .Font = grandeFont
+                End With
 
-                    If Smp.ne > 0 Then
-                        For s = 0 To Smp.ne - 1
-                            i = Smp.CE.i(s)
-                            j = Smp.CE.j(s)
-                            With Me.BT(i, j)
-                                .ForeColor = Color.Black
-                                .BackColor = Color.Gold
-                            End With
-                        Next
-                    End If
-                    For s = 0 To Smp.nr - 1
-                        i = Smp.CR.i(s)
-                        j = Smp.CR.j(s)
-                        With Me.BT(i, j)
-                            .ForeColor = Color.Black
-                            .BackColor = Color.Plum
-                        End With
-                    Next
+                LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
+            End If
 
+        End If
+
+        ' Traitement de techniques de simplification
+
+        If NbrSmp > 0 And Not Smp.MultiSol Then
+            ' Colorie les cases candidats impliqués 
+            Smp = TSmp(0)
+            LBL_Conseil.Text = Smp.motif
+            modeCandidat = True
+
+            If Smp.ne > 0 Then
+                For s = 0 To Smp.ne - 1
+                    i = Smp.CE.i(s)
+                    j = Smp.CE.j(s)
+                    With Me.BT(i, j)
+                        .ForeColor = Color.Black
+                        .BackColor = Color.Gold
+                    End With
+                Next
+
+            End If
+            For s = 0 To Smp.nr - 1
+                i = Smp.CR.i(s)
+                j = Smp.CR.j(s)
+                With Me.BT(i, j)
+                    .ForeColor = Color.Black
+                    .BackColor = Color.Plum
+                End With
+            Next
+
+            If stepByStepApply Then
+                AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
+            End If
+
+        End If
+
+        ' Traitement des chaînes Multi Solutions
+
+        If NbrSmp > 0 And Smp.MultiSol Then
+            ' Colorie les cases candidats impliqués 
+            LBL_Conseil.Text = Smp.motif
+            modeCandidat = True
+
+            If Smp.ne > 0 Then
+                For s = 0 To Smp.ne - 1
+                    i = Smp.CE.i(s)
+                    j = Smp.CE.j(s)
+                    With Me.BT(i, j)
+                        .ForeColor = Color.Black
+                        .BackColor = Color.Gold
+                    End With
+                Next
+            End If
+
+            If Smp.nr > 0 Then
+                For s = 0 To Smp.nr - 1
+                    i = Smp.CR.i(s)
+                    j = Smp.CR.j(s)
+                    v = Smp.CR.v(s)
+                    With Me.BT(i, j)
+                        .ForeColor = Color.Black
+                        .BackColor = Color.Plum
+                    End With
                     If stepByStepApply Then
-                        AppliqueUneSimplification(NbrSmp, TSmp, Candidats)
+                        AppliqueUneMaille(Grille, Candidats, NbVal, NbvalMax, i, j, v)
+                        BTPrécédent.Enabled = True
+                        With Me.BT(i, j)
+                            .Text = v
+                            .Font = grandeFont
+                        End With
                     End If
+                Next
+                If stepByStepApply Then
+                    NbrSmp -= 1
+                    LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
                 End If
             End If
+
         End If
 
         '
         ' Affiche les candidats dans la grille
         '
-
         For i = 0 To 8
             For j = 0 To 8
                 If Grille(i, j) = 0 Then
@@ -968,7 +1032,6 @@ Public Class Sudoku
                             .Font = grandeFont
                             .Enabled = True
                         End With
-
                     End If
                 End If
             Next
@@ -982,7 +1045,18 @@ Public Class Sudoku
 
     End Sub
 
+    Sub CouleurOrigine()
 
+        For i = 0 To 8
+            For j = 0 To 8
+                With Me.BT(i, j)
+                    .ForeColor = Color.Black
+                    .BackColor = colorIni(i, j)
+                End With
+            Next
+        Next
+
+    End Sub
     '============================================================================================================================================================
     '  - S O L U T I O N   C O M P L E T E
     '============================================================================================================================================================
@@ -2693,7 +2767,7 @@ Public Class Sudoku
                         End If
                         .Font = grandeFont
                         .ForeColor = Color.Black
-                        .BackColor = colorIni(iBT, jBT)
+                        '                  .BackColor = colorIni(iBT, jBT)
                     End With
                 End If
             End If
@@ -2716,19 +2790,19 @@ Public Class Sudoku
                             .Text = CaseCandidats
                             .Font = petiteFont
                             .ForeColor = Color.Black
-                            .BackColor = colorIni(iBT, jBT)
+                            '                     .BackColor = colorIni(iBT, jBT)
                             .Enabled = True
                         Else
                             .Text = " "
                             .Font = grandeFont
                             .ForeColor = Color.Black
-                            .BackColor = colorIni(iBT, jBT)
+                            ' .BackColor = colorIni(iBT, jBT)
                         End If
                     Else
                         .Text = Grille(iBT, jBT).ToString
                         .Font = grandeFont
                         .ForeColor = Color.Black
-                        .BackColor = colorIni(iBT, jBT)
+                        ' .BackColor = colorIni(iBT, jBT)
                     End If
                 End With
             End If
