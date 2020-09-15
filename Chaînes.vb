@@ -25,7 +25,7 @@
         Dim _Généré As Boolean = False
 
         For _k = 0 To 8
-            CollecteLiens(_Candidats, _tLiens, _NbLiens, _AnlLig, _AnlCol, _AnlReg, _k)
+            CollecteLiensForts(_Candidats, _tLiens, _NbLiens, _AnlLig, _AnlCol, _AnlReg, _k)
             If _NbLiens > 2 Then
                 CréeChaîneForte(_Candidats, _k, _tLiens, _NbLiens, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _AnlLig, _AnlCol, _AnlReg)
                 If _LngChP > 0 Then
@@ -41,6 +41,46 @@
                     End If
                 End If
             End If
+        Next
+
+    End Sub
+
+    '============================================================================================================================================================
+    ' Techniques d'élimination de candidats
+    ' Chaîne fortement liée - Contradiction (chaîne paire) ou Double exclusion (Chaîne impaire)
+    '============================================================================================================================================================
+
+    Sub ChaîneFaiblementLiée(ByRef _Candidats(,,) As Integer,
+                            ByRef _NbrSmp As Integer,
+                            ByRef _Tsmp() As Sudoku.StrSmp,
+                            ByVal _AnlLig(,) As Sudoku.StrAnalyse,
+                            ByVal _AnlCol(,) As Sudoku.StrAnalyse,
+                            ByVal _AnlReg(,) As Sudoku.StrAnalyse)
+
+
+        Dim _tLiens(Sudoku.MaxLiens) As Sudoku.strLien
+        Dim _NbLiens As Integer
+        Dim _tChaînePaire(Sudoku.MaxChn) As Sudoku.strChaîne
+        Dim _tChaîneImpaire(Sudoku.MaxChn) As Sudoku.strChaîne
+
+        Dim _LngChP As Integer = 0
+        Dim _LngChI As Integer = 0
+
+        Dim _NbChi As Integer = 0
+        Dim _Généré As Boolean = False
+
+        For _k = 0 To 8
+            CollecteLiensForts(_Candidats, _tLiens, _NbLiens, _AnlLig, _AnlCol, _AnlReg, _k)
+            CollecteLiensFaibles(_Candidats, _tLiens, _NbLiens, _AnlLig, _AnlCol, _AnlReg, _k)
+            'If _NbLiens > 2 Then
+            '    CréeChaîneFaible(_Candidats, _k, _tLiensFaibles, _NbLiens, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _AnlLig, _AnlCol, _AnlReg)
+            '    If _LngChP > 0 Then
+            '        Contradiction(_tChaînePaire, _LngChP, _NbrSmp, _Tsmp, _k, _Généré)
+            '        If _Généré Then
+            '            Exit Sub
+            '        End If
+            '    End If
+            'End If
         Next
 
     End Sub
@@ -360,16 +400,18 @@
                         ByVal _AnlReg(,) As Sudoku.StrAnalyse)
 
         'Initialisation des variables
-        Dim TC() As Integer 'représente le lien - tableau statique, contient les valeurs de 1 à _NbLiens + 1
-        ' remplacé par la structure du lien au moment deconstituer la chaîne
-        Dim c(,) As Boolean ' tableau des liens (TC) consommés ou disponibles par niveau de récursivité et rang dans la chaîne
+        Dim TC() As Integer 'représente le lien - tableau statique, contient les valeurs de 1 à _NbLiens + 1 (_NbLiens est en base 0)
+        ' remplacé par la structure du lien au moment de constituer la chaîne
 
-        Dim AF() As Integer 'Combinaison constituée des id (numéro d'ordre) des paires - vision verticale de l'arbre factoriel
+        Dim c(,) As Boolean ' tableau des liens (TC) consommés ou disponibles par niveau de récursivité (vertical) et rang dans la chaîne (horizontal)
+        ' chaque niveau est une réplication du niveau précédent auquel on ajoute l'indice traité à ce niveau
+
+        Dim AF() As Integer 'Arbre Factorielle - Combinaison constituée des id (numéro d'ordre) des liens - vision verticale de l'arbre factoriel
 
         Dim n As Integer = _NbLiens
-        Dim p As Integer ' p indique le niveau de la pile de récursivité - soit la longueur de la chaîne (à chaque niveau on cherche un élément de la chaine) 
+        Dim _p As Integer ' p indique le niveau de la pile de récursivité - soit la longueur de la chaîne (à chaque niveau on cherche un élément de la chaine) 
 
-        ' chaque niveau est une réplication du niveau précédent auquel on ajoute l'indice traité à ce niveau
+
         Dim _tChaîne(Sudoku.MaxChn) As Sudoku.strChaîne
         Dim nbIter As Integer = 0
 
@@ -416,9 +458,9 @@
             AF(p) = 99 'représente une valeur nulle
         Next
 
-        p = 0 ' racine de l'arborescence
+        _p = 0 ' racine de l'arborescence
 
-        Enchaînement(_Candidats, _k, p, n, c, AF, TC, nbIter, _tChaîne, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _tLiens) 'Niveau p = 0 de récursivité
+        Enchaînement(_Candidats, _k, _p, n, c, AF, TC, nbIter, _tChaîne, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _tLiens) 'Niveau p = 0 de récursivité
 
 
     End Sub
@@ -430,7 +472,7 @@
 
     Sub Enchaînement(ByVal _Candidats As Integer(,,),
                      ByVal _k As Integer,
-                     ByRef p As Integer,
+                     ByRef _p As Integer,
                      ByRef n As Integer,
                      ByRef c(,) As Boolean,
                      ByRef AF() As Integer,
@@ -473,16 +515,16 @@
         Dim _CIj2 As Integer
         Dim _CIr2 As Integer
 
-        If p > 0 Then
-            For r = 0 To n 'réplication des paires utilisée sur le niveau inférieur
-                c(p, r) = c(p - 1, r)
+        If _p > 0 Then
+            For r = 0 To n 'réplication des liens utilisés sur le niveau inférieur
+                c(_p, r) = c(_p - 1, r)
             Next
         End If
 
         For r = 0 To n
-            If c(p, r) = False Then ' on utilise une paire disponible
+            If c(_p, r) = False Then ' on utilise un lien disponible
                 _select = True
-                AF(p) = TC(r)
+                AF(_p) = TC(r)
                 'If i > 0 Then
                 '    _PAi1 = _tLiens(A(i - 1)).i1
                 '    _PAj1 = _tLiens(A(i - 1)).j1
@@ -494,10 +536,10 @@
                 '    _PJj2 = _tLiens(P(j)).j2
                 'End If
 
-                If p = 1 Then
-                    ' Amorçage de la chaîne - on utilise les paires identifiées par les numéros d'ordre dans A qui représentent la combinaison courante
-                    If (_tLiens(AF(p - 1)).i2 = _tLiens(TC(r)).i1) And (_tLiens(AF(p - 1)).j2 = _tLiens(TC(r)).j1) _
-                        And (_tLiens(AF(p - 1)).i1 <> _tLiens(TC(r)).i2) And (_tLiens(AF(p - 1)).j1 <> _tLiens(TC(r)).j2) Then   'pour ne pas enchaîner sur la paire symétrique
+                If _p = 1 Then
+                    ' Amorçage de la chaîne - on utilise les liens identifiés par les numéros d'ordre dans AF qui représentent la combinaison courante
+                    If (_tLiens(AF(_p - 1)).i2 = _tLiens(TC(r)).i1) And (_tLiens(AF(_p - 1)).j2 = _tLiens(TC(r)).j1) _
+                        And (_tLiens(AF(_p - 1)).i1 <> _tLiens(TC(r)).i2) And (_tLiens(AF(_p - 1)).j1 <> _tLiens(TC(r)).j2) Then   'pour ne pas enchaîner sur le lien symétrique
                         _tChaîne(0).nat = _tLiens(AF(1)).nat
                         _tChaîne(0).f = _tLiens(AF(0)).f
                         _tChaîne(0).i1 = _tLiens(AF(0)).i1
@@ -506,37 +548,37 @@
                         _tChaîne(0).i2 = _tLiens(AF(0)).i2
                         _tChaîne(0).j2 = _tLiens(AF(0)).j2
                         _tChaîne(0).r2 = _tLiens(AF(0)).r2
-                        _tChaîne(p).nat = _tLiens(TC(r)).nat
-                        _tChaîne(p).f = _tLiens(TC(r)).f
-                        _tChaîne(p).i1 = _tLiens(TC(r)).i1
-                        _tChaîne(p).j1 = _tLiens(TC(r)).j1
-                        _tChaîne(p).r1 = _tLiens(TC(r)).r1
-                        _tChaîne(p).i2 = _tLiens(TC(r)).i2
-                        _tChaîne(p).j2 = _tLiens(TC(r)).j2
-                        _tChaîne(p).r2 = _tLiens(TC(r)).r2
+                        _tChaîne(_p).nat = _tLiens(TC(r)).nat
+                        _tChaîne(_p).f = _tLiens(TC(r)).f
+                        _tChaîne(_p).i1 = _tLiens(TC(r)).i1
+                        _tChaîne(_p).j1 = _tLiens(TC(r)).j1
+                        _tChaîne(_p).r1 = _tLiens(TC(r)).r1
+                        _tChaîne(_p).i2 = _tLiens(TC(r)).i2
+                        _tChaîne(_p).j2 = _tLiens(TC(r)).j2
+                        _tChaîne(_p).r2 = _tLiens(TC(r)).r2
                     Else
                         _select = False
                     End If
                 End If
 
-                If p > 1 Then
+                If _p > 1 Then
                     ' Suite de la chaîne
-                    If (_tLiens(AF(p - 1)).i2 = _tLiens(TC(r)).i1) And (_tLiens(AF(p - 1)).j2 = _tLiens(TC(r)).j1) Then
-                        For b = 0 To p - 1
+                    If (_tLiens(AF(_p - 1)).i2 = _tLiens(TC(r)).i1) And (_tLiens(AF(_p - 1)).j2 = _tLiens(TC(r)).j1) Then
+                        For b = 0 To _p - 1
                             If (_tLiens(AF(b)).i1 = _tLiens(TC(r)).i2) And (_tLiens(AF(b)).j1 = _tLiens(TC(r)).j2) Then
                                 ' pour ne pas générer de boucle
                                 _select = False
                             End If
                         Next
                         If _select Then
-                            _tChaîne(p).nat = _tLiens(TC(r)).nat
-                            _tChaîne(p).f = _tLiens(TC(r)).f
-                            _tChaîne(p).i1 = _tLiens(TC(r)).i1
-                            _tChaîne(p).j1 = _tLiens(TC(r)).j1
-                            _tChaîne(p).r1 = _tLiens(TC(r)).r1
-                            _tChaîne(p).i2 = _tLiens(TC(r)).i2
-                            _tChaîne(p).j2 = _tLiens(TC(r)).j2
-                            _tChaîne(p).r2 = _tLiens(TC(r)).r2
+                            _tChaîne(_p).nat = _tLiens(TC(r)).nat
+                            _tChaîne(_p).f = _tLiens(TC(r)).f
+                            _tChaîne(_p).i1 = _tLiens(TC(r)).i1
+                            _tChaîne(_p).j1 = _tLiens(TC(r)).j1
+                            _tChaîne(_p).r1 = _tLiens(TC(r)).r1
+                            _tChaîne(_p).i2 = _tLiens(TC(r)).i2
+                            _tChaîne(_p).j2 = _tLiens(TC(r)).j2
+                            _tChaîne(_p).r2 = _tLiens(TC(r)).r2
                         End If
                     Else
                         _select = False
@@ -545,12 +587,12 @@
 
                 If _select = True Then
                     ' On descend d'un niveau
-                    c(p, r) = True
-                    If p < n Then
-                        p += 1
+                    c(_p, r) = True
+                    If _p < n Then
+                        _p += 1
                         'Niveau p de récursivité
-                        Enchaînement(_Candidats, _k, p, n, c, AF, TC, nbiter, _tChaîne, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _tLiens)
-                        c(p, r) = False
+                        Enchaînement(_Candidats, _k, _p, n, c, AF, TC, nbiter, _tChaîne, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _tLiens)
+                        c(_p, r) = False
                     End If
                 End If
 
@@ -559,26 +601,26 @@
         Next
 
         For j = 0 To n
-            c(p, j) = False ' on nettoie le tableau au niveau i avant de remonter d'un niveau
+            c(_p, j) = False ' on nettoie le tableau au niveau i avant de remonter d'un niveau
         Next
-        AF(p) = 99
-        p -= 1
+        AF(_p) = 99
+        _p -= 1 ' on remonte d'un niveau
 
-        If p > 1 Then ' on enregistre une chaîne qui a atteint une longueur de 3 ou plus 
+        If _p > 1 Then ' on enregistre une chaîne qui a atteint une longueur de 3 ou plus 
             ' test d'un lien faible pur boucler la chaîne
             _C0i1 = _tChaîne(0).i1
             _C0j1 = _tChaîne(0).j1
             _C0r1 = _tChaîne(0).r1
-            _CIi2 = _tChaîne(p).i2
-            _CIj2 = _tChaîne(p).j2
-            _CIr2 = _tChaîne(p).r2
+            _CIi2 = _tChaîne(_p).i2
+            _CIj2 = _tChaîne(_p).j2
+            _CIr2 = _tChaîne(_p).r2
 
-            If p Mod 2 = 1 Then ' une chaîne paire (nombre impair base 0) génère une contradiction
-                If (_tChaîne(0).i1 = _tChaîne(p).i2) Or (_tChaîne(0).j1 = _tChaîne(p).j2) Or (_tChaîne(0).r1 = _tChaîne(p).r2) Then
+            If _p Mod 2 = 1 Then ' une chaîne paire (nombre impair base 0) génère une contradiction
+                If (_tChaîne(0).i1 = _tChaîne(_p).i2) Or (_tChaîne(0).j1 = _tChaîne(_p).j2) Or (_tChaîne(0).r1 = _tChaîne(_p).r2) Then
                     'on a un maillon faible pour boucler la chaîne fortement liée
-                    If _LngChP < p Then
-                        _LngChP = p
-                        For t = 0 To p
+                    If _LngChP < _p Then
+                        _LngChP = _p
+                        For t = 0 To _p
                             _tChaînePaire(t).nat = _tChaîne(t).nat
                             _tChaînePaire(t).f = _tChaîne(t).f
                             _tChaînePaire(t).i1 = _tChaîne(t).i1
@@ -599,9 +641,9 @@
                 _j0 = _tChaîne(0).j1
                 _r0 = _tChaîne(0).r1
                 ' coordonnées fin de chaîne
-                _ip = _tChaîne(p).i2
-                _jp = _tChaîne(p).j2
-                _rp = _tChaîne(p).r2
+                _ip = _tChaîne(_p).i2
+                _jp = _tChaîne(_p).j2
+                _rp = _tChaîne(_p).r2
                 _csgi0 = (_r0 \ 3) * 3
                 _csgj0 = (_r0 - _csgi0) * 3
                 _csgip = (_rp \ 3) * 3
@@ -648,9 +690,9 @@
                 End If
 
                 If _Intersection Then
-                    If _LngChI = 0 Or _LngChI > p Then
-                        _LngChI = p
-                        For t = 0 To p
+                    If _LngChI = 0 Or _LngChI > _p Then
+                        _LngChI = _p
+                        For t = 0 To _p
                             _tChaîneImpaire(t).nat = _tChaîne(t).nat
                             _tChaîneImpaire(t).f = _tChaîne(t).f
                             _tChaîneImpaire(t).i1 = _tChaîne(t).i1
@@ -666,22 +708,22 @@
             End If
         End If
         'On prépare la tentative de chaîne suivante
-        _tChaîne(p + 1).nat = " "
-        _tChaîne(p + 1).f = False
-        _tChaîne(p + 1).i1 = 0
-        _tChaîne(p + 1).j1 = 0
-        _tChaîne(p + 1).r1 = 0
-        _tChaîne(p + 1).i2 = 0
-        _tChaîne(p + 1).j2 = 0
-        _tChaîne(p + 1).r2 = 0
+        _tChaîne(_p + 1).nat = " "
+        _tChaîne(_p + 1).f = False
+        _tChaîne(_p + 1).i1 = 0
+        _tChaîne(_p + 1).j1 = 0
+        _tChaîne(_p + 1).r1 = 0
+        _tChaîne(_p + 1).i2 = 0
+        _tChaîne(_p + 1).j2 = 0
+        _tChaîne(_p + 1).r2 = 0
     End Sub
 
     '============================================================================================================================================================
     ' Techniques d'élimination de candidats
-    ' Collecte des liens de k comme éléments de base d'une chaïne
+    ' Collecte des liens forts de k comme éléments de base d'une chaïne
     '============================================================================================================================================================
 
-    Sub CollecteLiens(ByRef _Candidats(,,) As Integer,
+    Sub CollecteLiensForts(ByRef _Candidats(,,) As Integer,
                        ByRef _tLiens() As Sudoku.strLien,
                        ByRef _NbLiens As Integer,
                        ByVal _AnlLig(,) As Sudoku.StrAnalyse,
@@ -702,7 +744,7 @@
             _tLiens(_p).i1 = 0
             _tLiens(_p).j1 = 0
         Next
-
+        _NbLiens = 0
         _p = 0
         ' liens en ligne
         For _i = 0 To 8
@@ -718,6 +760,7 @@
                                 _tLiens(_p).j2 = _jbis
                                 _tLiens(_p).r2 = ((_i \ 3) * 3) + (_jbis \ 3)
                                 _tLiens(_p).nat = "L"
+                                _tLiens(_p).f = "F"
                                 _p += 1
                                 _tLiens(_p).i1 = _tLiens(_p - 1).i2
                                 _tLiens(_p).j1 = _tLiens(_p - 1).j2
@@ -726,7 +769,7 @@
                                 _tLiens(_p).j2 = _tLiens(_p - 1).j1
                                 _tLiens(_p).r2 = _tLiens(_p - 1).r1
                                 _tLiens(_p).nat = _tLiens(_p - 1).nat
-                                _tLiens(_p).f = True
+                                _tLiens(_p).f = "F"
                                 _p += 1
                             End If
                         Next
@@ -748,6 +791,7 @@
                                 _tLiens(_p).j2 = _j
                                 _tLiens(_p).r2 = ((_ibis \ 3) * 3) + (_j \ 3)
                                 _tLiens(_p).nat = "C"
+                                _tLiens(_p).f = "F"
                                 _p += 1
                                 _tLiens(_p).i1 = _tLiens(_p - 1).i2
                                 _tLiens(_p).j1 = _tLiens(_p - 1).j2
@@ -756,7 +800,7 @@
                                 _tLiens(_p).j2 = _tLiens(_p - 1).j1
                                 _tLiens(_p).r2 = _tLiens(_p - 1).r1
                                 _tLiens(_p).nat = _tLiens(_p - 1).nat
-                                _tLiens(_p).f = True
+                                _tLiens(_p).f = "F"
                                 _p += 1
                             End If
                         Next
@@ -787,7 +831,7 @@
                                                 _tLiens(_p).j2 = _jbis
                                                 _tLiens(_p).r2 = ((_ibis \ 3) * 3) + (_jbis \ 3)
                                                 _tLiens(_p).nat = "R"
-                                                _tLiens(_p).f = True
+                                                _tLiens(_p).f = "F"
                                                 _p += 1
                                                 _tLiens(_p).i1 = _tLiens(_p - 1).i2
                                                 _tLiens(_p).j1 = _tLiens(_p - 1).j2
@@ -796,7 +840,7 @@
                                                 _tLiens(_p).j2 = _tLiens(_p - 1).j1
                                                 _tLiens(_p).r2 = _tLiens(_p - 1).r1
                                                 _tLiens(_p).nat = _tLiens(_p - 1).nat
-                                                _tLiens(_p).f = True
+                                                _tLiens(_p).f = "F"
                                                 _p += 1
                                             End If
                                         End If
@@ -811,6 +855,107 @@
         Next
 
         _NbLiens = _p - 1
+
+    End Sub
+    '============================================================================================================================================================
+    ' Techniques d'élimination de candidats
+    ' Collecte des liens faibles de k comme éléments de base d'une chaïne ils sont ajoutés aux liens forts
+    '============================================================================================================================================================
+
+    Sub CollecteLiensFaibles(ByRef _Candidats(,,) As Integer,
+                       ByRef _tLiens() As Sudoku.strLien,
+                       ByRef _NbLiens As Integer,
+                       ByVal _AnlLig(,) As Sudoku.StrAnalyse,
+                       ByVal _AnlCol(,) As Sudoku.StrAnalyse,
+                       ByVal _AnlReg(,) As Sudoku.StrAnalyse,
+                       ByVal _k As Integer)
+        Dim _i As Integer
+        Dim _j As Integer
+        Dim _r As Integer
+        Dim _l0i1 As Integer
+        Dim _l0j1 As Integer
+        Dim _l0r1 As Integer
+        Dim _l0i2 As Integer
+        Dim _l0j2 As Integer
+        Dim _l0r2 As Integer
+        Dim _l1i1 As Integer
+        Dim _l1j1 As Integer
+        Dim _l1r1 As Integer
+        Dim _l1i2 As Integer
+        Dim _l1j2 As Integer
+        Dim _l1r2 As Integer
+        Dim _NbLiensFaible As Integer
+
+        _NbLiensFaible = _NbLiens + 1
+
+        For _l0 = 0 To _NbLiens
+            For _l1 = 0 To _NbLiens
+                _l0i1 = _tLiens(_l0).i1
+                _l0i2 = _tLiens(_l0).i2
+                _l1i1 = _tLiens(_l1).i1
+                _l1i2 = _tLiens(_l1).i2
+                _l0j1 = _tLiens(_l0).j1
+                _l0j2 = _tLiens(_l0).j2
+                _l1j1 = _tLiens(_l1).j1
+                _l1j2 = _tLiens(_l1).j2
+                _l0r1 = _tLiens(_l0).r1
+                _l0r2 = _tLiens(_l0).r2
+                _l1r1 = _tLiens(_l1).r1
+                _l1r2 = _tLiens(_l1).r2
+                If _l0 <> _l1 Then
+                    If (_tLiens(_l0).i2 <> _tLiens(_l1).i1) Or (_tLiens(_l0).j2 <> _tLiens(_l1).j1) Then
+
+                        If (_tLiens(_l0).i2 = _tLiens(_l1).i1) And _tLiens(_l0).nat <> "L" And _tLiens(_l1).nat <> "L" Then
+                            _i = _tLiens(_l0).i2
+                            If _AnlLig(_i, _k).n > 2 Then
+                                _tLiens(_NbLiensFaible).i1 = _tLiens(_l0).i2
+                                _tLiens(_NbLiensFaible).j1 = _tLiens(_l0).j2
+                                _tLiens(_NbLiensFaible).r1 = _tLiens(_l0).r2
+                                _tLiens(_NbLiensFaible).i2 = _tLiens(_l1).i1
+                                _tLiens(_NbLiensFaible).j2 = _tLiens(_l1).j1
+                                _tLiens(_NbLiensFaible).r2 = _tLiens(_l1).r1
+                                _tLiens(_NbLiensFaible).nat = "L"
+                                _tLiens(_NbLiensFaible).f = "f"
+                                _NbLiensFaible += 1
+                            End If
+                        End If
+
+                        If (_tLiens(_l0).j2 = _tLiens(_l1).j1) And _tLiens(_l0).nat <> "C" And _tLiens(_l1).nat <> "C" Then
+                            _j = _tLiens(_l0).j2
+                            If _AnlCol(_j, _k).n > 2 Then
+                                _tLiens(_NbLiensFaible).i1 = _tLiens(_l0).i2
+                                _tLiens(_NbLiensFaible).j1 = _tLiens(_l0).j2
+                                _tLiens(_NbLiensFaible).r1 = _tLiens(_l0).r2
+                                _tLiens(_NbLiensFaible).i2 = _tLiens(_l1).i1
+                                _tLiens(_NbLiensFaible).j2 = _tLiens(_l1).j1
+                                _tLiens(_NbLiensFaible).r2 = _tLiens(_l1).r1
+                                _tLiens(_NbLiensFaible).nat = "C"
+                                _tLiens(_NbLiensFaible).f = "f"
+                                _NbLiensFaible += 1
+                            End If
+                        End If
+
+                        If (_tLiens(_l0).r2 = _tLiens(_l1).r1) And _tLiens(_l0).nat <> "R" And _tLiens(_l1).nat <> "R" Then
+                            _r = _tLiens(_l0).r2
+                            If _AnlReg(_r, _k).n > 2 Then
+                                _tLiens(_NbLiensFaible).i1 = _tLiens(_l0).i2
+                                _tLiens(_NbLiensFaible).j1 = _tLiens(_l0).j2
+                                _tLiens(_NbLiensFaible).r1 = _tLiens(_l0).r2
+                                _tLiens(_NbLiensFaible).i2 = _tLiens(_l1).i1
+                                _tLiens(_NbLiensFaible).j2 = _tLiens(_l1).j1
+                                _tLiens(_NbLiensFaible).r2 = _tLiens(_l1).r1
+                                _tLiens(_NbLiensFaible).nat = "R"
+                                _tLiens(_NbLiensFaible).f = "f"
+                                _NbLiensFaible += 1
+                            End If
+                        End If
+                    End If
+
+                End If
+            Next
+        Next
+
+        _NbLiens = _NbLiensFaible - 1
 
     End Sub
 

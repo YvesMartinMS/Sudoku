@@ -349,8 +349,8 @@
             PaireNueCol(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
             PaireNueReg(_Candidats, _NbrSmp, _TSmp, _opk, _nuplet)
 
-            CandidatVérouilléLig(_Candidats, _AnlLig, _AnlReg, _NbrSmp, _TSmp, _opk)
-            CandidatVérouilléCol(_Candidats, _AnlCol, _AnlReg, _NbrSmp, _TSmp, _opk)
+            CandidatVérrouilléLig(_Candidats, _AnlLig, _AnlReg, _NbrSmp, _TSmp, _opk)
+            CandidatVérrouilléCol(_Candidats, _AnlCol, _AnlReg, _NbrSmp, _TSmp, _opk)
 
             AnalyseTrpLig(_Candidats, _NbrSmp, _TSmp, _opk)
             AnalyseTrpCol(_Candidats, _NbrSmp, _TSmp, _opk)
@@ -377,6 +377,10 @@
 
             If _NbrSmp = 0 Then
                 ChaîneFortementLiée(_Candidats, _NbrSmp, _TSmp, _AnlLig, _AnlCol, _AnlReg)
+            End If
+
+            If _NbrSmp = 0 Then
+                ChaîneFaiblementLiée(_Candidats, _NbrSmp, _TSmp, _AnlLig, _AnlCol, _AnlReg)
             End If
 
         End If
@@ -655,8 +659,6 @@
         Dim _k1 As Integer
         Dim _Smp As Sudoku.StrSmp
 
-        _Smp = NewSmp()
-
         For _i = 0 To 8
             ' appariement
             For _j = 0 To 7
@@ -665,6 +667,7 @@
                         If _opk(_i, _jbis) = 2 Then
                             If _nuplet(_i, _j) = _nuplet(_i, _jbis) Then
                                 'Recherche si les paires sont actives (s'il y a des candidats à effacer)
+                                _Smp = NewSmp()
                                 _Smp.ne = 0
                                 For _jter = 0 To 8
                                     If _jter <> _j And _jter <> _jbis Then
@@ -703,7 +706,6 @@
                                     If _Smp.ne > 0 Then
                                         _TSmp(_NbrSmp) = _Smp
                                         _NbrSmp += 1
-                                        _Smp = NewSmp()
                                     End If
 
                                     Exit For
@@ -733,8 +735,6 @@
         Dim _k1 As Integer
         Dim _Smp As Sudoku.StrSmp
 
-        _Smp = NewSmp()
-
         For _j = 0 To 8
             ' appariement
             For _i = 0 To 7
@@ -743,6 +743,7 @@
                         If _opk(_ibis, _j) = 2 Then
                             If _nuplet(_i, _j) = _nuplet(_ibis, _j) Then
                                 'Recherche si les paires sont actives (s'il y a des candidats à effacer)
+                                _Smp = NewSmp()
                                 _Smp.ne = 0
                                 For _iter = 0 To 8
                                     If _iter <> _i And _iter <> _ibis Then
@@ -782,7 +783,6 @@
                                     If _Smp.ne > 0 Then
                                         _TSmp(_NbrSmp) = _Smp
                                         _NbrSmp += 1
-                                        _Smp = NewSmp()
                                     End If
 
                                     Exit For
@@ -819,8 +819,6 @@
         Dim _g As Integer
         Dim _gbis As Integer
 
-        _Smp = NewSmp()
-
         For _r = 0 To 8
             _csgi = (_r \ 3) * 3 'calcul coin supérieur gauche d'une région
             _csgj = (_r - _csgi) * 3 'calcul coin supérieur gauche d'une région
@@ -836,6 +834,7 @@
                                     If _opk(_ibis, _jbis) = 2 Then 'si l'élément 2 est une paire
                                         If _nuplet(_i, _j) = _nuplet(_ibis, _jbis) Then 'on compare les 2 paires
                                             'Recherche si les paires sont actives (s'il y a des candidats à effacer)
+                                            _Smp = NewSmp()
                                             _Smp.ne = 0
                                             For _iter = _csgi To _csgi + 2
                                                 For _jter = _csgj To _csgj + 2
@@ -876,7 +875,6 @@
                                                 If _Smp.ne > 0 Then
                                                     _TSmp(_NbrSmp) = _Smp
                                                     _NbrSmp += 1
-                                                    _Smp = NewSmp()
                                                 End If
 
                                                 Exit For
@@ -899,12 +897,12 @@
     ' Candidats verrouillés en ligne (communs à une région et une ligne)
     '============================================================================================================================================================
 
-    Sub CandidatVérouilléLig(ByRef _Candidats(,,) As Integer,
-                             ByRef _AnlLig(,) As Sudoku.StrAnalyse,
-                             ByRef _AnlReg(,) As Sudoku.StrAnalyse,
-                             ByRef _NbrSmp As Integer,
-                             ByRef _TSmp() As Sudoku.StrSmp,
-                             ByRef _opk(,) As Integer)
+    Sub CandidatVérrouilléLig(ByRef _Candidats(,,) As Integer,
+                              ByRef _AnlLig(,) As Sudoku.StrAnalyse,
+                              ByRef _AnlReg(,) As Sudoku.StrAnalyse,
+                              ByRef _NbrSmp As Integer,
+                              ByRef _TSmp() As Sudoku.StrSmp,
+                              ByRef _opk(,) As Integer)
 
 
         Dim _csgi As Integer 'Coin supérieur gauche région
@@ -912,8 +910,6 @@
         Dim _ir As Integer 'indice de ligne limité à l'intérieur d'une région
         Dim _AnlLigReg(2, 8) As Sudoku.StrAnalyse ' (i,k)
         Dim _Smp As Sudoku.StrSmp
-
-        _Smp = NewSmp()
 
         For _r = 0 To 8
             _csgi = (_r \ 3) * 3 'calcul du coin supérieur gauche d'une région
@@ -944,8 +940,9 @@
                     ' si il y a plus de k dans la ligne de la région que dans la ligne entière 
                     If _AnlLigReg(_ir, _k).n > 1 And _AnlReg(_r, _k).n = _AnlLigReg(_ir, _k).n And _AnlLig(_i, _k).n > _AnlLigReg(_ir, _k).n Then
 
-                        'candidats retenus (vérouillés)
+                        'candidats retenus (vérrouillés)
                         _Smp.nr = -0 'nombre de candidats retenus (indice base 0)
+                        _Smp = NewSmp()
                         For _j = _csgj To _csgj + 2
                             If _Candidats(_i, _j, _k) <> 0 Then
                                 _Smp.CR.i(_Smp.nr) = _i
@@ -970,12 +967,11 @@
                             End If
                         Next
 
-                        _Smp.motif = "Candidat vérouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Ligne " & _i + 1 & " LL"
+                        _Smp.motif = "Candidat vérrouillé : " & Val(_k + 1) & " - Région " & _r + 1 & " - Ligne " & _i + 1 & " LL"
 
                         If _Smp.ne > 0 Then
                             _TSmp(_NbrSmp) = _Smp
                             _NbrSmp += 1
-                            _Smp = NewSmp()
                         End If
 
                     End If
@@ -984,7 +980,8 @@
                     ' si il y a plus de k dans dans la région entière que la ligne de la région
                     ' si il y a autant de k dans la ligne de la région que dans la ligne entière 
                     If _AnlLigReg(_ir, _k).n > 1 And _AnlReg(_r, _k).n > _AnlLigReg(_ir, _k).n And _AnlLig(_i, _k).n = _AnlLigReg(_ir, _k).n Then
-                        'candidats retenus (vérouillés)
+                        'candidats retenus (vérrouillés)
+                        _Smp = NewSmp()
                         _Smp.nr = 0 'nombre de candidats retenus (indice base 0)
                         For _j = _csgj To _csgj + 2
                             If _Candidats(_i, _j, _k) <> 0 Then
@@ -1012,12 +1009,11 @@
                             Next
                         Next
 
-                        _Smp.motif = "Candidat vérouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Ligne " & _i + 1 & " LR"
+                        _Smp.motif = "Candidat vérrouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Ligne " & _i + 1 & " LR"
 
                         If _Smp.ne > 0 Then
                             _TSmp(_NbrSmp) = _Smp
                             _NbrSmp += 1
-                            _Smp = NewSmp()
                         End If
                     End If
                 Next
@@ -1031,7 +1027,7 @@
     ' Candidats verrouillés en colonne (communs à une région et une colonne)
     '============================================================================================================================================================
 
-    Sub CandidatVérouilléCol(ByRef _Candidats(,,) As Integer,
+    Sub CandidatVérrouilléCol(ByRef _Candidats(,,) As Integer,
                              ByRef _AnlCol(,) As Sudoku.StrAnalyse,
                              ByRef _AnlReg(,) As Sudoku.StrAnalyse,
                              ByRef _NbrSmp As Integer,
@@ -1043,8 +1039,6 @@
         Dim _jr As Integer 'indice de colonne limité à l'intérieur d'une région
         Dim _AnlLigReg(2, 8) As Sudoku.StrAnalyse ' (i,k)
         Dim _Smp As Sudoku.StrSmp
-
-        _Smp = NewSmp()
 
         For _r = 0 To 8
             _csgi = (_r \ 3) * 3 'calcul coin supérieur gauche d'une région
@@ -1073,7 +1067,8 @@
                     ' si il y a autant de k dans dans la région entière que la colonne de la région
                     ' si il y a plus de k dans la colonne de la région que dans la colonne entière 
                     If _AnlLigReg(_jr, _k).n > 1 And _AnlReg(_r, _k).n = _AnlLigReg(_jr, _k).n And _AnlCol(_j, _k).n > _AnlLigReg(_jr, _k).n Then
- _                        'candidats retenus (vérouillés)
+ _                        'candidats retenus (vérrouillés)
+                        _Smp = NewSmp()
                         _Smp.nr = 0 'nombre de candidats retenus (indice base 0)
                         For _i = _csgi To _csgi + 2
                             If _Candidats(_i, _j, _k) <> 0 Then
@@ -1099,12 +1094,11 @@
                             End If
                         Next
 
-                        _Smp.motif = "Candidat vérouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Colonne " & _j + 1 & " CC"
+                        _Smp.motif = "Candidat vérrouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Colonne " & _j + 1 & " CC"
 
                         If _Smp.ne > 0 Then
                             _TSmp(_NbrSmp) = _Smp
                             _NbrSmp += 1
-                            _Smp = NewSmp()
                         End If
 
                     End If
@@ -1113,7 +1107,8 @@
                     ' si il y a plus de k dans dans la région entière que la ligne de la région
                     ' si il y a autant de k dans la ligne de la région que dans la ligne entière 
                     If _AnlLigReg(_jr, _k).n > 1 And _AnlReg(_r, _k).n > _AnlLigReg(_jr, _k).n And _AnlCol(_j, _k).n = _AnlLigReg(_jr, _k).n Then
-                        'candidats retenus (vérouillés)
+                        'candidats retenus (vérrouillés)
+                        _Smp = NewSmp()
                         _Smp.nr = 0 'nombre de candidats retenus (indice base 0)
                         For _i = _csgi To _csgi + 2
                             If _Candidats(_i, _j, _k) <> 0 Then
@@ -1141,12 +1136,11 @@
                             Next
                         Next
 
-                        _Smp.motif = "Candidat vérouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Colonne " & _j + 1 & " CR"
+                        _Smp.motif = "Candidat vérrouillé : [" & Val(_k + 1) & "] - Région " & _r + 1 & " - Colonne " & _j + 1 & " CR"
 
                         If _Smp.ne > 0 Then
                             _TSmp(_NbrSmp) = _Smp
                             _NbrSmp += 1
-                            _Smp = NewSmp()
                         End If
 
                     End If
@@ -1198,8 +1192,6 @@
         Dim _tv(2) As Integer
         Dim _ej As Integer
         Dim _Smp As Sudoku.StrSmp
-
-        _Smp = NewSmp()
 
         For _i = 0 To 8
             _completed = False
@@ -1313,6 +1305,7 @@
             End If
 
             If _completed Then
+                _Smp = NewSmp()
                 _Smp.nr = 3
                 _Smp.CR.i(0) = _i0
                 _Smp.CR.j(0) = _j0
@@ -1360,7 +1353,6 @@
                 If _Smp.ne > 0 Then
                     _TSmp(_NbrSmp) = _Smp
                     _NbrSmp += 1
-                    _Smp = NewSmp()
                 End If
 
             End If
@@ -1410,8 +1402,6 @@
         Dim _tv(2) As Integer
         Dim _ei As Integer
         Dim _Smp As Sudoku.StrSmp
-
-        _Smp = NewSmp()
 
         For _j = 0 To 8
             _completed = False
@@ -1525,6 +1515,7 @@
             End If
 
             If _completed Then
+                _Smp = NewSmp()
                 _Smp.nr = 3
                 _Smp.CR.i(0) = _i0
                 _Smp.CR.j(0) = _j0
@@ -1572,7 +1563,6 @@
                 If _Smp.ne > 0 Then
                     _TSmp(_NbrSmp) = _Smp
                     _NbrSmp += 1
-                    _Smp = NewSmp()
                 End If
 
             End If
@@ -1627,8 +1617,6 @@
         Dim _ei As Integer
         Dim _ej As Integer
         Dim _Smp As Sudoku.StrSmp
-
-        _Smp = NewSmp()
 
         For _r = 0 To 8
             _csgi = (_r \ 3) * 3 'calcul coin supérieur gauche d'une région
@@ -1746,6 +1734,7 @@
             End If
 
             If _completed Then
+                _Smp = NewSmp()
                 _Smp.nr = 3
                 _Smp.CR.i(0) = _i0
                 _Smp.CR.j(0) = _j0
@@ -1796,7 +1785,6 @@
                 If _Smp.ne > 0 Then
                     _TSmp(_NbrSmp) = _Smp
                     _NbrSmp += 1
-                    _Smp = NewSmp()
                 End If
             End If
         Next
@@ -1831,7 +1819,6 @@
         Dim _commun As Boolean
         Dim _Smp As Sudoku.StrSmp
 
-        _Smp = NewSmp()
 
         For _i = 0 To 8
             For _j = 0 To 7
@@ -1847,7 +1834,7 @@
                                         _aile_ver = Nothing
                                         _aile_hor = Nothing
                                         _sommet = Nothing
-
+                                        _Smp = NewSmp()
                                         If _opk(_ibis, _j) = 2 Then
                                             _sommet = _nuplet(_i, _j)
                                             _sommet_i = _i
@@ -1913,7 +1900,6 @@
                                             If _Smp.ne > 0 Then
                                                 _TSmp(_NbrSmp) = _Smp
                                                 _NbrSmp += 1
-                                                _Smp = NewSmp()
                                             End If
 
                                         End If
@@ -1963,8 +1949,6 @@
         Dim _Smp As Sudoku.StrSmp
         Dim _commun As Boolean
 
-        _Smp = NewSmp()
-
         For _r = 0 To 8
             _csgi = (_r \ 3) * 3 'calcul du coin supérieur gauche d'une région
             _csgj = (_r - _csgi) * 3 'calcul du coin supérieur gauche d'une région
@@ -1996,6 +1980,7 @@
                                                             XYWing(_completed, _aile_int, _aile_ext, _exclu)
 
                                                             If _completed Then
+                                                                _Smp = NewSmp()
                                                                 _exclu_k = _exclu - 1
                                                                 _Smp.nr = 3
                                                                 _Smp.CR.i(0) = CInt(_aile_int_i)
@@ -2041,7 +2026,6 @@
                                                                 If _Smp.ne > 0 Then
                                                                     _TSmp(_NbrSmp) = _Smp
                                                                     _NbrSmp += 1
-                                                                    _Smp = NewSmp()
                                                                 End If
 
                                                             End If
@@ -2096,8 +2080,6 @@
         Dim _Smp As Sudoku.StrSmp
         Dim _commun As Integer
 
-        _Smp = NewSmp()
-
         For _r = 0 To 8
             _csgi = (_r \ 3) * 3 'calcul du coin supérieur gauche d'une région
             _csgj = (_r - _csgi) * 3 'calcul du coin supérieur gauche d'une région
@@ -2130,6 +2112,7 @@
                                                             XYWing(_completed, _aile_int, _aile_ext, _exclu)
 
                                                             If _completed Then
+                                                                _Smp = NewSmp()
                                                                 _exclu_k = _exclu - 1
                                                                 _Smp.nr = 3
                                                                 _Smp.CR.i(0) = CInt(_aile_int_i)
@@ -2175,7 +2158,6 @@
                                                                 If _Smp.ne > 0 Then
                                                                     _TSmp(_NbrSmp) = _Smp
                                                                     _NbrSmp += 1
-                                                                    _Smp = NewSmp()
                                                                 End If
 
                                                             End If
@@ -2232,8 +2214,6 @@
         Dim _actif As Boolean
         Dim _Smp As Sudoku.StrSmp
 
-        _Smp = NewSmp()
-
         For _isup = 0 To 7
             For _k = 0 To 8
                 If _AnlLig(_isup, _k).n = 2 Then
@@ -2246,6 +2226,7 @@
                                             ' on tient un X-Wing
                                             _Smp.ne = 0
                                             _actif = False
+                                            _Smp = NewSmp()
                                             For _i = 0 To 8
                                                 If _i <> _isup And _i <> _iinf Then
                                                     If _Grille(_i, _jgau) = "0" Then
@@ -2295,7 +2276,6 @@
                                                 If _Smp.ne > 0 Then
                                                     _TSmp(_NbrSmp) = _Smp
                                                     _NbrSmp += 1
-                                                    _Smp = NewSmp()
                                                 End If
 
                                             End If
@@ -2331,8 +2311,6 @@
         Dim _actif As Boolean
         Dim _Smp As Sudoku.StrSmp
 
-        _Smp = NewSmp()
-
         For _jgau = 0 To 7
             For _k = 0 To 8
                 If _AnlCol(_jgau, _k).n = 2 Then
@@ -2345,6 +2323,7 @@
                                             ' on tient un X-Wing
                                             _Smp.ne = 0
                                             _actif = False
+                                            _Smp = NewSmp()
                                             For _j = 0 To 8
                                                 If _j <> _jgau And _j <> _jdrt Then
                                                     If _Grille(_isup, _j) = "0" Then
@@ -2394,7 +2373,6 @@
                                                 If _Smp.ne > 0 Then
                                                     _TSmp(_NbrSmp) = _Smp
                                                     _NbrSmp += 1
-                                                    _Smp = NewSmp()
                                                 End If
 
                                             End If
@@ -2430,8 +2408,6 @@
         Dim _kbis As Integer
         Dim _Smp As Sudoku.StrSmp
 
-        _Smp = NewSmp()
-
         For _i = 0 To 8
             For _k0 = 0 To 8
                 If _AnlLig(_i, _k0).n = 2 Then ' recherche de la première paire de la ligne
@@ -2443,6 +2419,7 @@
                                         If _Candidats(_i, _jbis, _k0) <> 0 And _Candidats(_i, _jbis, _k1) <> 0 Then 'localisation de la deuxième paire sur la ligne
                                             If _opk(_i, _j) > 2 Or _opk(_i, _jbis) > 2 Then 'défini s'il y a des candidats à éliminer
                                                 _Smp.ne = 0
+                                                _Smp = NewSmp()
                                                 For _kbis = 0 To 8
                                                     If _k0 <> _kbis And _k1 <> _kbis Then
                                                         If _Candidats(_i, _j, _kbis) <> 0 Then
@@ -2477,7 +2454,6 @@
                                                 If _Smp.ne > 0 Then
                                                     _TSmp(_NbrSmp) = _Smp
                                                     _NbrSmp += 1
-                                                    _Smp = NewSmp()
                                                 End If
                                             End If
                                         End If
@@ -2512,7 +2488,7 @@
         Dim _kbis As Integer
         Dim _Smp As Sudoku.StrSmp
 
-        _Smp = NewSmp()
+
 
         For _j = 0 To 8
             For _k0 = 0 To 8
@@ -2524,6 +2500,7 @@
                                     For _ibis = _i + 1 To 8
                                         If _Candidats(_ibis, _j, _k0) <> 0 And _Candidats(_ibis, _j, _k1) <> 0 Then 'localisation de la deuxième paire sur la colonne
                                             If _opk(_i, _j) > 2 Or _opk(_ibis, _j) > 2 Then 'défini s'il y a des candidats à éliminer
+                                                _Smp = NewSmp()
                                                 _Smp.ne = 0
                                                 For _kbis = 0 To 8
                                                     If _k0 <> _kbis And _k1 <> _kbis Then
@@ -2559,7 +2536,6 @@
                                                 If _Smp.ne > 0 Then
                                                     _TSmp(_NbrSmp) = _Smp
                                                     _NbrSmp += 1
-                                                    _Smp = NewSmp()
                                                 End If
                                             End If
                                         End If
@@ -2594,8 +2570,6 @@
         Dim _gbis As Integer
         Dim _Smp As Sudoku.StrSmp
 
-        _Smp = NewSmp()
-
         For _r = 0 To 8
             _csgi = (_r \ 3) * 3
             _csgj = (_r - _csgi) * 3
@@ -2614,6 +2588,7 @@
                                                 If _g < _gbis Then ' on ne cherche que dans un sens (élément 2 tjrs > élément 1) 
                                                     If _Candidats(_ibis, _jbis, _k0) <> 0 And _Candidats(_ibis, _jbis, _k1) <> 0 Then 'localisation de la deuxième paire de la région
                                                         If _opk(_i, _j) > 2 Or _opk(_ibis, _jbis) > 2 Then 'défini s'il y a des candidats à éliminer
+                                                            _Smp = NewSmp()
                                                             _Smp.ne = 0
                                                             For _kbis = 0 To 8
                                                                 If _k0 <> _kbis And _k1 <> _kbis Then
@@ -2649,7 +2624,6 @@
                                                             If _Smp.ne > 0 Then
                                                                 _TSmp(_NbrSmp) = _Smp
                                                                 _NbrSmp += 1
-                                                                _Smp = NewSmp()
                                                             End If
 
                                                         End If
@@ -2701,8 +2675,6 @@
         Dim _imax2 As Integer
         Dim _imax3 As Integer
         Dim _Smp As Sudoku.StrSmp
-
-        _Smp = NewSmp()
 
         For _k = 0 To 8
             ' Recherches des lignes (3 ou +) du SwordFish
@@ -2770,6 +2742,7 @@
                     Next
                     If _nbj = 3 Then ' On tient un SwordFish
                         _Smp.ne = 0
+                        _Smp = NewSmp()
                         For _j = 0 To 8
                             If _tj(_j) <> 9 Then
                                 For _i = 0 To 8
@@ -2815,7 +2788,6 @@
 
                             _TSmp(_NbrSmp) = _Smp
                             _NbrSmp += 1
-                            _Smp = NewSmp()
 
                         End If
                     End If
@@ -2872,8 +2844,6 @@
         Dim _jmax2 As Integer
         Dim _jmax3 As Integer
         Dim _Smp As Sudoku.StrSmp
-
-        _Smp = NewSmp()
 
         For _k = 0 To 8
             ' Recherches des colonnes (3 ou +) du SwordFish
@@ -2940,6 +2910,7 @@
                         End If
                     Next
                     If _nbi = 3 Then ' On tient un SwordFish
+                        _Smp = NewSmp()
                         _Smp.ne = 0
                         For _i = 0 To 8
                             If _ti(_i) <> 9 Then
@@ -2986,7 +2957,6 @@
 
                             _TSmp(_NbrSmp) = _Smp
                             _NbrSmp += 1
-                            _Smp = NewSmp()
 
                         End If
                     End If

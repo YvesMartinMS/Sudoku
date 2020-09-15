@@ -101,7 +101,7 @@ Public Class Sudoku
     End Structure
     Structure strLien
         Dim nat As String 'Nature Ligne Colonne ou Région
-        Dim f As Boolean 'true = forte, false = faible
+        Dim f As String '"F" = fort, "f" = faible
         Dim i1 As Integer
         Dim j1 As Integer
         Dim r1 As Integer
@@ -111,7 +111,7 @@ Public Class Sudoku
     End Structure
     Structure strChaîne
         Dim nat As String 'Nature Ligne Colonne ou Région
-        Dim f As Boolean 'true = forte, false = faible
+        Dim f As String '"F" = fort, "f" = faible
         Dim i1 As Integer
         Dim j1 As Integer
         Dim r1 As Integer
@@ -877,6 +877,11 @@ Public Class Sudoku
 
         CouleurOrigine()
 
+        If NbVal = 81 Then
+            MsgBox("Bravo ! ")
+            Exit Sub
+        End If
+
         If Not stepByStepApply Then
             QSol.Clear()
             TsmpClear(NbrSmp, TSmp)
@@ -884,11 +889,7 @@ Public Class Sudoku
         End If
 
         If QSol.Count = 0 And NbrSmp = 0 Then
-            If NbVal < 81 Then
-                MsgBox("Plus de solution " & NbVal & "*")
-            Else
-                MsgBox("Bravo ! ")
-            End If
+            MsgBox("Plus de solution " & NbVal & "*")
             Exit Sub
         End If
 
@@ -932,10 +933,9 @@ Public Class Sudoku
         End If
 
         ' Traitement de techniques de simplification
-
+        Smp = TSmp(0)
         If NbrSmp > 0 And Not Smp.MultiSol Then
             ' Colorie les cases candidats impliqués 
-            Smp = TSmp(0)
             LBL_Conseil.Text = Smp.motif
             modeCandidat = True
 
