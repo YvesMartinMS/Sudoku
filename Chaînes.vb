@@ -12,7 +12,7 @@
                             ByVal _AnlCol(,) As Sudoku.StrAnalyse,
                             ByVal _AnlReg(,) As Sudoku.StrAnalyse)
 
-
+        Dim _TypeChaîne As Boolean = True
         Dim _tLiens(Sudoku.MaxLiens) As Sudoku.strLien
         Dim _NbLiens As Integer
         Dim _tChaînePaire(Sudoku.MaxChn) As Sudoku.strChaîne
@@ -21,13 +21,12 @@
         Dim _LngChP As Integer = 0
         Dim _LngChI As Integer = 0
 
-        Dim _NbChi As Integer = 0
         Dim _Généré As Boolean = False
 
         For _k = 0 To 8
             CollecteLiensForts(_Candidats, _tLiens, _NbLiens, _AnlLig, _AnlCol, _AnlReg, _k)
             If _NbLiens > 2 Then
-                CréeChaîneForte(_Candidats, _k, _tLiens, _NbLiens, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _AnlLig, _AnlCol, _AnlReg)
+                CréeChaîne(_Candidats, _k, _tLiens, _NbLiens, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _AnlLig, _AnlCol, _AnlReg, _TypeChaîne)
                 If _LngChP > 0 Then
                     Contradiction(_tChaînePaire, _LngChP, _NbrSmp, _Tsmp, _k, _Généré)
                     If _Généré Then
@@ -35,7 +34,7 @@
                     End If
                 End If
                 If _NbrSmp = 0 And _LngChI > 0 Then
-                    DoubleExclusion(_Candidats, _tChaîneImpaire, _LngChI, _NbChi, _NbrSmp, _Tsmp, _k, _Généré)
+                    DoubleExclusion(_Candidats, _tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _k, _TypeChaîne, _Généré)
                     If _Généré Then
                         Exit Sub
                     End If
@@ -57,7 +56,7 @@
                             ByVal _AnlCol(,) As Sudoku.StrAnalyse,
                             ByVal _AnlReg(,) As Sudoku.StrAnalyse)
 
-
+        Dim _TypeChaîne As Boolean = False
         Dim _tLiens(Sudoku.MaxLiens) As Sudoku.strLien
         Dim _NbLiens As Integer
         Dim _tChaînePaire(Sudoku.MaxChn) As Sudoku.strChaîne
@@ -72,15 +71,15 @@
         For _k = 0 To 8
             CollecteLiensForts(_Candidats, _tLiens, _NbLiens, _AnlLig, _AnlCol, _AnlReg, _k)
             CollecteLiensFaibles(_Candidats, _tLiens, _NbLiens, _AnlLig, _AnlCol, _AnlReg, _k)
-            'If _NbLiens > 2 Then
-            '    CréeChaîneFaible(_Candidats, _k, _tLiensFaibles, _NbLiens, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _AnlLig, _AnlCol, _AnlReg)
-            '    If _LngChP > 0 Then
-            '        Contradiction(_tChaînePaire, _LngChP, _NbrSmp, _Tsmp, _k, _Généré)
-            '        If _Généré Then
-            '            Exit Sub
-            '        End If
-            '    End If
-            'End If
+            If _NbLiens > 2 Then
+                CréeChaîne(_Candidats, _k, _tLiens, _NbLiens, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _AnlLig, _AnlCol, _AnlReg, _TypeChaîne)
+                If _LngChI > 0 Then
+                    DoubleExclusion(_Candidats, _tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _k, _TypeChaîne, _Généré)
+                    If _Généré Then
+                        Exit Sub
+                    End If
+                End If
+            End If
         Next
 
     End Sub
@@ -155,10 +154,10 @@
     Sub DoubleExclusion(ByVal _Candidats As Integer(,,),
                         ByVal _tChaîneImpaire() As Sudoku.strChaîne,
                         ByVal _LngChI As Integer,
-                        ByVal _NbChi As Integer,
                         ByRef _NbrSmp As Integer,
                         ByRef _Tsmp() As Sudoku.StrSmp,
                         ByVal _k As Integer,
+                        ByVal _TypeChaîne As Boolean,
                         ByRef _Généré As Boolean)
 
         Dim _i As Integer
@@ -201,7 +200,7 @@
                 _Smp.CE.k(_Smp.ne) = _k
                 _Smp.CE.v(_Smp.ne) = _k + 1
                 _Smp.ne += 1
-                GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k)
+                GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k, _TypeChaîne)
                 Exit Sub
             End If
             If _Candidats(_ip, _j0, _k) = _k + 1 Then
@@ -210,7 +209,7 @@
                 _Smp.CE.k(_Smp.ne) = _k
                 _Smp.CE.v(_Smp.ne) = _k + 1
                 _Smp.ne += 1
-                GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k)
+                GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k, _TypeChaîne)
                 Exit Sub
             End If
         End If
@@ -242,7 +241,7 @@
                             _Smp.CE.v(_Smp.ne) = _k + 1
                             _Smp.ne += 1
                         End If
-                        GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k)
+                        GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k, _TypeChaîne)
                         Exit Sub
                     End If
                 End If
@@ -269,7 +268,7 @@
                             _Smp.CE.v(_Smp.ne) = _k + 1
                             _Smp.ne += 1
                         End If
-                        GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k)
+                        GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k, _TypeChaîne)
                         Exit Sub
                     End If
                 End If
@@ -300,7 +299,7 @@
                             _Smp.CE.v(_Smp.ne) = _k + 1
                             _Smp.ne += 1
                         End If
-                        GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k)
+                        GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k, _TypeChaîne)
                         Exit Sub
                     End If
                 End If
@@ -327,7 +326,7 @@
                             _Smp.CE.v(_Smp.ne) = _k + 1
                             _Smp.ne += 1
                         End If
-                        GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k)
+                        GénéDoubleExclusion(_tChaîneImpaire, _LngChI, _NbrSmp, _Tsmp, _Smp, _c, _k, _TypeChaîne)
                         Exit Sub
                     End If
                 End If
@@ -346,11 +345,19 @@
                             ByRef _Tsmp() As Sudoku.StrSmp,
                             ByVal _Smp As Sudoku.StrSmp,
                             ByVal _c As Integer,
-                            ByVal _k As Integer)
+                            ByVal _k As Integer,
+                            ByVal _TypeChaîne As Boolean)
 
         Dim _m As String
+        Dim _adverbe As String
 
-        _m = "Double Exclusion [" & _k + 1 & "] grâce à la chaîne fortement liée : " & vbCrLf &
+        If _TypeChaîne Then
+            _adverbe = "fortement"
+        Else
+            _adverbe = "faiblement"
+        End If
+
+        _m = "Double Exclusion [" & _k + 1 & "] grâce à la chaîne " & _adverbe & " liée : " & vbCrLf &
                             "L" & _tChaîneImpaire(0).i1 + 1 & "C" & _tChaîneImpaire(0).j1 + 1
         For _l = 0 To _LngChI
             _m = _m & "-L" & _tChaîneImpaire(_l).i2 + 1 & "C" & _tChaîneImpaire(_l).j2 + 1
@@ -387,37 +394,38 @@
     '                                                    pour éviter d'exporer tout l'arbre 
     '============================================================================================================================================================
 
-    Sub CréeChaîneForte(ByVal _Candidats(,,) As Integer,
-                        ByVal _k As Integer,
-                        ByRef _tLiens() As Sudoku.strLien,
-                        ByRef _NbLiens As Integer,
-                        ByRef _tChaînePaire() As Sudoku.strChaîne,
-                        ByRef _LngChP As Integer,
-                        ByRef _tChaîneImpaire() As Sudoku.strChaîne,
-                        ByRef _LngChI As Integer,
-                        ByVal _AnlLig(,) As Sudoku.StrAnalyse,
-                        ByVal _AnlCol(,) As Sudoku.StrAnalyse,
-                        ByVal _AnlReg(,) As Sudoku.StrAnalyse)
+    Sub CréeChaîne(ByVal _Candidats(,,) As Integer,
+                   ByVal _k As Integer,
+                   ByRef _tLiens() As Sudoku.strLien,
+                   ByRef _NbLiens As Integer,
+                   ByRef _tChaînePaire() As Sudoku.strChaîne,
+                   ByRef _LngChP As Integer,
+                   ByRef _tChaîneImpaire() As Sudoku.strChaîne,
+                   ByRef _LngChI As Integer,
+                   ByVal _AnlLig(,) As Sudoku.StrAnalyse,
+                   ByVal _AnlCol(,) As Sudoku.StrAnalyse,
+                   ByVal _AnlReg(,) As Sudoku.StrAnalyse,
+                   ByVal _TypeChaîne As Boolean)
 
         'Initialisation des variables
-        Dim TC() As Integer 'représente le lien - tableau statique, contient les valeurs de 1 à _NbLiens + 1 (_NbLiens est en base 0)
+        Dim _TC() As Integer 'représente le lien - tableau statique, contient les valeurs de 1 à _NbLiens + 1 (_NbLiens est en base 0)
         ' remplacé par la structure du lien au moment de constituer la chaîne
 
-        Dim c(,) As Boolean ' tableau des liens (TC) consommés ou disponibles par niveau de récursivité (vertical) et rang dans la chaîne (horizontal)
+        Dim _c(,) As Boolean ' tableau des liens (TC) consommés ou disponibles par niveau de récursivité (vertical) et rang dans la chaîne (horizontal)
         ' chaque niveau est une réplication du niveau précédent auquel on ajoute l'indice traité à ce niveau
 
-        Dim AF() As Integer 'Arbre Factorielle - Combinaison constituée des id (numéro d'ordre) des liens - vision verticale de l'arbre factoriel
+        Dim _AF() As Integer 'Arbre Factorielle - Combinaison constituée des id (numéro d'ordre) des liens - vision verticale de l'arbre factoriel
 
-        Dim n As Integer = _NbLiens
+        Dim _n As Integer = _NbLiens
         Dim _p As Integer ' p indique le niveau de la pile de récursivité - soit la longueur de la chaîne (à chaque niveau on cherche un élément de la chaine) 
 
 
         Dim _tChaîne(Sudoku.MaxChn) As Sudoku.strChaîne
         Dim nbIter As Integer = 0
 
-        ReDim TC(_NbLiens)
-        ReDim AF(_NbLiens)
-        ReDim c(_NbLiens, _NbLiens)
+        ReDim _TC(_NbLiens)
+        ReDim _AF(_NbLiens)
+        ReDim _c(_NbLiens, _NbLiens)
 
         _LngChP = 0
         _LngChI = 0
@@ -450,17 +458,17 @@
         Next
 
         ' préparation du parcours de l'arborescence
-        For p = 0 To n
-            For r = 0 To n
-                c(p, r) = False
+        For _p = 0 To _n
+            For r = 0 To _n
+                _c(_p, r) = False
             Next
-            TC(p) = p
-            AF(p) = 99 'représente une valeur nulle
+            _TC(_p) = _p
+            _AF(_p) = 99 'représente une valeur nulle
         Next
 
         _p = 0 ' racine de l'arborescence
 
-        Enchaînement(_Candidats, _k, _p, n, c, AF, TC, nbIter, _tChaîne, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _tLiens) 'Niveau p = 0 de récursivité
+        Enchaînement(_Candidats, _k, _p, _n, _c, _AF, _TC, nbIter, _tChaîne, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _tLiens, _TypeChaîne) 'Niveau _p = 0 de récursivité
 
 
     End Sub
@@ -473,22 +481,20 @@
     Sub Enchaînement(ByVal _Candidats As Integer(,,),
                      ByVal _k As Integer,
                      ByRef _p As Integer,
-                     ByRef n As Integer,
-                     ByRef c(,) As Boolean,
-                     ByRef AF() As Integer,
-                     ByVal TC() As Integer,
+                     ByRef _n As Integer,
+                     ByRef _c(,) As Boolean,
+                     ByRef _AF() As Integer,
+                     ByVal _TC() As Integer,
                      ByRef nbiter As Integer,
                      ByRef _tChaîne() As Sudoku.strChaîne,
                      ByRef _tChaînePaire() As Sudoku.strChaîne,
                      ByRef _LngChP As Integer,
                      ByRef _tChaîneImpaire() As Sudoku.strChaîne,
                      ByRef _LngChI As Integer,
-                     ByVal _tLiens() As Sudoku.strLien)
+                     ByVal _tLiens() As Sudoku.strLien,
+                     ByVal _TypeChaîne As Boolean)
 
         Dim _select As Boolean
-        Dim _i As Integer
-        Dim _j As Integer
-        Dim _c As Integer
         Dim _i0 As Integer
         Dim _ip As Integer
         Dim _j0 As Integer
@@ -500,14 +506,15 @@
         Dim _csgj0 As Integer
         Dim _csgjp As Integer
         Dim _Intersection As Boolean = False
-        'Dim _PAi1 As Integer
-        'Dim _PAj1 As Integer
-        'Dim _PAi2 As Integer
-        'Dim _PAj2 As Integer
-        'Dim _PJi1 As Integer
-        'Dim _PJj1 As Integer
-        'Dim _PJi2 As Integer
-        'Dim _PJj2 As Integer
+        Dim _PAi1 As Integer
+        Dim _PAj1 As Integer
+        Dim _PAi2 As Integer
+        Dim _PAj2 As Integer
+        Dim _PJi1 As Integer
+        Dim _PJj1 As Integer
+        Dim _PJi2 As Integer
+        Dim _PJj2 As Integer
+        Dim _Pjf As String
         Dim _C0i1 As Integer
         Dim _C0j1 As Integer
         Dim _C0r1 As Integer
@@ -516,46 +523,50 @@
         Dim _CIr2 As Integer
 
         If _p > 0 Then
-            For r = 0 To n 'réplication des liens utilisés sur le niveau inférieur
-                c(_p, r) = c(_p - 1, r)
+            For _r = 0 To _n 'réplication des liens utilisés sur le niveau inférieur
+                _c(_p, _r) = _c(_p - 1, _r)
             Next
         End If
 
-        For r = 0 To n
-            If c(_p, r) = False Then ' on utilise un lien disponible
+        For _r = 0 To _n
+            If _c(_p, _r) = False Then ' on utilise un lien disponible
                 _select = True
-                AF(_p) = TC(r)
-                'If i > 0 Then
-                '    _PAi1 = _tLiens(A(i - 1)).i1
-                '    _PAj1 = _tLiens(A(i - 1)).j1
-                '    _PAi2 = _tLiens(A(i - 1)).i2
-                '    _PAj2 = _tLiens(A(i - 1)).j2
-                '    _PJi1 = _tLiens(P(j)).i1
-                '    _PJj1 = _tLiens(P(j)).j1
-                '    _PJi2 = _tLiens(P(j)).i2
-                '    _PJj2 = _tLiens(P(j)).j2
-                'End If
+                _AF(_p) = _TC(_r)
+                If _p > 0 Then
+                    _PAi1 = _tLiens(_AF(_p - 1)).i1
+                    _PAj1 = _tLiens(_AF(_p - 1)).j1
+                    _PAi2 = _tLiens(_AF(_p - 1)).i2
+                    _PAj2 = _tLiens(_AF(_p - 1)).j2
+                    _PJi1 = _tLiens(_TC(_r)).i1
+                    _PJj1 = _tLiens(_TC(_r)).j1
+                    _PJi2 = _tLiens(_TC(_r)).i2
+                    _PJj2 = _tLiens(_TC(_r)).j2
+                    _Pjf = _tLiens(_TC(_r)).f
+
+                End If
 
                 If _p = 1 Then
                     ' Amorçage de la chaîne - on utilise les liens identifiés par les numéros d'ordre dans AF qui représentent la combinaison courante
-                    If (_tLiens(AF(_p - 1)).i2 = _tLiens(TC(r)).i1) And (_tLiens(AF(_p - 1)).j2 = _tLiens(TC(r)).j1) _
-                        And (_tLiens(AF(_p - 1)).i1 <> _tLiens(TC(r)).i2) And (_tLiens(AF(_p - 1)).j1 <> _tLiens(TC(r)).j2) Then   'pour ne pas enchaîner sur le lien symétrique
-                        _tChaîne(0).nat = _tLiens(AF(1)).nat
-                        _tChaîne(0).f = _tLiens(AF(0)).f
-                        _tChaîne(0).i1 = _tLiens(AF(0)).i1
-                        _tChaîne(0).j1 = _tLiens(AF(0)).j1
-                        _tChaîne(0).r1 = _tLiens(AF(0)).r1
-                        _tChaîne(0).i2 = _tLiens(AF(0)).i2
-                        _tChaîne(0).j2 = _tLiens(AF(0)).j2
-                        _tChaîne(0).r2 = _tLiens(AF(0)).r2
-                        _tChaîne(_p).nat = _tLiens(TC(r)).nat
-                        _tChaîne(_p).f = _tLiens(TC(r)).f
-                        _tChaîne(_p).i1 = _tLiens(TC(r)).i1
-                        _tChaîne(_p).j1 = _tLiens(TC(r)).j1
-                        _tChaîne(_p).r1 = _tLiens(TC(r)).r1
-                        _tChaîne(_p).i2 = _tLiens(TC(r)).i2
-                        _tChaîne(_p).j2 = _tLiens(TC(r)).j2
-                        _tChaîne(_p).r2 = _tLiens(TC(r)).r2
+                    If (_tLiens(_AF(_p - 1)).i2 = _tLiens(_TC(_r)).i1) And (_tLiens(_AF(_p - 1)).j2 = _tLiens(_TC(_r)).j1) _
+                        And (_tLiens(_AF(_p - 1)).i1 <> _tLiens(_TC(_r)).i2) And (_tLiens(_AF(_p - 1)).j1 <> _tLiens(_TC(_r)).j2) _ 'pour ne pas enchaîner sur le lien symétrique
+                        And (_tLiens(_TC(_r)).f = "F" Or ((Not _TypeChaîne) And _tLiens(_TC(_r)).f = "f")) _     ' Chaîne forte ou chaîne faible impaire 
+                        And (_tLiens(_AF(_p - 1)).f = "F") Then   ' Chaîne Forte au niveau 0 
+                        _tChaîne(0).nat = _tLiens(_AF(1)).nat
+                        _tChaîne(0).f = _tLiens(_AF(0)).f
+                        _tChaîne(0).i1 = _tLiens(_AF(0)).i1
+                        _tChaîne(0).j1 = _tLiens(_AF(0)).j1
+                        _tChaîne(0).r1 = _tLiens(_AF(0)).r1
+                        _tChaîne(0).i2 = _tLiens(_AF(0)).i2
+                        _tChaîne(0).j2 = _tLiens(_AF(0)).j2
+                        _tChaîne(0).r2 = _tLiens(_AF(0)).r2
+                        _tChaîne(_p).nat = _tLiens(_TC(_r)).nat
+                        _tChaîne(_p).f = _tLiens(_TC(_r)).f
+                        _tChaîne(_p).i1 = _tLiens(_TC(_r)).i1
+                        _tChaîne(_p).j1 = _tLiens(_TC(_r)).j1
+                        _tChaîne(_p).r1 = _tLiens(_TC(_r)).r1
+                        _tChaîne(_p).i2 = _tLiens(_TC(_r)).i2
+                        _tChaîne(_p).j2 = _tLiens(_TC(_r)).j2
+                        _tChaîne(_p).r2 = _tLiens(_TC(_r)).r2
                     Else
                         _select = False
                     End If
@@ -563,22 +574,23 @@
 
                 If _p > 1 Then
                     ' Suite de la chaîne
-                    If (_tLiens(AF(_p - 1)).i2 = _tLiens(TC(r)).i1) And (_tLiens(AF(_p - 1)).j2 = _tLiens(TC(r)).j1) Then
+                    If (_tLiens(_AF(_p - 1)).i2 = _tLiens(_TC(_r)).i1) And (_tLiens(_AF(_p - 1)).j2 = _tLiens(_TC(_r)).j1) _
+                        And ((_tLiens(_TC(_r)).f = "F") Or (_p Mod 2 = 1 And (Not _TypeChaîne) And _tLiens(_TC(_r)).f = "f")) Then   ' Chaîne forte ou chaîne faible impaire
                         For b = 0 To _p - 1
-                            If (_tLiens(AF(b)).i1 = _tLiens(TC(r)).i2) And (_tLiens(AF(b)).j1 = _tLiens(TC(r)).j2) Then
+                            If (_tLiens(_AF(b)).i1 = _tLiens(_TC(_r)).i2) And (_tLiens(_AF(b)).j1 = _tLiens(_TC(_r)).j2) Then
                                 ' pour ne pas générer de boucle
                                 _select = False
                             End If
                         Next
                         If _select Then
-                            _tChaîne(_p).nat = _tLiens(TC(r)).nat
-                            _tChaîne(_p).f = _tLiens(TC(r)).f
-                            _tChaîne(_p).i1 = _tLiens(TC(r)).i1
-                            _tChaîne(_p).j1 = _tLiens(TC(r)).j1
-                            _tChaîne(_p).r1 = _tLiens(TC(r)).r1
-                            _tChaîne(_p).i2 = _tLiens(TC(r)).i2
-                            _tChaîne(_p).j2 = _tLiens(TC(r)).j2
-                            _tChaîne(_p).r2 = _tLiens(TC(r)).r2
+                            _tChaîne(_p).nat = _tLiens(_TC(_r)).nat
+                            _tChaîne(_p).f = _tLiens(_TC(_r)).f
+                            _tChaîne(_p).i1 = _tLiens(_TC(_r)).i1
+                            _tChaîne(_p).j1 = _tLiens(_TC(_r)).j1
+                            _tChaîne(_p).r1 = _tLiens(_TC(_r)).r1
+                            _tChaîne(_p).i2 = _tLiens(_TC(_r)).i2
+                            _tChaîne(_p).j2 = _tLiens(_TC(_r)).j2
+                            _tChaîne(_p).r2 = _tLiens(_TC(_r)).r2
                         End If
                     Else
                         _select = False
@@ -587,12 +599,12 @@
 
                 If _select = True Then
                     ' On descend d'un niveau
-                    c(_p, r) = True
-                    If _p < n Then
+                    _c(_p, _r) = True
+                    If _p < _n Then
                         _p += 1
                         'Niveau p de récursivité
-                        Enchaînement(_Candidats, _k, _p, n, c, AF, TC, nbiter, _tChaîne, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _tLiens)
-                        c(_p, r) = False
+                        Enchaînement(_Candidats, _k, _p, _n, _c, _AF, _TC, nbiter, _tChaîne, _tChaînePaire, _LngChP, _tChaîneImpaire, _LngChI, _tLiens, _TypeChaîne)
+                        _c(_p, _r) = False
                     End If
                 End If
 
@@ -600,10 +612,10 @@
             nbiter += 1 ' pour connaître la charge de travail
         Next
 
-        For j = 0 To n
-            c(_p, j) = False ' on nettoie le tableau au niveau i avant de remonter d'un niveau
+        For j = 0 To _n
+            _c(_p, j) = False ' on nettoie le tableau au niveau i avant de remonter d'un niveau
         Next
-        AF(_p) = 99
+        _AF(_p) = 99
         _p -= 1 ' on remonte d'un niveau
 
         If _p > 1 Then ' on enregistre une chaîne qui a atteint une longueur de 3 ou plus 
@@ -739,6 +751,7 @@
 
         For _p = 0 To Sudoku.MaxLiens
             _tLiens(_p).nat = " "
+            _tLiens(_p).f = " "
             _tLiens(_p).i1 = 0
             _tLiens(_p).j1 = 0
             _tLiens(_p).i1 = 0
@@ -857,6 +870,7 @@
         _NbLiens = _p - 1
 
     End Sub
+
     '============================================================================================================================================================
     ' Techniques d'élimination de candidats
     ' Collecte des liens faibles de k comme éléments de base d'une chaïne ils sont ajoutés aux liens forts

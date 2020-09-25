@@ -4,7 +4,8 @@ Module Problème
                  ByRef NbVal As Integer,
                  ByRef Grille(,) As Integer,
                  ByRef Candidats(,,) As Integer,
-                 ByRef NbrLoop As Integer)
+                 ByRef NbLoop As Integer,
+                 ByRef NbAppel As Integer)
 
         Dim i As Integer
         Dim j As Integer
@@ -62,7 +63,7 @@ Module Problème
                 Grille(i, j) = 0
 
                 Array.Copy(Grille, GrilleFB, 81)
-                ForceBrute.ForceBrute(GrilleFB, NbSol, NbrLoop)
+                ForceBrute.ForceBrute(GrilleFB, NbSol, NbLoop, NbAppel)
 
                 If NbSol = 0 Then
                     wMsgBox = "Pas de Solution !"

@@ -144,6 +144,7 @@ Partial Class Sudoku
         Me.BTPossibilités = New System.Windows.Forms.Button()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Boucles = New System.Windows.Forms.Label()
+        Me.LBL_Appels = New System.Windows.Forms.Label()
         Me.MenuStrip1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -1325,7 +1326,7 @@ Partial Class Sudoku
         '
         'BTStepByStep
         '
-        Me.BTStepByStep.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.BTStepByStep.BackColor = System.Drawing.Color.Bisque
         Me.BTStepByStep.ForeColor = System.Drawing.Color.Black
         Me.BTStepByStep.Location = New System.Drawing.Point(590, 114)
         Me.BTStepByStep.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
@@ -1348,7 +1349,7 @@ Partial Class Sudoku
         '
         Me.nomFichierOuvert.AutoSize = True
         Me.nomFichierOuvert.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.nomFichierOuvert.Location = New System.Drawing.Point(350, 803)
+        Me.nomFichierOuvert.Location = New System.Drawing.Point(345, 803)
         Me.nomFichierOuvert.Name = "nomFichierOuvert"
         Me.nomFichierOuvert.Size = New System.Drawing.Size(77, 25)
         Me.nomFichierOuvert.TabIndex = 1097
@@ -1356,7 +1357,7 @@ Partial Class Sudoku
         '
         'BTForceBrute
         '
-        Me.BTForceBrute.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.BTForceBrute.BackColor = System.Drawing.Color.Bisque
         Me.BTForceBrute.ForeColor = System.Drawing.Color.Black
         Me.BTForceBrute.Location = New System.Drawing.Point(770, 114)
         Me.BTForceBrute.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
@@ -1368,7 +1369,7 @@ Partial Class Sudoku
         '
         'BTPossibilités
         '
-        Me.BTPossibilités.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.BTPossibilités.BackColor = System.Drawing.Color.Bisque
         Me.BTPossibilités.ForeColor = System.Drawing.Color.Black
         Me.BTPossibilités.Location = New System.Drawing.Point(50, 190)
         Me.BTPossibilités.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
@@ -1393,8 +1394,17 @@ Partial Class Sudoku
         Me.Boucles.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Boucles.Location = New System.Drawing.Point(50, 803)
         Me.Boucles.Name = "Boucles"
-        Me.Boucles.Size = New System.Drawing.Size(0, 25)
+        Me.Boucles.Size = New System.Drawing.Size(27, 25)
         Me.Boucles.TabIndex = 1101
+        Me.Boucles.Text = "..."
+        '
+        'LBL_Appels
+        '
+        Me.LBL_Appels.AutoSize = True
+        Me.LBL_Appels.Location = New System.Drawing.Point(52, 834)
+        Me.LBL_Appels.Name = "LBL_Appels"
+        Me.LBL_Appels.Size = New System.Drawing.Size(0, 18)
+        Me.LBL_Appels.TabIndex = 1102
         '
         'Sudoku
         '
@@ -1402,6 +1412,7 @@ Partial Class Sudoku
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(1184, 861)
+        Me.Controls.Add(Me.LBL_Appels)
         Me.Controls.Add(Me.Boucles)
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.BTPossibilités)
@@ -1641,4 +1652,5 @@ Partial Class Sudoku
     Friend WithEvents BTTerminé As ToolStripButton
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents Boucles As Label
+    Friend WithEvents LBL_Appels As Label
 End Class

@@ -126,7 +126,8 @@ Public Class Sudoku
     Dim ErreurGrille(8, 8) As String
     Dim SegmentCandidats(8, 8) As String
     Dim NbSol As Integer
-    Dim NbrLoop As Integer
+    Dim NbLoop As Integer
+    Dim NbAppel As Integer
 
     Public pileGrilles(81, 8, 8) As Integer ' La grille de Sudoku à chaque tour
 
@@ -143,6 +144,8 @@ Public Class Sudoku
 
     Public ChiffreOffColor As Color = Color.LightSkyBlue
     Public ChiffreOnColor As Color = Color.AliceBlue
+    Public ButtonOffColor As Color = Color.Bisque
+    Public ButtonOnColor As Color = Color.LightYellow
     Public petiteFont As Font = New Font("Courier New", 9, FontStyle.Regular, GraphicsUnit.Point)
     Public grandeFont As Font = New Font("Microsoft Sans Serif", 18, FontStyle.Regular, GraphicsUnit.Point)
     Dim colorIni(8, 8) As Color
@@ -151,8 +154,10 @@ Public Class Sudoku
     Dim CaseCandidats As String
     Dim TextSudoku As String = "                                                                                 "
 
+    Public ProfondeurPile As Integer = 49  ' ProfondeurPile + GrilleAléatoire = 80
+    Public GrilleAléatoire As Integer = 32
     Public MaxChn As Integer = 19
-    Public MaxLiens As Integer = 39
+    Public MaxLiens As Integer = 59
     Public Generator As System.Random = New System.Random()
 
 
@@ -169,6 +174,9 @@ Public Class Sudoku
         BTForceBrute.Enabled = False
         BTStepByStep.Enabled = False
         BTPossibilités.Enabled = False
+        BTStepByStep.BackColor = ButtonOffColor
+        BTForceBrute.BackColor = ButtonOffColor
+        BTPossibilités.BackColor = ButtonOffColor
         BTEnregistrer.Enabled = False
         BTRecommencer.Enabled = False
         BTPrécédent.Enabled = False
@@ -395,7 +403,8 @@ Public Class Sudoku
         Next
 
         LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
-        Boucles.Text = "Force brute : " & NbrLoop.ToString
+        Boucles.Text = "Force brute : " & NbLoop.ToString
+        LBL_Appels.Text = "Tentatives : " & NbAppel.ToString
 
     End Sub
 
@@ -563,10 +572,12 @@ Public Class Sudoku
     Sub FonctionGénérer()
 
         mode = "Générer"
-        NbrLoop = 0
-        Générateur.Générateur(Grille, NbrLoop)
+        NbAppel = 0
+        NbVal = 0
+        Générateur.Générateur(Grille, NbVal, NbLoop, NbAppel)
         '    Problème.Problème(typeGrille, NbVal, Grille, Candidats, NbrLoop)
-
+        LBL_nbVal.Text = "Cases remplies : " & NbVal.ToString
+        Boucles.Text = "Force brute : " & NbLoop.ToString
         Affichage()
         FonctionJouer()
 
@@ -633,10 +644,20 @@ Public Class Sudoku
 
         CalculCandidats(Grille, Candidats)
         ControleSaisie(Erreur, ErreurGrille, Grille, Candidats) 'Vérifie la validité de la grille
-        LBL_Conseil.Text = ""
-        Affichage()
-        FonctionJouer()
-
+        NbAppel = 0 = 0
+        Array.Copy(Grille, GrilleFinale, 81)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbLoop, NbAppel)
+        If NbSol = 1 Then
+            LBL_Conseil.Text = ""
+            Affichage()
+            FonctionJouer()
+        Else
+            If NbSol = 0 Then
+                MsgBox("Pas de solution")
+            Else
+                MsgBox("Cette grille admet plusieurs solutions")
+            End If
+        End If
 
     End Sub
 
@@ -652,8 +673,9 @@ Public Class Sudoku
 
     Sub FonctionSauvegarderFichier()
 
+        NbAppel = 0
         Array.Copy(Grille, GrilleFinale, 81)
-        ForceBrute.ForceBrute(GrilleFinale, NbSol, nbrLoop)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbLoop, NbAppel)
 
         If NbSol = 1 Then
             ' Grille valide
@@ -695,7 +717,18 @@ Public Class Sudoku
 
     Private Sub JouerToolStripButton1_Click(sender As Object, e As EventArgs) Handles JouerToolStripButton1.Click
 
-        FonctionJouer()
+        NbAppel = 0
+        Array.Copy(Grille, GrilleFinale, 81)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbLoop, NbAppel)
+        If NbSol = 1 Then
+            FonctionJouer()
+        Else
+            If NbSol = 0 Then
+                MsgBox("Pas de solution")
+            Else
+                MsgBox("Cette grille admet plusieurs solutions")
+            End If
+        End If
 
     End Sub
 
@@ -713,39 +746,30 @@ Public Class Sudoku
         Array.Copy(Grille, GrilleInitiale, 81)
         NbValInitial = NbVal
 
-        NbrLoop = 0
-        Array.Copy(Grille, GrilleFinale, 81)
-        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbrLoop)
 
-        If NbSol = 1 Then
 
-            For i = 0 To 8
-                For j = 0 To 8
-                    If Grille(i, j) <> 0 Then
-                        With Me.BT(i, j)
-                            .Enabled = False
-                        End With
-                    End If
-                Next
+        For i = 0 To 8
+            For j = 0 To 8
+                If Grille(i, j) <> 0 Then
+                    With Me.BT(i, j)
+                        .Enabled = False
+                    End With
+                End If
             Next
-            BTForceBrute.Enabled = True
-            BTStepByStep.Enabled = True
-            BTPossibilités.Enabled = True
-            BTRecommencer.Enabled = True
-            BTEnregistrer.Enabled = True
-            BTPrécédent.Enabled = True
-            BTSuivant.Enabled = True
-            BTTerminé.Enabled = True
-            CalculCandidats(Grille, Candidats)
-            Affichage()
-        Else
-            If NbSol = 0 Then
-                MsgBox("Pas de solution")
-            Else
-                MsgBox("Cette grille admet plusieurs solutions")
-            End If
-        End If
-
+        Next
+        BTForceBrute.Enabled = True
+        BTStepByStep.Enabled = True
+        BTPossibilités.Enabled = True
+        BTStepByStep.BackColor = ButtonOnColor
+        BTForceBrute.BackColor = ButtonOnColor
+        BTPossibilités.BackColor = ButtonOnColor
+        BTRecommencer.Enabled = True
+        BTEnregistrer.Enabled = True
+        BTPrécédent.Enabled = True
+        BTSuivant.Enabled = True
+        BTTerminé.Enabled = True
+        CalculCandidats(Grille, Candidats)
+        Affichage()
 
 
     End Sub
@@ -760,8 +784,6 @@ Public Class Sudoku
         Msg = "Etes vous sûr de vouloir recommencer la partie ?"  ' Define message.
         Style = vbYesNo + vbQuestion + vbDefaultButton2    ' Define buttons.
         Title = ""    ' Define title.
-
-
         Response = MsgBox(Msg, Style, Title)
 
         If Response = vbNo Then    ' User chose No.
@@ -830,8 +852,9 @@ Public Class Sudoku
             Exit Sub
         End If
 
+        NbAppel = 0
         Array.Copy(Grille, GrilleFinale, 81)
-        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbrLoop)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbLoop, NbAppel)
 
         If NbSol = 1 Then
             Array.Copy(GrilleFinale, Grille, 81)
@@ -879,6 +902,12 @@ Public Class Sudoku
 
         If NbVal = 81 Then
             MsgBox("Bravo ! ")
+            BTForceBrute.Enabled = False
+            BTStepByStep.Enabled = False
+            BTPossibilités.Enabled = False
+            BTStepByStep.BackColor = ButtonOffColor
+            BTForceBrute.BackColor = ButtonOffColor
+            BTPossibilités.BackColor = ButtonOffColor
             Exit Sub
         End If
 
@@ -1063,8 +1092,9 @@ Public Class Sudoku
 
     Private Sub BTForceBrute_Click(sender As Object, e As EventArgs) Handles BTForceBrute.Click
 
+        NbAppel = 0
         Array.Copy(Grille, GrilleFinale, 81)
-        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbrLoop)
+        ForceBrute.ForceBrute(GrilleFinale, NbSol, NbLoop, NbAppel)
 
         If NbSol = 1 Then
             Array.Copy(GrilleFinale, Grille, 81)
@@ -1076,6 +1106,13 @@ Public Class Sudoku
                 MsgBox("Cette grille admet plusieurs solutions")
             End If
         End If
+        NbVal = 81
+        BTForceBrute.Enabled = False
+        BTStepByStep.Enabled = False
+        BTPossibilités.Enabled = False
+        BTStepByStep.BackColor = ButtonOffColor
+        BTForceBrute.BackColor = ButtonOffColor
+        BTPossibilités.BackColor = ButtonOffColor
 
     End Sub
 
@@ -2713,8 +2750,8 @@ Public Class Sudoku
 
     Private Sub CtlBT()
 
-        '   If valSaisie <> Nothing Then
-        If mode = "Saisie" Or mode = "Jouer" Then
+        If NbVal < 81 Then
+            If mode = "Saisie" Or mode = "Jouer" Then
                 For i = 0 To 8
                     For j = 0 To 8
                         BT(i, j).BackColor = colorIni(i, j)
@@ -2748,7 +2785,7 @@ Public Class Sudoku
                 End If
 
             End If
-        '  End If
+        End If
 
     End Sub
 
